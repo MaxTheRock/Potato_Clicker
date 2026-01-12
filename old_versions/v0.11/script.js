@@ -9,10 +9,6 @@ const modal = document.getElementById('modal');
 const openBtns = document.getElementById('openModalStats');
 const closeBtns = document.getElementById('closeModalStats');
 const modals = document.getElementById('modalstats');
-const openBtno = document.getElementById('openModalOptions');
-const closeBtno = document.getElementById('closeModalOptions');
-const openBtnv = document.getElementById('openModalOptionsv');
-const modalo = document.getElementById('modaloptions');
 const potatoesCountElement = document.getElementById('potBank');
 const allTimePotatoesElement = document.getElementById('totPot');
 const runStartTimeElement = document.getElementById('runStart');
@@ -29,7 +25,6 @@ const clickArea = document.getElementById('potato-button');
 const goldenPotato = document.getElementById('golden-potato-button');
 const goldenPotatoImage = document.getElementById('golden-potato');
 
-
 let rawPotatoes = 0;
 let potatoes = 0;
 let potatoesPerSecond = 0;
@@ -42,70 +37,7 @@ let potatoesPerClick = 1;
 let potatoClicks = 0;
 let handFarmedPotatoes = 0;
 let goldenPotatoClicks = 0;
-let runningVersion = "v0.21"
-let autoClickAmount = 0;
-
-
-let buildings = [
-  {
-    id: "cursor",
-    name: "Cursor",
-    price: 15,
-    owned: 0,
-    icon: "assets/cursor.png",
-    realIcon: "assets/cursor.png",
-    cps: 0.1,
-    unlocked: true,
-    sort: 1,
-    mystery: true
-  },
-  {
-    id: "farmer",
-    name: "Farmer",
-    price: 100,
-    owned: 0,
-    icon: "assets/farmer.png",
-    realIcon: "assets/farmer.png",
-    cps: 1,
-    unlocked: true,
-    sort: 2,
-    mystery: true
-  },
-  {
-    id: "tractor",
-    name: "Tractor",
-    price: 1100,
-    owned: 0,
-    icon: "assets/tractor.png",
-    realIcon: "assets/tractor.png",
-    cps: 8,
-    unlocked: true,
-    sort: 3,
-    mystery: true
-  },
-  {
-    id: "greenhouse",
-    name: "Greenhouse",
-    price: 12000,
-    owned: 0,
-    icon: "assets/greenhouse.png",
-    realIcon: "assets/greenhouse.png",
-    cps: 30,
-    unlocked: true,
-    sort: 4,
-    mystery: true
-  }
-];
-
-let mysteryCount = 0;
-buildings.forEach(b => {
-  if (b.mystery && mysteryCount < 2) {
-    b.unlocked = true;
-    mysteryCount++;
-  } else if (b.mystery) {
-    b.unlocked = false;
-  }
-});
+let runningVersion = "v0.11"
 
 var comment_types = {
   "none": ["Nobody is talking about your potatoes.", "Your potatoes are non-existent.", "You have no potatoes to discuss.", "Your potatoes are invisible to the world."],
@@ -160,49 +92,32 @@ async function updatePotatoComments() {
 
 function updatePotatoDisplay() {
   if (potatoes === 1) {
-    clickerCountDisplay.innerText = Math.floor(potatoes) + ' Potato';
-    titleElement.innerText = Math.floor(potatoes) + ' potato - Potato Clicker';
+    clickerCountDisplay.innerText = potatoes + ' Potato';
+    titleElement.innerText = potatoes + ' potato - Potato Clicker';
     return;
   } else {
-    clickerCountDisplay.innerText = Math.floor(potatoes) + ' Potatoes';
-    titleElement.innerText = Math.floor(potatoes) + ' potatoes - Potato Clicker';
+    clickerCountDisplay.innerText = potatoes + ' Potatoes';
+    titleElement.innerText = potatoes + ' potatoes - Potato Clicker';
   }
-  renderBuildings();
 }
 
 function rateCounter() {
-  /*
     if (potatoes !== potatoesLastSecond || potatoesPerSecond !== (potatoes - potatoesLastSecond)) {
       potatoesPerSecond = potatoes - potatoesLastSecond;
       potatoesLastSecond = potatoes;
-      if (potatoesPerSecond < 0) {
-        document.querySelector('.potato-amount-persecond').innerText = 'per second: 0';
-      } else {
-        document.querySelector('.potato-amount-persecond').innerText = 'per second: ' + (Math.floor(potatoesPerSecond * 10) / 10);
-      }
+      document.querySelector('.potato-amount-persecond').innerText = 'per second: ' + potatoesPerSecond;
     }
-  */
-    document.querySelector('.potato-amount-persecond').innerText = 'per second: ' + Math.floor(autoClickAmount * 10) / 10;
     setTimeout(rateCounter, 1000); // schedule the next call
 }
 
-function formatRunTime(seconds) {
-  const hrs = Math.floor(seconds / 3600);
-  const mins = Math.floor((seconds % 3600) / 60);
-  const secs = seconds % 60;
-
-  const pad = (n) => n.toString().padStart(2, '0');
-
-  return `${pad(hrs)}:${pad(mins)}:${pad(secs)}`;
-}
-
 function updateStatsDisplay() {
-  potatoesCountElement.innerText = 'Potatoes in bank: ' + Math.floor(potatoes * 10) / 10;
-  allTimePotatoesElement.innerText = 'Potatoes gathered (all time): ' + Math.floor(allTimePotatoes * 10) / 10;
-  const runDurationSeconds = Math.floor((Date.now() - runStartTime) / 1000);
-  runStartTimeElement.innerText = 'Run started: ' + formatRunTime(runDurationSeconds);
+  potatoesCountElement.innerText = 'Potatoes in bank: ' + potatoes;
+  allTimePotatoesElement.innerText = 'Potatoes gathered (all time): ' + allTimePotatoes;
+  let runDuration = Math.floor((Date.now() - runStartTime) / 1000);
+  runStartTimeElement.innerText = 'Run started: ' + runDuration + ' seconds ago';
   buildingsOwnedElement.innerText = 'Buildings owned: ' + buildingsOwned;
-  potatoesPerSecondElement.innerText = 'Potatoes per second: ' + Math.floor(autoClickAmount * 10) / 10;
+  potatoesPerSecondElement.innerText = 'Potatoes per second: ' + potatoesPerSecond;
+  rawPotatoesPerSecondElement.innerText = 'Raw potatoes per second: ' + rawPotatoesPerSecond;
   potatoesPerClickElement.innerText = 'Potatoes per click: ' + potatoesPerClick;
   potatoClicksElement.innerText = 'Potato clicks: ' + potatoClicks;
   handFarmedPotatoesElement.innerText = 'Hand-farmed potatoes: ' + handFarmedPotatoes;
@@ -210,28 +125,6 @@ function updateStatsDisplay() {
   runningVersionElement.innerText = 'Running version: ' + runningVersion;
   versionElement.innerText = runningVersion;
   setTimeout(updateStatsDisplay, 1000);
-}
-
-function enforceMysteryLimit() {
-  let activeMysteryCount = buildings.filter(b => b.mystery && b.unlocked).length;
-
-  let mysterySlots = 2 - activeMysteryCount;
-
-  buildings.forEach(b => {
-    if (!b.mystery) {
-      b.unlocked = true;
-      return;
-    }
-
-    if (b.unlocked && mysterySlots <= 0) {
-      return;
-    }
-
-    if (!b.unlocked && mysterySlots > 0) {
-      b.unlocked = true;
-      mysterySlots--;
-    }
-  });
 }
 
 clickerButton.addEventListener('click', function() {
@@ -243,6 +136,40 @@ clickerButton.addEventListener('click', function() {
   updatePotatoDisplay()
   
 });
+
+function updateStatsDisplay() {
+  potatoesCountElement.innerText = 'Potatoes in bank: ' + potatoes;
+  allTimePotatoesElement.innerText = 'Potatoes gathered (all time): ' + allTimePotatoes;
+  let runDuration = Math.floor((Date.now() - runStartTime) / 1000);
+  runStartTimeElement.innerText = 'Run started: ' + runDuration + ' seconds ago';
+  buildingsOwnedElement.innerText = 'Buildings owned: ' + buildingsOwned;
+  potatoesPerSecondElement.innerText = 'Potatoes per second: ' + potatoesPerSecond;
+  rawPotatoesPerSecondElement.innerText = 'Raw potatoes per second: ' + rawPotatoesPerSecond;
+  potatoesPerClickElement.innerText = 'Potatoes per click: ' + potatoesPerClick;
+  potatoClicksElement.innerText = 'Potato clicks: ' + potatoClicks;
+  handFarmedPotatoesElement.innerText = 'Hand-farmed potatoes: ' + handFarmedPotatoes;
+  goldenPotatoClicksElement.innerText = 'Golden potato clicks: ' + goldenPotatoClicks;
+  runningVersionElement.innerText = 'Running version: ' + runningVersion;
+  versionElement.innerText = runningVersion;
+  setTimeout(updateStatsDisplay, 1000);
+}
+
+function updateStatsDisplay() {
+  potatoesCountElement.innerText = 'Potatoes in bank: ' + potatoes;
+  allTimePotatoesElement.innerText = 'Potatoes gathered (all time): ' + allTimePotatoes;
+  let runDuration = Math.floor((Date.now() - runStartTime) / 1000);
+  runStartTimeElement.innerText = 'Run started: ' + runDuration + ' seconds ago';
+  buildingsOwnedElement.innerText = 'Buildings owned: ' + buildingsOwned;
+  potatoesPerSecondElement.innerText = 'Potatoes per second: ' + potatoesPerSecond;
+  rawPotatoesPerSecondElement.innerText = 'Raw potatoes per second: ' + rawPotatoesPerSecond;
+  potatoesPerClickElement.innerText = 'Potatoes per click: ' + potatoesPerClick;
+  potatoClicksElement.innerText = 'Potato clicks: ' + potatoClicks;
+  handFarmedPotatoesElement.innerText = 'Hand-farmed potatoes: ' + handFarmedPotatoes;
+  goldenPotatoClicksElement.innerText = 'Golden potato clicks: ' + goldenPotatoClicks;
+  runningVersionElement.innerText = 'Running version: ' + runningVersion;
+  versionElement.innerText = runningVersion;
+  setTimeout(updateStatsDisplay, 1000);
+}
 
 const GOLDEN_DELAY = 1000 * 1000;
 const GOLDEN_VISIBLE_TIME = 10 * 1000;
@@ -265,7 +192,7 @@ goldenPotatoImage.addEventListener('click', (e) => {
   goldenPotatoClicks++;
 
   updatePotatoDisplay();
-  renderBuildings();
+
   hideGoldenPotato();
   scheduleNextGoldenPotato();
 });
@@ -297,89 +224,6 @@ function scheduleNextGoldenPotato() {
   spawnTimeout = setTimeout(showGoldenPotato, GOLDEN_DELAY);
 }
 
-function renderBuildings() {
-  enforceMysteryLimit();
-  const container = document.getElementById("buildings");
-  container.innerHTML = "";
-
-  const visible = buildings.filter(b => b.unlocked);
-  visible.sort((a, b) => a.sort - b.sort);
-
-  visible.forEach(b => {
-    const buildingButton = document.createElement("button");
-    buildingButton.className = "building-container";
-
-    let displayName = b.name;
-    let displayPrice = b.price;
-    let displayIcon = b.realIcon;
-
-    if (b.mystery) {
-      if (potatoes < b.price) {
-        displayName = "???";
-        displayPrice = b.price;
-        displayIcon = "assets/mystery.png";
-      } else {
-        b.mystery = false;
-        displayName = b.name;
-        displayPrice = b.price;
-        displayIcon = b.realIcon;
-      }
-    }
-    buildingButton.innerHTML = `
-      <div class="building-icon">
-        <img src="${displayIcon}" class="building-image" draggable="false" width="60">
-      </div>
-
-      <div class="building-info">
-        <div class="building-name-price">
-          <h4 class="building-name">${displayName}</h4>
-          <p class="building-price">
-            <img src="assets/potato.png" class="potato-icon" draggable="false" width="15">
-            <span class="price-value">${displayPrice}</span>
-          </p>
-        </div>
-
-        <div class="building-amount">
-          <p class="amount-owned">${b.owned}</p>
-        </div>
-      </div>
-    `;
-
-    const priceElement = buildingButton.querySelector('.building-price');
-    if (!isNaN(b.price) && potatoes >= b.price) {
-      priceElement.style.color = 'lightgreen';
-    } else {
-      priceElement.style.color = 'rgb(209, 73, 73)';
-    }
-
-    buildingButton.addEventListener('click', () => {
-      if (!b.mystery && potatoes >= b.price) {
-        buildingsOwned++;
-        b.owned++;
-        potatoes -= b.price;
-        b.price = Math.ceil(b.price * 1.15);
-        buildingAutoClicker(b.cps);
-        renderBuildings();
-        updatePotatoDisplay();
-      }
-    });
-
-    container.appendChild(buildingButton);
-  });
-}
-
-function unlockBuilding(id) {
-  const b = buildings.find(b => b.id === id);
-  if (!b) return;
-
-  b.unlocked = true;
-  renderBuildings();
-}
-
-function buildingAutoClicker(amount) {
-  autoClickAmount=autoClickAmount+amount;
-}
-
 goldenPotatoImage.classList.add('hidden');
 scheduleNextGoldenPotato();
 
@@ -406,18 +250,6 @@ openBtns.addEventListener('click', () => {
 
 closeBtns.addEventListener('click', () => {
   modals.classList.remove("open");
-});
-
-openBtno.addEventListener('click', () => {
-  modalo.classList.add("open");
-});
-
-closeBtno.addEventListener('click', () => {
-  modalo.classList.remove("open");
-});
-
-openBtnv.addEventListener('click', () => {
-  modalo.classList.add("open");
 });
 
 clickArea.addEventListener('click', (e) => {
@@ -478,14 +310,9 @@ clickArea.addEventListener('click', (e) => {
   }, 16);
 });
 
-function autoClick() {
-  potatoes += autoClickAmount;
-  allTimePotatoes += autoClickAmount
-  updatePotatoDisplay();
-  setTimeout(autoClick, 1000);
-}
+
 
 rateCounter();
 updatePotatoComments();
 updateStatsDisplay()
-autoClick();
+randomGoldenPotatoPosition();
