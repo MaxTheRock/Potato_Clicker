@@ -4,7 +4,7 @@ html {
   padding: 0px;
   user-select: none;
   cursor: default;  
-  overflow: hidden;
+  overflow: auto;
   font-family: "Rubik", sans-serif;
 }
 
