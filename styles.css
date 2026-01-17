@@ -101,7 +101,6 @@ section {
   background-color: #2a3f52;
   flex-grow: 1;
   margin: 10px;
-  
 }
 
 @media (min-width: 701px) {
@@ -169,12 +168,13 @@ section {
 .game-section {
   width: 500px;
   margin: 5px;
+  overflow-y: auto;
 }
 
 .upgrade-section {
   width: 10px;
   margin: 5px;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 @media (min-width: 1040px) and (max-width: 1450px) {
@@ -986,6 +986,8 @@ h3 {
   background-color: #37495a;
   border: #283642 solid 2px;
   color: white;
+  overflow-x: hidden;
+  overflow-y: visible !important;
 }
 
 
