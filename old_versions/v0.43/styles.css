@@ -186,7 +186,6 @@ section {
 .upgrades-container {
   margin: 0px;
   padding: 0px;
-  overflow-x: auto;
 }
 
 .upgrade-button {
@@ -1182,12 +1181,4 @@ h3 {
 .tooltip .effect {
   color: #9fdc9f;
   margin-top: 2px;
-}
-
-.username, .password {
-  color: white;
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin: 10px;
 }
