@@ -36,6 +36,7 @@ const upgradeTotalElement = document.getElementById("upgrades-text");
 const openOptionsMobile = document.getElementById("openModalOptions_mobile");
 const openStatsMobile = document.getElementById("openModalStats_mobile");
 const openInfoMobile = document.getElementById("openModalInfo_mobile");
+const accountStatus = document.getElementById("accountStatus"); // <-- added
 
 let rawPotatoes = 0;
 let potatoes = 0;
@@ -752,19 +753,57 @@ function getSaveObject() {
 }
 
 // existing saveGame now uses helper
-function saveGame() {
+async function saveGame() {
   const save = getSaveObject();
+  // persist locally
   localStorage.setItem(SAVE_KEY_V2, JSON.stringify(save));
 
-  // best-effort remote save when logged in (non-blocking)
-  try {
-    if (window.authApi && window.authApi.getToken()) {
-      window.authApi
-        .save(save)
-        .catch((e) => console.warn("remote save failed", e));
+  // if logged in, attempt server sync and show status
+  if (window.authApi && window.authApi.getToken()) {
+    try {
+      await window.authApi.save(save);
+      if (accountStatus) {
+        accountStatus.textContent = `Last saved: ${new Date().toLocaleTimeString()}`;
+        setTimeout(() => {
+          if (accountStatus) accountStatus.textContent = " ";
+        }, 4000);
+      }
+      console.log("saveGame: remote sync successful");
+    } catch (e) {
+      console.warn("saveGame: remote sync failed", e);
+      if (accountStatus) {
+        accountStatus.textContent = "Save failed (network)";
+        setTimeout(() => {
+          if (accountStatus) accountStatus.textContent = " ";
+        }, 4000);
+      }
     }
-  } catch (e) {
-    console.warn("saveGame remote attempt failed", e);
+  } else {
+    // not logged in - indicate local save
+    if (accountStatus) {
+      accountStatus.textContent = "Saved locally";
+      setTimeout(() => {
+        if (accountStatus) accountStatus.textContent = " ";
+      }, 2000);
+    }
+  }
+}
+
+// Manual save wrapper for button (gives immediate feedback)
+function saveGameManual() {
+  const btn = document.getElementById("saveButton");
+  if (btn) {
+    btn.disabled = true;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = "<p>Saving...</p>";
+    Promise.resolve(saveGame())
+      .catch(() => {}) // saveGame already handles feedback
+      .finally(() => {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = originalText;
+        }
+      });
   }
 }
 
@@ -1416,7 +1455,7 @@ async function autoSave() {
     console.warn("Autosave: remote sync failed", e);
   }
 
-  setTimeout(autoSave, 180000); // autosave every 3 minutes
+  setTimeout(autoSave, 30000); // autosave every 30 seconds
 }
 
 function renderBuildingsRegular() {
