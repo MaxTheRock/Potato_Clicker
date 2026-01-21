@@ -1300,10 +1300,13 @@ h3 {
 }
 
 @media (max-width: 700px) {
-  .first, .second, .third, .other {
+  .first,
+  .second,
+  .third,
+  .other {
     font-size: 12px;
-  };
-};
+  }
+}
 
 .place {
   text-align: left;
