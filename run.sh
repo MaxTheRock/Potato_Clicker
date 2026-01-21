@@ -1,1 +1,4 @@
-npx live-server --port=8000 --open=./index.html --watch=.
+#!/usr/bin/env bash
+set -e
+npm install
+npm start

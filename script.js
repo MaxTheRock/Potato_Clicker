@@ -712,13 +712,14 @@ function enforceMysteryLimit() {
   });
 }
 
-function saveGame() {
+// NEW: build save object helper
+function getSaveObject() {
   const save = {
     version: runningVersion,
     stats: {
       potatoes,
       allTimePotatoes,
-      runStartedAt: Date.now() - runDurationSeconds * 1000,
+      runStartedAt: Date.now() - (runDurationSeconds || 0) * 1000,
       potatoesPerClick,
       autoClickAmount,
       potatoClicks,
@@ -747,10 +748,50 @@ function saveGame() {
     };
   });
 
+  return save;
+}
+
+// existing saveGame now uses helper
+function saveGame() {
+  const save = getSaveObject();
   localStorage.setItem(SAVE_KEY_V2, JSON.stringify(save));
+
+  // best-effort remote save when logged in (non-blocking)
+  try {
+    if (window.authApi && window.authApi.getToken()) {
+      window.authApi
+        .save(save)
+        .catch((e) => console.warn("remote save failed", e));
+    }
+  } catch (e) {
+    console.warn("saveGame remote attempt failed", e);
+  }
 }
 
 function loadGame() {
+  // If logged in, attempt to load from server first
+  if (window.authApi && window.authApi.getToken()) {
+    window.authApi
+      .load()
+      .then((remoteSave) => {
+        if (remoteSave && remoteSave.stats) {
+          loadV2(remoteSave);
+        } else {
+          // fallback to local
+          const save = localStorage.getItem(SAVE_KEY_V2);
+          if (save) loadV2(JSON.parse(save));
+          else migrateOldSave();
+        }
+      })
+      .catch(() => {
+        // remote load failed -> fallback to local
+        const save = localStorage.getItem(SAVE_KEY_V2);
+        if (save) loadV2(JSON.parse(save));
+        else migrateOldSave();
+      });
+    return;
+  }
+
   const save = localStorage.getItem(SAVE_KEY_V2);
   if (save) loadV2(JSON.parse(save));
   else migrateOldSave();
@@ -1359,9 +1400,23 @@ function autoClick() {
   setTimeout(autoClick, 50);
 }
 
-function autoSave() {
-  saveGame();
-  setTimeout(autoSave, 60000);
+// autosave: persist locally and sync to DB when signed in (awaited, logged)
+async function autoSave() {
+  const save = getSaveObject();
+  // persist locally
+  localStorage.setItem(SAVE_KEY_V2, JSON.stringify(save));
+
+  // if logged in, attempt server sync and log errors
+  try {
+    if (window.authApi && window.authApi.getToken()) {
+      await window.authApi.save(save);
+      console.log("Autosave: remote sync successful");
+    }
+  } catch (e) {
+    console.warn("Autosave: remote sync failed", e);
+  }
+
+  setTimeout(autoSave, 180000); // autosave every 3 minutes
 }
 
 function renderBuildingsRegular() {
