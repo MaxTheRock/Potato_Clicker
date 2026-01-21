@@ -1,3 +1,4 @@
+const validator = require("validator");
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
@@ -61,16 +62,30 @@ async function getUserById(id) {
 // Signup
 app.post("/api/auth/signup", async (req, res) => {
   try {
-    const { username, email, password } = req.body;
-    if (!username || !email || !password) return res.status(400).json({ error: "Missing fields" });
+    let { username, email, password } = req.body;
 
-    const exists = await pool.query("SELECT id FROM users WHERE email = $1 OR username = $2", [email, username]);
-    if (exists.rowCount) return res.status(409).json({ error: "User already exists" });
+    if (!username || !email || !password) {
+      return res.status(400).json({ error: "Missing fields" });
+    }
+
+    // Normalize & validate email
+    email = validator.normalizeEmail(email);
+    if (!validator.isEmail(email)) {
+      return res.status(400).json({ error: "Invalid email address" });
+    }
+
+    const exists = await pool.query(
+      "SELECT id FROM users WHERE email = $1 OR username = $2",
+      [email, username]
+    );
+    if (exists.rowCount) {
+      return res.status(409).json({ error: "User already exists" });
+    }
 
     const hash = await bcrypt.hash(password, 10);
     const insert = await pool.query(
       "INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING id, username, email",
-      [username, email, hash],
+      [username, email, hash]
     );
 
     const user = insert.rows[0];
