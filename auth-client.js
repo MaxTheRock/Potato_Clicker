@@ -1,5 +1,3 @@
-// Minimal frontend auth client + remote save/load bridge
-
 const AUTH_API_BASE = "/api/auth";
 const tokenKey = "pc_auth_token";
 
@@ -121,3 +119,4 @@ window.authApi = {
   getToken,
   updateAccountUI,
 };
+
