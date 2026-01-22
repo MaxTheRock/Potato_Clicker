@@ -50,12 +50,10 @@ let potatoesPerClick = 1;
 let potatoClicks = 0;
 let handFarmedPotatoes = 0;
 let goldenPotatoClicks = 0;
-let runningVersion = "v0.48";
+let runningVersion = "v0.47";
 let autoClickAmount = 0;
 let runDurationSeconds;
 let totalUpgrades = 0;
-let frenzy = false;
-let half_price_amount = 1;
 
 // ================== BUILDINGS ==================
 let buildings = [
@@ -654,7 +652,7 @@ function updatePotatoDisplay() {
 
 function rateCounter() {
   document.querySelector(".potato-amount-persecond").innerText =
-    "per second: " + (Math.floor(autoClickAmount * 10 * frenzy_amount) / 10).toLocaleString();
+    "per second: " + (Math.floor(autoClickAmount * 10) / 10).toLocaleString();
   setTimeout(rateCounter, 1000);
 }
 
@@ -939,41 +937,16 @@ const GOLDEN_VISIBLE_TIME = 10 * 1000;
 let spawnTimeout = null;
 let hideTimeout = null;
 
-let goldenPotatoVariants = ["normal", "frenzy", "half_price", "clicker"]
-
 goldenPotatoImage.addEventListener("click", (e) => {
-  let goldenPotatoVariant = goldenPotatoVariants[Math.floor(Math.random() * goldenPotatoVariants.length)]
   const text = document.createElement("div");
   text.className = "text";
-  let reward = 0;
-  if (goldenPotatoVariant == "normal") {
-    text.textContent = `Lucky, ${autoClickAmount * 1000} Potatoes!`;
-    reward = autoClickAmount * 1000;
-  } else if (goldenPotatoVariant == "frenzy") {
-    text.textContent = `3 Minute Frenzy!`;
-    frenzy = true;
-    setTimeout(() => {
-      frenzy = false;
-    }, 3 * 60 * 1000);
-  } else if (goldenPotatoVariant == "half_price") {
-    text.textContent = `3 Minute Half Price!`;
-    half_price_amount = 0.5;
-    setTimeout(() => {
-      half_price_amount = 1;
-    }, 3 * 60 * 1000);
-  } else if (goldenPotatoVariant == "clicker") {
-    text.textContent = `3 Minute boosted clicks per second!`;
-    potatoesPerClick*=3;
-    setTimeout(() => {
-      potatoesPerClick/=3;
-    }, 3 * 60 * 1000);
-  }
-  
+  text.textContent = `Lucky, ${potatoesPerClick * 5000} Potatoes!`;
   text.style.left = e.clientX + (Math.random() * 40 - 20) + "px";
   text.style.top = e.clientY - 20 + "px";
   document.body.appendChild(text);
   setTimeout(() => text.remove(), 1000);
 
+  const reward = potatoesPerClick * 5000;
   potatoes += reward;
   allTimePotatoes += reward;
   goldenPotatoClicks++;
@@ -1148,7 +1121,7 @@ function renderUpgrades() {
     upgradeButton.className = "upgrades-container";
 
     upgradeButton.innerHTML = `<img src="${u.icon}" draggable="false" class="upgrade-button" width="70" />`;
-    upgradeButton.style.opacity = potatoes >= (u.price * half_price_amount) ? 1 : 0.5;
+    upgradeButton.style.opacity = potatoes >= u.price ? 1 : 0.5;
 
     upgradeButton.addEventListener("mouseenter", () => {
       showTooltip(
@@ -1156,7 +1129,7 @@ function renderUpgrades() {
         <div class="title">${u.name}</div>
         <div>${u.description}</div>
         <div class="effect">${u.effect}</div>
-        <div class="price">Cost: ${formatNumber(u.price*half_price_amount)} potatoes</div>
+        <div class="price">Cost: ${formatNumber(u.price)} potatoes</div>
       `,
         upgradeButton,
       );
@@ -1164,8 +1137,8 @@ function renderUpgrades() {
     upgradeButton.addEventListener("mouseleave", hideTooltip);
 
     upgradeButton.addEventListener("click", () => {
-      if (potatoes < u.price*half_price_amount) return;
-      potatoes -= u.price*half_price_amount;
+      if (potatoes < u.price) return;
+      potatoes -= u.price;
       u.completed = true;
       u.unlocked = false;
       totalUpgrades++;
@@ -1224,13 +1197,13 @@ function renderBuildings() {
     buildingButton.className = "building-container";
 
     let displayName = b.name;
-    let displayPrice = b.price * half_price_amount;
+    let displayPrice = b.price;
     let displayIcon = b.realIcon;
 
     if (b.mystery) {
-      if (potatoes < b.price * half_price_amount) {
+      if (potatoes < b.price) {
         displayName = "???";
-        displayPrice = b.price * half_price_amount;
+        displayPrice = b.price;
         displayIcon = "assets/mystery.png";
       } else {
         b.mystery = false;
@@ -1262,7 +1235,7 @@ function renderBuildings() {
 
     const priceElement = buildingButton.querySelector(".building-price");
 
-    if (!isNaN(b.price * half_price_amount) && potatoes >= b.price * half_price_amount) {
+    if (!isNaN(b.price) && potatoes >= b.price) {
       priceElement.style.color = "lightgreen";
       buildingButton.style.backgroundColor = "#37495a";
       buildingButton.style.cursor = "pointer";
@@ -1294,10 +1267,10 @@ function renderBuildings() {
     buildingButton.addEventListener("mouseleave", hideTooltip);
 
     buildingButton.addEventListener("click", () => {
-      if (!b.mystery && potatoes >= b.price * half_price_amount) {
+      if (!b.mystery && potatoes >= b.price) {
         buildingsOwned++;
         b.owned++;
-        potatoes -= b.price * half_price_amount;
+        potatoes -= b.price;
         b.price = Math.ceil(b.price * 1.15);
 
         calculateAutoClick();
@@ -1452,12 +1425,8 @@ clickArea.addEventListener("click", (e) => {
   }, 16);
 });
 
-let frenzy_amount;
-
 function autoClick() {
-  if (frenzy === true) {frenzy_amount = 3;} else {frenzy_amount = 1;}
-  const increment = (autoClickAmount * frenzy_amount)/ 20;
-  console.log(increment);
+  const increment = autoClickAmount / 20;
   potatoes += increment;
   allTimePotatoes += increment;
 
