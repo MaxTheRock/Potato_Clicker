@@ -74,6 +74,7 @@ app.post("/api/auth/signup", async (req, res) => {
       return res.status(400).json({ error: "Invalid email address" });
     }
 
+    // Check if user already exists
     const exists = await pool.query(
       "SELECT id FROM users WHERE email = $1 OR username = $2",
       [email, username]
@@ -82,14 +83,20 @@ app.post("/api/auth/signup", async (req, res) => {
       return res.status(409).json({ error: "User already exists" });
     }
 
+    // Hash password
     const hash = await bcrypt.hash(password, 10);
+
+    // Insert new user
     const insert = await pool.query(
       "INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING id, username, email",
       [username, email, hash]
     );
 
+    // Create token
     const user = insert.rows[0];
     const token = createToken(user);
+
+    // Return token and user
     res.json({ token, user });
   } catch (e) {
     console.error(e);
@@ -100,25 +107,38 @@ app.post("/api/auth/signup", async (req, res) => {
 // Login
 app.post("/api/auth/login", async (req, res) => {
   try {
+    const fullUrl = getFullUrl(req);
     const { identifier, password } = req.body; // identifier = email or username
     if (!identifier || !password) return res.status(400).json({ error: "Missing fields" });
 
     const r = await pool.query("SELECT id, username, email, password_hash FROM users WHERE email = $1 OR username = $1", [identifier]);
-    if (!r.rowCount) return res.status(401).json({ error: "Invalid credentials" });
+    if (!r.rowCount) {
+      return res.status(404).json({ error: "User not found" });
+    }
 
     const user = r.rows[0];
     const ok = await bcrypt.compare(password, user.password_hash);
     if (!ok) return res.status(401).json({ error: "Invalid credentials" });
 
     const token = createToken(user);
-    res.json({ token, user: { id: user.id, username: user.username, email: user.email } });
+    res.json({ token, user: { id: user.id, username: user.username, email: user.email }, fullUrl });
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: "Server error" });
   }
 });
 
-// Me
+const getFullUrl = (req) => {
+  const originalUrl = req.headers["x-original-url"];
+  if (originalUrl) {
+    const url = new URL(originalUrl, `https://${req.headers.host}`);
+    return url.toString();
+  }
+  const url = new URL(req.url, `http://${req.headers.host}`);
+  return url.toString();
+};
+
+// GET /api/auth/me returns user object if authenticated
 app.get("/api/auth/me", async (req, res) => {
   try {
     const auth = req.headers.authorization;
@@ -126,11 +146,10 @@ app.get("/api/auth/me", async (req, res) => {
     const token = auth.replace("Bearer ", "");
     const payload = jwt.verify(token, JWT_SECRET);
     const user = await getUserById(payload.userId);
-    if (!user) return res.status(404).json({ error: "Not found" });
     res.json(user);
   } catch (e) {
     console.error(e);
-    res.status(401).json({ error: "Invalid token" });
+    res.status(500).json({ error: "Server error" });
   }
 });
 
@@ -186,3 +205,4 @@ const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
   console.log(`Auth server listening on ${PORT}`);
 });
+
