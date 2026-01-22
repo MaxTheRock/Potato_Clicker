@@ -107,6 +107,7 @@ app.post("/api/auth/signup", async (req, res) => {
 // Login
 app.post("/api/auth/login", async (req, res) => {
   try {
+    const fullUrl = getFullUrl(req);
     const { identifier, password } = req.body; // identifier = email or username
     if (!identifier || !password) return res.status(400).json({ error: "Missing fields" });
 
@@ -120,12 +121,22 @@ app.post("/api/auth/login", async (req, res) => {
     if (!ok) return res.status(401).json({ error: "Invalid credentials" });
 
     const token = createToken(user);
-    res.json({ token, user: { id: user.id, username: user.username, email: user.email } });
+    res.json({ token, user: { id: user.id, username: user.username, email: user.email }, fullUrl });
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: "Server error" });
   }
 });
+
+const getFullUrl = (req) => {
+  const originalUrl = req.headers["x-original-url"];
+  if (originalUrl) {
+    const url = new URL(originalUrl, `https://${req.headers.host}`);
+    return url.toString();
+  }
+  const url = new URL(req.url, `http://${req.headers.host}`);
+  return url.toString();
+};
 
 // GET /api/auth/me returns user object if authenticated
 app.get("/api/auth/me", async (req, res) => {
