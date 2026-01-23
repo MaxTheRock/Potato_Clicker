@@ -976,9 +976,10 @@ goldenPotatoImage.addEventListener("click", (e) => {
     }, 3 * 60 * 1000);
   } else if (goldenPotatoVariant == "clicker") {
     text.textContent = `3 Minute boosted clicks per second!`;
-    potatoesPerClick*=3;
+    let old_click = potatoesPerClick;
+    potatoesPerClick=potatoesPerSecond;
     setTimeout(() => {
-      potatoesPerClick/=3;
+      potatoesPerClick=old_click;
     }, 3 * 60 * 1000);
   }
   
