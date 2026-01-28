@@ -1346,6 +1346,9 @@ function unlockBuilding(id) {
   b.unlocked = true;
   renderBuildings();
   renderUpgrades();
+
+  // Call the save function from the server.js file
+  window.authApi.save();
 }
 
 function calculateAutoClick() {
