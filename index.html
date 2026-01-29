@@ -161,7 +161,9 @@
         </section>
 
         <section class="upgrade-section">
-          <h1 class="store-title">Store</h1>
+          <button class="store-title-button" onclick="storeCounter()">
+            <h1 class="store-title">Store</h1>
+          </button>
           <div class="divider"></div>
           <div class="upgrades-container" id="upgrades">
             <!-- Upgrades will be dynamically added here -->
@@ -324,6 +326,26 @@
             <div class="skins-container" id="skinsContainer">
               <!-- Skins will be dynamically added here -->
           </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal" id="modalcodes">
+        <div class="modal-inner">
+          <div class="modal-header">
+            <h2 class="info-h2">The Vault</h2>
+            <button class="closeButton" id="closeModalCodes">&times;</button>
+          </div>
+          <div class="general-stats">
+            <h2 class="general-text">Enter a unique code to unlock special rewards!</h2>
+            <input
+              id="codeInput"
+              class="code-input"
+              type="text"
+              placeholder="Enter your code here"
+            />
+            <button id="redeemCodeButton" class="redeem-code-button">
+              Redeem Code
+            </button>
           </div>
         </div>
       </div>
