@@ -117,7 +117,8 @@
               <button id="potato-button" class="clicker-button">
                 <img
                   class="clicker-image"
-                  src="assets/potato.png"
+                  src="assets/potato.png" 
+                  id="potatoImage"
                   alt="Potato Image"
                   draggable="false"
                 />
@@ -125,7 +126,19 @@
             </div>
           </div>
           <div class="version-box-container">
-            <p id="version" class="version-text">v0.00</p>
+            <div>
+              <p id="version" class="version-text">v0.00</p>
+            </div>
+            <div class="skin-button-container">
+              <button id="openModalSkins" class="skin-button">
+                <img
+                  src="assets/skin_icon.png"
+                  alt="Default Skin"
+                  width="40"
+                  draggable="false"
+                />
+              </button>
+            </div>
           </div>
         </section>
 
@@ -297,6 +310,20 @@
                 <a href="/old_versions/v0.11/index.html">v0.11</a>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal" id="modalskins">
+        <div class="modal-inner">
+          <div class="modal-header">
+            <h2 class="info-h2">Skins</h2>
+            <button class="closeButton" id="closeModalSkins">&times;</button>
+          </div>
+          <div class="general-stats">
+            <h2 class="general-text">Choose your potato skin!</h2>
+            <div class="skins-container" id="skinsContainer">
+              <!-- Skins will be dynamically added here -->
+          </div>
           </div>
         </div>
       </div>
@@ -584,16 +611,9 @@
         </div>
       </div>
     </main>
+    <div id="achievement-container"></div>
     <div id="tooltip" class="tooltip hidden"></div>
     <script src="script.js"></script>
     <script src="auth-client.js"></script>
-    <script>
-      window.va =
-        window.va ||
-        function () {
-          (window.vaq = window.vaq || []).push(arguments);
-        };
-    </script>
-    <script defer src="/_vercel/insights/script.js"></script>
   </body>
 </html>

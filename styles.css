@@ -4,6 +4,7 @@ html {
   user-select: none;
   cursor: default;
   font-family: "Rubik", sans-serif;
+  -webkit-tap-highlight-color: transparent;
 }
 
 html,
@@ -305,14 +306,17 @@ section {
 .version-text {
   color: rgba(255, 255, 255, 0.712);
   font-size: 10px;
-  margin-bottom: 5px;
   font-size: 25px;
   font-weight: bold;
+  margin-bottom: -20px;
 }
 
 .version-box-container {
   margin-top: auto;
   padding-left: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;  
 }
 
 .shine-container {
@@ -1206,7 +1210,7 @@ h3 {
   color: #e6e6e6;
   font-size: 13px;
   pointer-events: none;
-  z-index: 6767;
+  z-index: 9999999;
   max-width: 220px;
   opacity: 0;
   transition:
@@ -1421,4 +1425,123 @@ h3 {
 .scrolling-part {
   overflow-y: auto;
   max-height: 400px;
+}
+
+.skin-button-container {
+  display: flex;
+  justify-content: right;
+  margin-top: 10px;
+  margin-right: 10px;
+  margin-left: auto;
+}
+
+.skin-button {
+  background-color: #2a3f52;
+  border-radius: 100px;
+  border: #37495a solid 3px;
+  padding: 5px 10px;
+  cursor: pointer;
+  margin-bottom: 10px
+}
+
+.skin-button:hover {
+  background-color: #1d2b39;
+  border-radius: 100px;
+  border: #1d2b39 solid 3px;
+  padding: 5px 10px;
+  color: white;
+  cursor: pointer;
+  margin-bottom: 10px
+}
+
+.skin-div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+  border: #37495a solid 2px;
+  cursor: pointer;
+  max-width: 150px;
+  margin-bottom: 10px;
+  color: white;
+  background-color: #1f2635;
+}
+
+.skin-div:hover {
+  border: rgb(144, 123, 1) solid 3px;
+}
+
+.skin-options {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 10px;
+}
+
+.selected-skin {
+  border: gold solid 3px;
+}
+
+.skins-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  justify-items: center;
+  align-items: center;
+  margin: 20px
+}
+
+.locked-skin {
+  opacity: 0.4;
+  pointer-events: auto; /* keep hover for tooltip */
+}
+
+#achievement-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.achievement-popup {
+  min-width: 260px;
+  background: #111;
+  color: #fff;
+  border-left: 5px solid gold;
+  padding: 12px 14px;
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+  animation: slideIn 0.4s ease, fadeOut 0.4s ease 3.2s forwards;
+}
+
+.achievement-title {
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.achievement-desc {
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    transform: translateX(120%);
+  }
 }

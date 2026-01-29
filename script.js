@@ -14,6 +14,11 @@ const openBtno = document.getElementById("openModalOptions");
 const closeBtno = document.getElementById("closeModalOptions");
 const openBtnv = document.getElementById("openModalOptionsv");
 const modalo = document.getElementById("modaloptions");
+
+const openBtnsk = document.getElementById("openModalSkins");
+const closeBtnsk = document.getElementById("closeModalSkins");
+const modalsk = document.getElementById("modalskins");
+
 const potatoesCountElement = document.getElementById("potBank");
 const allTimePotatoesElement = document.getElementById("totPot");
 const runStartTimeElement = document.getElementById("runStart");
@@ -471,6 +476,189 @@ let upgrades = [
   },
 ];
 
+let skins = [
+  {
+    id: "default",
+    name: "Default",
+    image: "assets/potato.png",
+    unlocked: true,
+    equipped: true,
+    description: "Unlocked by default.",
+  },
+  {
+    id: "blank",
+    name: "Blank",
+    image: "assets/variants/blank.png",
+    unlocked: true,
+    equipped: false,
+    description: "Do nothing for 1 hour.",
+  },
+  {
+    id: "code",
+    name: "Code",
+    image: "assets/variants/code.png",
+    unlocked: true,
+    equipped: false,
+    description: "Click on the github link in the navbar.",
+  },
+  {
+    id: "crown",
+    name: "Crown",
+    image: "assets/variants/crown.png",
+    unlocked: true,
+    equipped: false,
+    description: "Collect 1 million potatoes.",
+  },
+  {
+    id: "golden",
+    name: "Golden",
+    image: "assets/variants/golden.png",
+    unlocked: true,
+    equipped: false,
+    description: "Use every golden potato variant at least once.",
+  },
+  {
+    id: "monster",
+    name: "Monster",
+    image: "assets/variants/monster.png",
+    unlocked: true,
+    equipped: false,
+    description: "A secret is required to unlock this skin.",
+  },
+  {
+    id: "music",
+    name: "Music",
+    image: "assets/variants/music.png",
+    unlocked: true,
+    equipped: false,
+    description: "Listen to every sound in the game at least once.",
+  },
+  {
+    id: "pixel",
+    name: "Pixel",
+    image: "assets/variants/pixel.png",
+    unlocked: true,
+    equipped: false,
+    description: "Collect 10 different skins.",
+  },
+  {
+    id: "rainbow",
+    name: "Rainbow",
+    image: "assets/variants/rainbow.png",
+    unlocked: true,
+    equipped: false,
+    description: "Unlock every skin in the game.",
+  },
+  {
+    id: "realistic",
+    name: "Realistic",
+    image: "assets/variants/realistic.png",
+    unlocked: true,
+    equipped: false,
+    description: "Start your run 25 days ago.",
+  },
+  {
+    id: "rock",
+    name: "Rock",
+    image: "assets/variants/rock.png",
+    unlocked: true,
+    equipped: false,
+    description: "Buy 100 buildings.",
+  },
+  {
+    id: "synth",
+    name: "Synth",
+    image: "assets/variants/synth.png",
+    unlocked: true,
+    equipped: false,
+    description: "A secret is required to unlock this skin.",
+  },
+  {
+    id: "inverted",
+    name: "Inverted",
+    image: "assets/variants/inverted.png",
+    unlocked: true,
+    equipped: false,
+    description: "Click exactly 666 times in one session.",
+  },
+  {
+    id: "monochrome",
+    name: "Monochrome",
+    image: "assets/variants/monochrome.png",
+    unlocked: true,
+    equipped: false,
+    description: "Buy no upgrades for 10 minutes whilst having the 'Blank' skin equipped.",
+  },
+  {
+    id: "neon",
+    name: "Neon",
+    image: "assets/variants/neon.png",
+    unlocked: true,
+    equipped: false,
+    description: "Click 200 times in 30 seconds.",
+  },
+  {
+    id: "face",
+    name: "Face",
+    image: "assets/variants/face.png",
+    unlocked: true,
+    equipped: false,
+    description: "A secret is required to unlock this skin.",
+  },
+]
+
+let achievments = [
+  {
+    id: "first_click",
+    name: "First Click",
+    description: "Make your first potato click.",
+    completed: false,
+    skinReward: null,
+  },
+  {
+    id: "hundred_potatoes",
+    name: "Century of Potatoes",
+    description: "Collect 100 potatoes.",
+    completed: false,
+    skinReward: null,
+  },
+  {
+    id: "million_potatoes",
+    name: "Millionaire",
+    description: "Collect 1 million potatoes.",
+    completed: false,
+    skinReward: "crown",
+  },
+  {
+    id: "inverted_potatoes",
+    name: "Something Feels Wrong",
+    description: "Click exactly 666 times in one session.",
+    completed: false,
+    skinReward: "inverted",
+  },
+  {
+    id: "monochrome_potatoes",
+    name: "Monochrome Master",
+    description: "Buy no upgrades for 10 minutes whilst having the 'Blank' skin equipped.",
+    completed: false,
+    skinReward: "monochrome",
+  },
+  {
+    id: "overclock",
+    name: "Overclock",
+    description: "Click 200 times in 30 seconds.",
+    completed: false,
+    skinReward: "neon",
+  },
+  {
+    id: "You look like a potato",
+    name: "You look like a potato",
+    description: "A secret is required to unlock this skin.",
+    completed: false,
+    skinReward: "face",
+  }
+]
+
 let mysteryCount = 0;
 buildings.forEach((b) => {
   if (b.mystery && mysteryCount < 2) {
@@ -572,6 +760,41 @@ function setCommentSmooth(text) {
     comments_mobile.innerText = text;
     comments_mobile.style.opacity = "1";
   }, 400);
+}
+
+function showAchievementPopup(title, description) {
+  const container = document.getElementById("achievement-container");
+
+  const popup = document.createElement("div");
+  popup.className = "achievement-popup";
+
+  popup.innerHTML = `
+    <div class="achievement-title">🏆 Achievement Unlocked</div>
+    <div class="achievement-title">${title}</div>
+    <div class="achievement-desc">${description}</div>
+  `;
+
+  container.appendChild(popup);
+
+  setTimeout(() => {
+    popup.remove();
+  }, 3600);
+}
+
+function achievmentsAdd(id) {
+  const a = achievments.find(a => a.id === id);
+  if (!a || a.completed) return;
+
+  a.completed = true;
+
+  if (a.skinReward) {
+    unlockSkin(a.skinReward);
+  }
+  
+  showAchievementPopup(a.name, a.description);
+  console.log(`Achievement unlocked: ${a.name}`);
+
+  saveGame();
 }
 
 async function updatePotatoComments() {
@@ -750,6 +973,17 @@ function getSaveObject() {
     },
     buildings: {},
     upgrades: {},
+
+    skins: skins.map(s => ({
+      id: s.id,
+      unlocked: s.unlocked,
+      equipped: s.equipped,
+    })),
+
+    achievments: achievments.map(a => ({
+      id: a.id,
+      completed: a.completed,
+    })),
   };
 
   buildings.forEach((b) => {
@@ -767,6 +1001,17 @@ function getSaveObject() {
       completed: u.completed,
     };
   });
+
+  skins: skins.map(s => ({
+    id: s.id,
+    unlocked: s.unlocked,
+    equipped: s.equipped,
+  }));
+
+  achievments: achievments.map(a => ({
+    id: a.id,
+    completed: a.completed,
+  }));
 
   return save;
 }
@@ -886,8 +1131,23 @@ function loadV2(save) {
     u.completed = data.completed;
   });
 
-  if (potatoesPerClick === 0 || potatoesPerClick > 8) {
-    potatoesPerClick = 8;
+  if (save.skins) {
+    save.skins.forEach(savedSkin => {
+      const skin = skins.find(s => s.id === savedSkin.id);
+      if (!skin) return;
+
+      skin.unlocked = savedSkin.unlocked;
+      skin.equipped = savedSkin.equipped;
+    });
+  }
+
+  if (save.achievments) {
+    save.achievments.forEach(savedA => {
+      const a = achievments.find(a => a.id === savedA.id);
+      if (!a) return;
+
+      a.completed = savedA.completed;
+    });
   }
 
   calculateAutoClick();
@@ -1227,6 +1487,77 @@ function renderUpgrades() {
   });
 }
 
+function renderSkins() {
+  const container = document.getElementById("skinsContainer");
+  container.innerHTML = "";
+
+  skins.forEach((s) => {
+    const skinDiv = document.createElement("button");
+    skinDiv.className = `skin-div ${s.equipped ? "selected-skin" : ""}`;
+    if (!s.unlocked) skinDiv.classList.add("locked-skin");
+
+    skinDiv.innerHTML = `
+      <img
+        src="${s.unlocked ? s.image : 'assets/mystery_potato.png'}"
+        alt="${s.name}"
+        width="100"
+        class="skin-option"
+        data-skin="${s.id}"
+        draggable="false"
+      />
+      <p class="skin-label">${s.unlocked ? s.name : '???'}</p>
+    `;
+
+    skinDiv.addEventListener("mouseenter", () => {
+      if (s.unlocked) {
+        const html = `
+          <div class="title">${s.name}</div>
+          <div>${s.description}</div>
+        `;
+        showTooltip(html, skinDiv);
+      } else {
+        const html = `
+          <div class="title">???</div>
+          <div>${s.description}</div>
+        `;
+        showTooltip(html, skinDiv);
+      }
+    });
+    skinDiv.addEventListener("mouseleave", hideTooltip);
+
+    skinDiv.addEventListener("click", () => {
+      if (!s.unlocked) return; // Prevent selecting locked skins
+      selectSkin(s.id);
+      updatePotatoDisplay();
+    });
+
+    container.appendChild(skinDiv);
+  });
+}
+
+function unlockSkin(id) {
+  const skin = skins.find((s) => s.id === id);
+  if (!skin || skin.unlocked) return;
+  skin.unlocked = true;
+  renderSkins();
+}
+
+function selectSkin(id) {
+  skins.forEach((s) => {
+    s.equipped = s.id === id;
+  });
+  
+  const equippedSkin = skins.find((s) => s.equipped);
+  if (equippedSkin) {
+    const potatoImage = document.getElementById("potatoImage");
+    if (potatoImage) {
+      potatoImage.src = equippedSkin.image;
+    }
+  }
+  renderSkins();
+  renderBuildings();
+}
+
 function unlockUpgrade(id) {
   const u = upgrades.find((u) => u.id === id);
   if (!u) return;
@@ -1235,10 +1566,17 @@ function unlockUpgrade(id) {
   renderUpgrades();
 }
 
+function getEquippedSkin() {
+  return skins.find((s) => s.equipped) || skins[0];
+}
+
+
 function renderBuildings() {
   enforceMysteryLimit();
   const container = document.getElementById("buildings");
   container.innerHTML = "";
+
+  const equippedSkin = getEquippedSkin();
 
   const visible = buildings
     .filter((b) => b.unlocked)
@@ -1267,21 +1605,21 @@ function renderBuildings() {
 
     buildingButton.innerHTML = `
       <div class="building-icon">
-        <img src="${displayIcon}" class="building-image" draggable="false" width="60">
+      <img src="${displayIcon}" class="building-image" draggable="false" width="60"">
       </div>
 
       <div class="building-info">
-        <div class="building-name-price">
-          <h4 class="building-name">${displayName}</h4>
-          <p class="building-price">
-            <img src="assets/potato.png" class="potato-icon" draggable="false" width="15">
-            <span class="price-value">${formatNumber(displayPrice)}</span>
-          </p>
-        </div>
+      <div class="building-name-price">
+        <h4 class="building-name">${displayName}</h4>
+        <p class="building-price">
+        <img src="${equippedSkin.image}" class="potato-icon" draggable="false" width="15">
+        <span class="price-value">${formatNumber(displayPrice)}</span>
+        </p>
+      </div>
 
-        <div class="building-amount">
-          <p class="amount-owned">${b.owned}</p>
-        </div>
+      <div class="building-amount">
+        <p class="amount-owned">${b.owned}</p>
+      </div>
       </div>
     `;
 
@@ -1425,9 +1763,20 @@ closeBtno.addEventListener("click", () => {
   modalo.style.display = "none";
 });
 
+openBtnsk.addEventListener("click", () => {
+  modalsk.classList.add("open");
+  modalsk.style.display = "flex";
+  renderSkins();
+});
+
+closeBtnsk.addEventListener("click", () => {
+  modalsk.classList.remove("open");
+  modalsk.style.display = "none";
+});
+
 clickArea.addEventListener("click", (e) => {
   const rect = clickArea.getBoundingClientRect();
-
+  const equippedSkin = getEquippedSkin();
   // --- +1 trail ---
   const trail = document.createElement("div");
   trail.className = "trail";
@@ -1440,7 +1789,7 @@ clickArea.addEventListener("click", (e) => {
 
   // --- Potato image jump ---
   const potato = document.createElement("img");
-  potato.src = "assets/potato.png";
+  potato.src = `${equippedSkin.image}`;
   potato.className = "jump-image";
   potato.style.left = e.clientX - rect.left - 20 + "px";
   potato.style.top = e.clientY - rect.top - 20 + "px";
@@ -1500,7 +1849,7 @@ function autoClick() {
     const incomeFromThisBuilding = (b.cps * b.owned) / 20;
     b.totalGenerated += incomeFromThisBuilding;
   });
-
+  checkAchievements();
   updatePotatoDisplay();
   setTimeout(autoClick, 50);
 }
@@ -1542,6 +1891,7 @@ autoClick();
 renderBuildingsRegular();
 renderUpgradesRegular();
 autoSave();
+renderSkins()
 console.log(`
   ---------------------------------------------------------------
   Potato Clicker!
