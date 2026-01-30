@@ -83,7 +83,7 @@ The name, branding, and assets may not be reused.
 ## 📌 Status
 
 - Desktop supported ✅  
-- Mobile support ❌ (planned)  
+- Mobile support ✅ 
 - Actively developed 🚀
 
 ---
