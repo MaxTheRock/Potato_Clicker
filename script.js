@@ -1053,6 +1053,24 @@
       equipped: false,
       description: "Check out Potion Clicker!",
       credits: "Designed by Rohan Launer.",
+    },
+    {
+      id: "geometry",
+      name: "Geometry Dash",
+      image: "assets/variants/geometry.png",
+      unlocked: false,
+      equipped: false,
+      description: "A secret is required to unlock this skin.",
+      credits: "Designed by Arthur Weedon."
+    },
+    {
+      id: "baked",
+      name: "Baked",
+      image: "assets/variants/baked.png",
+      unlocked: false,
+      equipped: false,
+      description: "Play the game for 1 week.",
+      credits: "Designed by Rohan Launer."
     }
   ];
 
@@ -1187,6 +1205,10 @@
 
     if (runStartTime <= Date.now() - 5 * 24 * 60 * 60 * 1000) {
       achievmentsAdd("five_day_run");
+    }
+
+    if (runStartTime <= Date.now() - 7 * 24 * 60 * 60 * 1000) {
+      achievmentsAdd("baked");
     }
 
     if (getEquippedSkin().id === "blank" && upgradeTime >= 600) {
@@ -1573,6 +1595,20 @@
       description: "Check out Potion Clicker!.",
       completed: false,
       skinReward: "potion",
+    },
+    {
+      id: "geometry_dash",
+      name: "How did you do that!",
+      description: "A secret is required to unlock this skin.",
+      completed: false,
+      skinReward: "geometry",
+    },
+    {
+      id: "baked",
+      name: "Mmmm... Yummy!",
+      description: "Play the game for 1 week.",
+      completed: false,
+      skinReward: "baked",
     }
   ]
 
@@ -1644,7 +1680,12 @@
     if (value === "dossersgames") {
       achievmentsAdd("dosser");
       Codeinput.value = "";
-      alert("Code redeemed! Achievement unlocked: Dosser");
+      alert("Code redeemed! Achievement unlocked: Menglish");
+    }
+    if (value === "impossibletiming") {
+      achievmentsAdd("geometry_dash")
+      Codeinput.value = "";
+      alert("Code redeemed! Achievement unlocked: How did you do that!");
     }
   });
 
