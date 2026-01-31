@@ -991,28 +991,6 @@
     }, 400);
   }
 
-  function achievmentsAdd(id) {
-    const a = achievments.find(a => a.id === id);
-    if (!a || a.completed) return;
-
-    a.completed = true;
-
-    let rewardText = null;
-
-    if (a.skinReward) {
-      unlockSkin(a.skinReward);
-
-      const skin = skins.find(s => s.id === a.skinReward);
-      if (skin) {
-        rewardText = `Skin unlocked — ${skin.name}`;
-      }
-    }
-
-    showAchievementPopup(a.name, a.description, rewardText);
-    console.log(`Achievement unlocked: ${a.name}`);
-
-    saveGame();
-  }
   async function updatePotatoComments() {
     setTimeout(updatePotatoComments, 10000);
 
@@ -1270,22 +1248,7 @@
   }
 
   // Manual save wrapper for button (gives immediate feedback)
-  function saveGameManual() {
-    const btn = document.getElementById("saveButton");
-    if (btn) {
-      btn.disabled = true;
-      const originalText = btn.innerHTML;
-      btn.innerHTML = "<p>Saving...</p>";
-      Promise.resolve(saveGame())
-        .catch(() => {})
-        .finally(() => {
-          if (btn) {
-            btn.disabled = false;
-            btn.innerHTML = originalText;
-          }
-        });
-    }
-  }
+  
 
   async function loadGame() {
     const localSaveRaw = localStorage.getItem(SAVE_KEY_V2);
@@ -1421,19 +1384,6 @@
     });
 
     saveGame();
-  }
-
-  function clearLocalData() {
-    if (
-      confirm(
-        "Are you sure you want to erase your current save (this change cannot by reverted)?",
-      )
-    ) {
-      localStorage.clear();
-      location.reload();
-    } else {
-      console.log("DEBUG: Canceled");
-    }
   }
 
   clickerButton.addEventListener("click", function () {
@@ -2190,3 +2140,60 @@
 
   document.addEventListener("contextmenu", e => e.preventDefault());
 })();
+
+function achievmentsAdd(id) {
+  const a = achievments.find(a => a.id === id);
+  if (!a || a.completed) return;
+
+  a.completed = true;
+
+  let rewardText = null;
+
+  if (a.skinReward) {
+    unlockSkin(a.skinReward);
+
+    const skin = skins.find(s => s.id === a.skinReward);
+    if (skin) {
+      rewardText = `Skin unlocked — ${skin.name}`;
+    }
+  }
+
+  showAchievementPopup(a.name, a.description, rewardText);
+  console.log(`Achievement unlocked: ${a.name}`);
+
+  saveGame();
+}
+
+function storeCounter() {
+  storeCount++;
+}
+
+function saveGameManual() {
+  const btn = document.getElementById("saveButton");
+  if (btn) {
+    btn.disabled = true;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = "<p>Saving...</p>";
+    Promise.resolve(saveGame())
+      .catch(() => {})
+      .finally(() => {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = originalText;
+        }
+      });
+  }
+}
+
+function clearLocalData() {
+  if (
+    confirm(
+      "Are you sure you want to erase your current save (this change cannot by reverted)?",
+    )
+  ) {
+    localStorage.clear();
+    location.reload();
+  } else {
+    console.log("DEBUG: Canceled");
+  }
+}
