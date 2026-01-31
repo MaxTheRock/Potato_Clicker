@@ -2745,128 +2745,141 @@
 
   function renderBuildings() {
     enforceMysteryLimit();
-    const container = document.getElementById("buildings");
-    const equippedSkin = getEquippedSkin();
 
-    // Only show unlocked buildings, sorted
+    const container = document.getElementById("buildings");
+    if (!container) return;
+
+    const equippedSkin = getEquippedSkin();
+    const isTouch = "ontouchstart" in window;
+
     const visible = buildings
       .filter((b) => b.unlocked)
       .sort((a, b) => a.sort - b.sort);
 
     visible.forEach((b) => {
-      // Give each building a persistent ID
       let buildingButton = document.getElementById(`building-${b.id}`);
 
-      // If it doesn't exist yet, create it
+      /* ---------------- CREATE ONCE ---------------- */
       if (!buildingButton) {
         buildingButton = document.createElement("button");
         buildingButton.className = "building-container";
         buildingButton.id = `building-${b.id}`;
+        buildingButton.style.webkitTapHighlightColor = "transparent";
         container.appendChild(buildingButton);
 
-        // Event listeners only added once
-        buildingButton.addEventListener("mouseenter", () => {
-          if (!b.mystery) {
-            const html = `
-              <div class="title">${b.name}</div>
-              <div>Price: ${formatNumber(b.price)} potatoes</div>
-              <div>Owned: ${b.owned}</div>
-              <div>Total income generated: ${Math.floor(b.totalGenerated)}</div>
-              <div>Income per second: ${Math.floor(b.cps * b.owned * 10) / 10}</div>
-            `;
-            showTooltip(html, buildingButton);
-          } else {
-            const html = `
-              <div class="title">???</div>
-              <div>Price: ${formatNumber(b.price)} potatoes</div>
-            `;
-            showTooltip(html, buildingButton);
-          }
-        });
+        // ICON
+        const iconDiv = document.createElement("div");
+        iconDiv.className = "building-icon";
 
-        buildingButton.addEventListener("mouseleave", hideTooltip);
+        const img = document.createElement("img");
+        img.className = "building-image";
+        img.width = 60;
+        img.draggable = false;
+        iconDiv.appendChild(img);
 
+        // INFO
+        const infoDiv = document.createElement("div");
+        infoDiv.className = "building-info";
+        infoDiv.innerHTML = `
+          <div class="building-name-price">
+            <h4 class="building-name"></h4>
+            <p class="building-price">
+              <img class="potato-icon" draggable="false" width="15">
+              <span class="price-value"></span>
+            </p>
+          </div>
+          <div class="building-amount">
+            <p class="amount-owned"></p>
+          </div>
+        `;
+
+        buildingButton.appendChild(iconDiv);
+        buildingButton.appendChild(infoDiv);
+
+        // TOOLTIP (desktop only)
+        if (!isTouch) {
+          buildingButton.addEventListener("mouseenter", () => {
+            const html = b.mystery
+              ? `
+                <div class="title">???</div>
+                <div>Price: ${formatNumber(b.price)}</div>
+              `
+              : `
+                <div class="title">${b.name}</div>
+                <div>Price: ${formatNumber(b.price)}</div>
+                <div>Owned: ${b.owned}</div>
+                <div>Total generated: ${Math.floor(b.totalGenerated)}</div>
+                <div>Income/sec: ${Math.floor(b.cps * b.owned * 10) / 10}</div>
+              `;
+            showTooltip(html, buildingButton);
+          });
+
+          buildingButton.addEventListener("mouseleave", hideTooltip);
+        }
+
+        // CLICK
         buildingButton.addEventListener("click", () => {
           markPlayerActivity();
-          if (!b.mystery && potatoes >= b.price * half_price_amount) {
-            buildingsOwned++;
-            b.owned++;
-            potatoes -= b.price * half_price_amount;
-            b.price = Math.ceil(b.price * 1.15);
 
-            calculateAutoClick();
-            updatePotatoDisplay();
-            renderBuildings(); // only updates content
+          const cost = b.price * half_price_amount;
+          if (b.mystery || potatoes < cost) return;
+
+          buildingsOwned++;
+          b.owned++;
+          potatoes -= cost;
+          b.price = Math.ceil(b.price * 1.15);
+
+          calculateAutoClick();
+          updatePotatoDisplay();
+
+          // 🚑 delay render → fixes iOS flicker
+          requestAnimationFrame(() => {
+            renderBuildings();
             renderUpgrades();
-          }
+          });
         });
       }
 
-      // Update display info dynamically
+      /* ---------------- UPDATE ONLY ---------------- */
+      const displayPrice = b.price * half_price_amount;
+
+      const img = buildingButton.querySelector(".building-image");
+      const nameEl = buildingButton.querySelector(".building-name");
+      const priceEl = buildingButton.querySelector(".price-value");
+      const ownedEl = buildingButton.querySelector(".amount-owned");
+      const potatoIcon = buildingButton.querySelector(".potato-icon");
+
+      // Mystery logic
       let displayName = b.name;
-      let displayPrice = b.price * half_price_amount;
       let displayIcon = b.realIcon;
 
-      if (b.mystery) {
-        if (potatoes < b.price * half_price_amount) {
-          displayName = "???";
-          displayIcon = "assets/mystery.png";
-        } else {
-          b.mystery = false;
-          displayName = b.name;
-          displayIcon = b.realIcon;
-        }
-      }
-
-      // Only update the image src if it has changed
-      let buildingIconDiv = buildingButton.querySelector(".building-icon");
-      let buildingImage;
-      if (!buildingIconDiv) {
-        buildingIconDiv = document.createElement("div");
-        buildingIconDiv.className = "building-icon";
-        buildingImage = document.createElement("img");
-        buildingImage.className = "building-image";
-        buildingImage.setAttribute("draggable", "false");
-        buildingImage.setAttribute("width", "60");
-        buildingIconDiv.appendChild(buildingImage);
-        buildingButton.appendChild(buildingIconDiv);
+      if (b.mystery && potatoes < displayPrice) {
+        displayName = "???";
+        displayIcon = "assets/mystery.png";
       } else {
-        buildingImage = buildingIconDiv.querySelector(".building-image");
-      }
-      if (buildingImage.src !== location.origin + "/" + displayIcon) {
-        buildingImage.src = displayIcon;
+        b.mystery = false;
       }
 
-      // Update info section
-      let infoDiv = buildingButton.querySelector(".building-info");
-      if (!infoDiv) {
-        infoDiv = document.createElement("div");
-        infoDiv.className = "building-info";
-        buildingButton.appendChild(infoDiv);
-      }
-      infoDiv.innerHTML = `
-        <div class="building-name-price">
-          <h4 class="building-name">${displayName}</h4>
-          <p class="building-price">
-            <img src="${equippedSkin.image}" class="potato-icon" draggable="false" width="15">
-            <span class="price-value">${formatNumber(displayPrice)}</span>
-          </p>
-        </div>
-        <div class="building-amount">
-          <p class="amount-owned">${b.owned}</p>
-        </div>
-      `;
+      // Update text (cheap, no flicker)
+      nameEl.textContent = displayName;
+      priceEl.textContent = formatNumber(displayPrice);
+      ownedEl.textContent = b.owned;
 
-      // Update button styles
-      const priceElement = infoDiv.querySelector(".building-price");
-      if (!isNaN(displayPrice) && potatoes >= displayPrice) {
-        priceElement.style.color = "lightgreen";
-        buildingButton.style.backgroundColor = "#37495a";
-        buildingButton.style.cursor = "pointer";
-      } else {
-        priceElement.style.color = "rgb(209, 73, 73)";
-        buildingButton.style.backgroundColor = "#212d38";
-        buildingButton.style.cursor = "default";
+      // Update images only if changed
+      if (!img.src.endsWith(displayIcon)) img.src = displayIcon;
+      if (!potatoIcon.src.endsWith(equippedSkin.image)) {
+        potatoIcon.src = equippedSkin.image;
+      }
+
+      // Affordability styles (only when changed)
+      const canAfford = potatoes >= displayPrice;
+      if (buildingButton.dataset.affordable !== String(canAfford)) {
+        buildingButton.dataset.affordable = String(canAfford);
+
+        const priceWrapper = buildingButton.querySelector(".building-price");
+        priceWrapper.style.color = canAfford ? "lightgreen" : "rgb(209,73,73)";
+        buildingButton.style.backgroundColor = canAfford ? "#37495a" : "#212d38";
+        buildingButton.style.cursor = canAfford ? "pointer" : "default";
       }
     });
   }
