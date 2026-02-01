@@ -1479,6 +1479,18 @@ h3 {
   background-color: #1f2635;
 }
 
+@media (max-width: 700px) {
+  .skin-div{
+    max-width: 100px;
+  }
+  .skin-div img {
+    width: 95%;
+  }
+  .skins-container {
+    grid-template-columns: repeat(auto-fit, minmax(96px, 5fr)) !important;
+  }
+}
+
 .skin-div:hover {
   border: rgb(144, 123, 1) solid 3px;
 }
