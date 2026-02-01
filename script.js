@@ -1071,13 +1071,21 @@
       equipped: false,
       description: "Play the game for 1 week.",
       credits: "Designed by Rohan Launer."
+    },
+    {
+      id: "finger",
+      name: "Finger",
+      image: "assets/variants/finger.png",
+      unlocked: false,
+      equipped: false,
+      description: "Click 100,000 times.",
     }
   ];
 
   function checkAchievements() {
     if (potatoes >= 100000000000000) {
-      potatoes = -99999999999999999999999999;
-      
+      potatoes = 0;
+      autoClickAmount = 0;
     }
     if (potatoClicks >= 1) {
       achievmentsAdd("first_click");
@@ -1260,6 +1268,10 @@
     // Time Traveler (version change)
     if (window.versionTraveled) {
       achievmentsAdd("time_traveler");
+    }
+
+    if (potatoClicks >= 100000) {
+      achievmentsAdd("finger");
     }
   }
 
@@ -1613,6 +1625,13 @@
       description: "Play the game for 1 week.",
       completed: false,
       skinReward: "baked",
+    },
+    {
+      id: "finger",
+      name: "My thumb is sore...",
+      description: "Click 100,000 times in total.",
+      completed: false,
+      skinReward: "finger",
     }
   ]
 
@@ -2393,293 +2412,136 @@
     setTimeout(() => tooltip.classList.add("hidden"), 150);
   }
 
+  const renderedUpgrades = new Map();
+
   function renderUpgrades() {
     const container = document.getElementById("upgrades");
-    container.innerHTML = "";
 
+    // --- unlock logic (UNCHANGED, just moved to top) ---
     upgrades.forEach((u) => {
-      // Unlock based on building ownership
-      if (
-        (u.id.includes("peelerx2_1") || u.id.includes("peelerx2_2")) &&
-        buildings.find((b) => b.id === "cursor").owned >= 1
-      )
-        u.unlocked = !u.completed;
-      if (
-        (u.id.includes("farmerx2_1") || u.id.includes("farmerx2_2")) &&
-        buildings.find((b) => b.id === "farmer").owned >= 1
-      )
-        u.unlocked = !u.completed;
-      if (
-        (u.id.includes("tractorx2_1") || u.id.includes("tractorx2_2")) &&
-        buildings.find((b) => b.id === "tractor").owned >= 1
-      )
-        u.unlocked = !u.completed;
-      if (
-        (u.id.includes("greenhousex2_1") || u.id.includes("greenhousex2_2")) &&
-        buildings.find((b) => b.id === "greenhouse").owned >= 1
-      )
-        u.unlocked = !u.completed;
-      if (
-        (u.id.includes("chipfactoryx2_1") || u.id.includes("chipfactoryx2_2")) &&
-        buildings.find((b) => b.id === "chip_factory").owned >= 1
-      )
-        u.unlocked = !u.completed;
-      if (
-        (u.id.includes("restaurantx2_1") || u.id.includes("restaurantx2_2")) &&
-        buildings.find((b) => b.id === "restaurant").owned >= 1
-      )
-        u.unlocked = !u.completed;
-      if (
-        (u.id.includes("supermarketx2_1") || u.id.includes("supermarketx2_2")) &&
-        buildings.find((b) => b.id === "supermarket").owned >= 1
-      )
-        u.unlocked = !u.completed;
-      if (
-        (u.id.includes("distillaryx2_1") || u.id.includes("distillaryx2_2")) &&
-        buildings.find((b) => b.id === "distillary").owned >= 1
-      )
-        u.unlocked = !u.completed;
-      if (
-        (u.id.includes("spacestationx2_1") || u.id.includes("spacestationx2_2")) &&
-        buildings.find((b) => b.id === "space_station").owned >= 1
-      )
-        u.unlocked = !u.completed;
-      if (
-        (u.id.includes("planetx2_1") || u.id.includes("planetx2_2")) &&
-        buildings.find((b) => b.id === "planet").owned >= 1
-      )
-        u.unlocked = !u.completed;
-      if (
-        (u.id.includes("intergalacticfarmx2_1") || u.id.includes("intergalacticfarmx2_2")) &&
-        buildings.find((b) => b.id === "intergalactic_farm").owned >= 1
-      )
-        u.unlocked = !u.completed;
-      if (
-        (u.id.includes("timemachinex2_1") || u.id.includes("timemachinex2_2")) &&
-        buildings.find((b) => b.id === "time_machine").owned >= 1
-      )
-        u.unlocked = !u.completed;
-      if (
-        (u.id.includes("quantumreactorx2_1") || u.id.includes("quantumreactorx2_2")) &&
-        buildings.find((b) => b.id === "quantum_reactor").owned >= 1
-      )
-        u.unlocked = !u.completed;
+      const buildingMap = {
+        peeler: "cursor",
+        farmer: "farmer",
+        tractor: "tractor",
+        greenhouse: "greenhouse",
+        chipfactory: "chip_factory",
+        restaurant: "restaurant",
+        supermarket: "supermarket",
+        distillary: "distillary",
+        airport: "airport",
+        spacestation: "space_station",
+        planet: "planet",
+        intergalacticfarm: "intergalactic_farm",
+        timemachine: "time_machine",
+        quantumreactor: "quantum_reactor",
+      };
 
-      // Unlock after 10 Buildings
-      if (
-        u.id.includes("peelerx2_3") &&
-        buildings.find((b) => b.id === "cursor").owned >= 10
-      )
-        u.unlocked = !u.completed;
-      if (
-        u.id.includes("farmerx2_3") &&
-        buildings.find((b) => b.id === "farmer").owned >= 10
-      )
-        u.unlocked = !u.completed;
-      if (
-        u.id.includes("tractorx2_3") &&
-        buildings.find((b) => b.id === "tractor").owned >= 10
-      )
-        u.unlocked = !u.completed;
-      if (
-        u.id.includes("greenhousex2_3") &&
-        buildings.find((b) => b.id === "greenhouse").owned >= 10
-      )
-        u.unlocked = !u.completed;
-      if (
-        u.id.includes("chipfactoryx2_3") &&
-        buildings.find((b) => b.id === "chip_factory").owned >= 10
-      )
-        u.unlocked = !u.completed;
-      if (
-        u.id.includes("restaurantx2_3") &&
-        buildings.find((b) => b.id === "restaurant").owned >= 10
-      )
-        u.unlocked = !u.completed;
-      if (
-        u.id.includes("supermarketx2_3") &&
-        buildings.find((b) => b.id === "supermarket").owned >= 10
-      )
-        u.unlocked = !u.completed;
-      if (
-        u.id.includes("distillaryx2_3") &&
-        buildings.find((b) => b.id === "distillary").owned >= 10
-      )
-        u.unlocked = !u.completed;
-      if (
-        u.id.includes("airportx2_3") &&
-        buildings.find((b) => b.id === "airport").owned >= 10
-      )
-        u.unlocked = !u.completed;
-      if (
-        u.id.includes("spacestationx2_3") &&
-        buildings.find((b) => b.id === "space_station").owned >= 10
-      )
-        u.unlocked = !u.completed;
-      if (
-        u.id.includes("planetx2_3") &&
-        buildings.find((b) => b.id === "planet").owned >= 10
-      )
-        u.unlocked = !u.completed;
-      if (
-        u.id.includes("intergalacticfarmx2_3") &&
-        buildings.find((b) => b.id === "intergalactic_farm").owned >= 10
-      )
-        u.unlocked = !u.completed;
-      if (
-        u.id.includes("timemachinex2_3") &&
-        buildings.find((b) => b.id === "time_machine").owned >= 10
-      )
-        u.unlocked = !u.completed;
-      if (
-        u.id.includes("quantumreactorx2_3") &&
-        buildings.find((b) => b.id === "quantum_reactor").owned >= 10
-      )
-        u.unlocked = !u.completed;
-      // Unlock after 20 Buildings
-      if (
-        u.id.includes("peelerx2_4") &&
-        buildings.find((b) => b.id === "cursor").owned >= 20
-      )
-        u.unlocked = !u.completed;
-      if (
-        u.id.includes("farmerx2_4") &&
-        buildings.find((b) => b.id === "farmer").owned >= 20
-      )
-        u.unlocked = !u.completed;
-      if (
-        u.id.includes("tractorx2_4") &&
-        buildings.find((b) => b.id === "tractor").owned >= 20
-      )
-        u.unlocked = !u.completed;
-      if (
-        u.id.includes("greenhousex2_4") &&
-        buildings.find((b) => b.id === "greenhouse").owned >= 20
-      )
-        u.unlocked = !u.completed;
-      if (
-        u.id.includes("chipfactoryx2_4") &&
-        buildings.find((b) => b.id === "chip_factory").owned >= 20
-      )
-        u.unlocked = !u.completed;
-      if (
-        u.id.includes("restaurantx2_4") &&
-        buildings.find((b) => b.id === "restaurant").owned >= 20
-      )
-        u.unlocked = !u.completed;
-      if (
-        u.id.includes("supermarketx2_4") &&
-        buildings.find((b) => b.id === "supermarket").owned >= 20
-      )
-        u.unlocked = !u.completed;
-      if (
-        u.id.includes("distillaryx2_4") &&
-        buildings.find((b) => b.id === "distillary").owned >= 20
-      )
-        u.unlocked = !u.completed;
-      if (
-        u.id.includes("airportx2_4") &&
-        buildings.find((b) => b.id === "airport").owned >= 20
-      )
-        u.unlocked = !u.completed;
-      if (
-        u.id.includes("spacestationx2_4") &&
-        buildings.find((b) => b.id === "space_station").owned >= 20
-      )
-        u.unlocked = !u.completed;
-      if (
-        u.id.includes("planetx2_4") &&
-        buildings.find((b) => b.id === "planet").owned >= 20
-      )
-        u.unlocked = !u.completed;
-      if (
-        u.id.includes("intergalacticfarmx2_4") &&
-        buildings.find((b) => b.id === "intergalactic_farm").owned >= 20
-      )
-        u.unlocked = !u.completed;
-      if (
-        u.id.includes("timemachinex2_4") &&
-        buildings.find((b) => b.id === "time_machine").owned >= 20
-      )
-        u.unlocked = !u.completed;
-      if (
-        u.id.includes("quantumreactorx2_4") &&
-        buildings.find((b) => b.id === "quantum_reactor").owned >= 20
-      )
-        u.unlocked = !u.completed;
+      for (const key in buildingMap) {
+        const building = buildings.find(b => b.id === buildingMap[key]);
+        if (!building) continue;
+
+        if (u.id.includes(`${key}x2_1`) || u.id.includes(`${key}x2_2`))
+          u.unlocked = building.owned >= 1 && !u.completed;
+
+        if (u.id.includes(`${key}x2_3`))
+          u.unlocked = building.owned >= 10 && !u.completed;
+
+        if (u.id.includes(`${key}x2_4`))
+          u.unlocked = building.owned >= 20 && !u.completed;
+      }
     });
 
     const visible = upgrades
-      .filter((u) => u.unlocked && !u.completed)
+      .filter(u => u.unlocked && !u.completed)
       .sort((a, b) => a.price - b.price);
 
+    const visibleIds = new Set(visible.map(u => u.id));
+
+    // --- remove upgrades no longer visible ---
+    for (const [id, btn] of renderedUpgrades) {
+      if (!visibleIds.has(id)) {
+        btn.remove();
+        renderedUpgrades.delete(id);
+      }
+    }
+
+    // --- add / update visible upgrades ---
     visible.forEach((u) => {
-      const upgradeButton = document.createElement("button");
-      upgradeButton.className = "upgrades-container";
+      let upgradeButton = renderedUpgrades.get(u.id);
 
-      upgradeButton.innerHTML = `<img src="${u.icon}" draggable="false" class="upgrade-button" width="70" />`;
-      upgradeButton.style.opacity = potatoes >= (u.price * half_price_amount) ? 1 : 0.5;
+      if (!upgradeButton) {
+        upgradeButton = document.createElement("button");
+        upgradeButton.className = "upgrades-container";
 
-      upgradeButton.addEventListener("mouseenter", () => {
-        showTooltip(
-          `
-          <div class="title">${u.name}</div>
-          <div>${u.description}</div>
-          <div class="effect">${u.effect}</div>
-          <div class="price">Cost: ${formatNumber(u.price*half_price_amount)} potatoes</div>
-        `,
-          upgradeButton,
-        );
-      });
-      upgradeButton.addEventListener("mouseleave", hideTooltip);
+        const img = document.createElement("img");
+        img.src = u.icon;
+        img.width = 70;
+        img.draggable = false;
+        img.className = "upgrade-button";
 
-      upgradeButton.addEventListener("click", () => {
-        upgradeTime = 0;
-        if (potatoes < u.price*half_price_amount) return;
-        potatoes -= u.price*half_price_amount;
-        u.completed = true;
-        u.unlocked = false;
-        totalUpgrades++;
+        upgradeButton.appendChild(img);
 
-        if (u.id.includes("peeler")) {
-          const peeler = buildings.find((b) => b.id === "cursor");
-          peeler.cpsMultiplier *= 2;
-          potatoesPerClick *= 2;
-        }
-        if (u.id.includes("farmer"))
-          buildings.find((b) => b.id === "farmer").cpsMultiplier *= 2;
-        if (u.id.includes("tractor"))
-          buildings.find((b) => b.id === "tractor").cpsMultiplier *= 2;
-        if (u.id.includes("greenhouse"))
-          buildings.find((b) => b.id === "greenhouse").cpsMultiplier *= 2;
-        if (u.id.includes("chipfactory"))
-          buildings.find((b) => b.id === "chip_factory").cpsMultiplier *= 2;
-        if (u.id.includes("restaurant"))
-          buildings.find((b) => b.id === "restaurant").cpsMultiplier *= 2;
-        if (u.id.includes("supermarket"))
-          buildings.find((b) => b.id === "supermarket").cpsMultiplier *= 2;
-        if (u.id.includes("distillary"))
-          buildings.find((b) => b.id === "distillary").cpsMultiplier *= 2;
-        if (u.id.includes("airport"))
-          buildings.find((b) => b.id === "airport").cpsMultiplier *= 2;
-        if (u.id.includes("spacestation"))
-          buildings.find((b) => b.id === "space_station").cpsMultiplier *= 2;
-        if (u.id.includes("planet"))
-          buildings.find((b) => b.id === "planet").cpsMultiplier *= 2;
-        if (u.id.includes("intergalacticfarm"))
-          buildings.find((b) => b.id === "intergalactic_farm").cpsMultiplier *= 2;
-        if (u.id.includes("timemachine"))
-          buildings.find((b) => b.id === "time_machine").cpsMultiplier *= 2;
-        if (u.id.includes("quantumreactor"))
-          buildings.find((b) => b.id === "quantum_reactor").cpsMultiplier *= 2;
-        calculateAutoClick();
-        updatePotatoDisplay();
-        renderBuildings();
-        renderUpgrades();
-        checkAchievements();
-      });
+        upgradeButton.addEventListener("mouseenter", () => {
+          showTooltip(
+            `
+            <div class="title">${u.name}</div>
+            <div>${u.description}</div>
+            <div class="effect">${u.effect}</div>
+            <div class="price">Cost: ${formatNumber(u.price * half_price_amount)} potatoes</div>
+            `,
+            upgradeButton
+          );
+        });
 
-      container.appendChild(upgradeButton);
+        upgradeButton.addEventListener("mouseleave", hideTooltip);
+
+        upgradeButton.addEventListener("click", () => {
+          upgradeTime = 0;
+          if (potatoes < u.price * half_price_amount) return;
+
+          potatoes -= u.price * half_price_amount;
+          u.completed = true;
+          u.unlocked = false;
+          totalUpgrades++;
+
+          const effects = {
+            peeler: "cursor",
+            farmer: "farmer",
+            tractor: "tractor",
+            greenhouse: "greenhouse",
+            chipfactory: "chip_factory",
+            restaurant: "restaurant",
+            supermarket: "supermarket",
+            distillary: "distillary",
+            airport: "airport",
+            spacestation: "space_station",
+            planet: "planet",
+            intergalacticfarm: "intergalactic_farm",
+            timemachine: "time_machine",
+            quantumreactor: "quantum_reactor",
+          };
+
+          for (const key in effects) {
+            if (u.id.includes(key)) {
+              buildings.find(b => b.id === effects[key]).cpsMultiplier *= 2;
+              if (key === "peeler") potatoesPerClick *= 2;
+            }
+          }
+
+          calculateAutoClick();
+          updatePotatoDisplay();
+          renderBuildings();
+          renderUpgrades();
+          checkAchievements();
+        });
+
+        renderedUpgrades.set(u.id, upgradeButton);
+        container.appendChild(upgradeButton);
+      }
+
+      // --- update affordability (NO re-render) ---
+      upgradeButton.style.opacity =
+        potatoes >= u.price * half_price_amount ? 1 : 0.5;
     });
   }
 
@@ -2841,7 +2703,9 @@
         buildingButton.appendChild(iconDiv);
         buildingButton.appendChild(infoDiv);
 
-        // TOOLTIP (desktop only)
+        let tooltipTimeout;
+
+        // DESKTOP (hover)
         if (!isTouch) {
           buildingButton.addEventListener("mouseenter", () => {
             const html = b.mystery
@@ -2856,10 +2720,37 @@
                 <div>Total generated: ${Math.floor(b.totalGenerated)}</div>
                 <div>Income/sec: ${Math.floor(b.cps * b.owned * 10) / 10}</div>
               `;
+
             showTooltip(html, buildingButton);
           });
 
           buildingButton.addEventListener("mouseleave", hideTooltip);
+        }
+
+        // MOBILE (tap, auto-hide after 5s)
+        else {
+          buildingButton.addEventListener("click", () => {
+            const html = b.mystery
+              ? `
+                <div class="title">???</div>
+                <div>Price: ${formatNumber(b.price)}</div>
+              `
+              : `
+                <div class="title">${b.name}</div>
+                <div>Price: ${formatNumber(b.price)}</div>
+                <div>Owned: ${b.owned}</div>
+                <div>Total generated: ${Math.floor(b.totalGenerated)}</div>
+                <div>Income/sec: ${Math.floor(b.cps * b.owned * 10) / 10}</div>
+              `;
+
+            showTooltip(html, buildingButton);
+
+            // reset timer if tapped again
+            clearTimeout(tooltipTimeout);
+            tooltipTimeout = setTimeout(() => {
+              hideTooltip();
+            }, 5000);
+          });
         }
 
         // CLICK
@@ -2876,8 +2767,7 @@
 
           calculateAutoClick();
           updatePotatoDisplay();
-
-          // 🚑 delay render → fixes iOS flicker
+          checkAchievements();
           requestAnimationFrame(() => {
             renderBuildings();
             renderUpgrades();
@@ -3028,42 +2918,54 @@
     modalanouncements.style.display = "none";
   });
 
+  const preloadedSkins = new Map();
+
+  function preloadSkin(imageSrc) {
+    if (preloadedSkins.has(imageSrc)) return;
+
+    const img = new Image();
+    img.src = imageSrc;
+    img.decoding = "async"; // helps Safari
+    preloadedSkins.set(imageSrc, img);
+  }
+
   clickArea.addEventListener("click", (e) => {
     const rect = clickArea.getBoundingClientRect();
     const equippedSkin = getEquippedSkin();
+
+    preloadSkin(equippedSkin.image);
+
     // --- +1 trail ---
     const trail = document.createElement("div");
     trail.className = "trail";
-    const offsetX = Math.random() * 40 - 20;
-    trail.style.left = e.clientX - rect.left + offsetX + "px";
+    trail.style.left = e.clientX - rect.left + (Math.random() * 40 - 20) + "px";
     trail.style.top = e.clientY - rect.top - 20 + "px";
     trail.textContent = `+${potatoesPerClick}`;
     clickArea.appendChild(trail);
     setTimeout(() => trail.remove(), 1000);
 
-    // --- Potato image jump ---
-    const potato = document.createElement("img");
-    potato.src = `${equippedSkin.image}`;
+    // --- Potato jump (PRELOADED) ---
+    const potato = preloadedSkins
+      .get(equippedSkin.image)
+      .cloneNode(false);
+
     potato.className = "jump-image";
     potato.style.left = e.clientX - rect.left - 20 + "px";
     potato.style.top = e.clientY - rect.top - 20 + "px";
     potato.style.opacity = "1";
+
     clickArea.appendChild(potato);
 
-    // Jump physics
-    let velocityY = -6 - Math.random() * 2; // same jump
-    let velocityX = Math.random() * 4 - 2; // same drift
+    // Physics
+    let velocityY = -6 - Math.random() * 2;
+    let velocityX = Math.random() * 4 - 2;
     const gravity = 0.55;
     let posX = e.clientX - rect.left - 20;
     let posY = e.clientY - rect.top - 20;
 
-    // Rotation
-    let rotation = Math.random() * 360; // random start rotation
-    let rotationSpeed = Math.random() * 10 - 5; // random rotation speed
-
-    // Fade timer
+    let rotation = Math.random() * 360;
+    let rotationSpeed = Math.random() * 10 - 5;
     let opacity = 1;
-    const fadeSpeed = 0.05; // fade faster
 
     const animation = setInterval(() => {
       velocityY += gravity;
@@ -3071,14 +2973,13 @@
       posX += velocityX;
 
       rotation += rotationSpeed;
-      opacity -= fadeSpeed;
+      opacity -= 0.05;
 
-      potato.style.top = posY + "px";
-      potato.style.left = posX + "px";
       potato.style.transform = `rotate(${rotation}deg)`;
+      potato.style.left = posX + "px";
+      potato.style.top = posY + "px";
       potato.style.opacity = opacity;
 
-      // Remove when opacity is zero or falls below click
       if (opacity <= 0 || posY > e.clientY - rect.top) {
         clearInterval(animation);
         potato.remove();
