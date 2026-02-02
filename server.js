@@ -184,11 +184,14 @@ app.post("/api/auth/save", requireAuth, async (req, res) => {
     const saveData = req.body; // expect full save object
     if (!saveData) return res.status(400).json({ error: "Missing save body" });
 
+    // Ensure saveData is properly formatted as JSON for JSONB column
+    const jsonData = JSON.stringify(saveData);
+
     await pool.query(
       `INSERT INTO saves (user_id, data, updated_at)
-       VALUES ($1, $2, now())
-       ON CONFLICT (user_id) DO UPDATE SET data = $2, updated_at = now()`,
-      [userId, saveData],
+       VALUES ($1, $2::jsonb, now())
+       ON CONFLICT (user_id) DO UPDATE SET data = $2::jsonb, updated_at = now()`,
+      [userId, jsonData],
     );
 
     res.json({ ok: true });

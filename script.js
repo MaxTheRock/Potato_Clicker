@@ -2034,17 +2034,6 @@
       };
     });
 
-    skins: skins.map(s => ({
-      id: s.id,
-      unlocked: s.unlocked,
-      equipped: s.equipped,
-    }));
-
-    achievments: achievments.map(a => ({
-      id: a.id,
-      completed: a.completed,
-    }));
-
     return save;
   }
 
