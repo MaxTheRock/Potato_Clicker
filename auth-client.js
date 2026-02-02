@@ -34,67 +34,14 @@
     return apiFetch("/me", { method: "GET" });
   }
 
+  // Save game to remote - expects save object from script.js
   async function saveRemote(saveObj) {
     return apiFetch("/save", { method: "POST", body: JSON.stringify(saveObj) });
   }
+  
+  // Load game from remote
   async function loadRemote() {
     return apiFetch("/load", { method: "GET" });
-  }
-
-  function saveLocal(saveObj) {
-    localStorage.setItem(LOCAL_SAVE_KEY, JSON.stringify(saveObj));
-  }
-  function loadLocal() {
-    const data = localStorage.getItem(LOCAL_SAVE_KEY);
-    return data ? JSON.parse(data) : null;
-  }
-
-  // Core: save current game state
-  async function saveGame() {
-    const saveObj = {
-      potatoes: window.potatoes,
-      allTimePotatoes: window.allTimePotatoes,
-      buildings: window.buildings,
-      upgrades: window.upgrades,
-      skins: window.skins,
-      lastSaved: Date.now()
-    };
-
-    const token = getToken();
-    if (token) {
-      try {
-        await saveRemote(saveObj);
-      } catch (e) {
-        console.warn("Remote save failed, falling back to localStorage", e);
-        saveLocal(saveObj);
-      }
-    } else {
-      saveLocal(saveObj);
-    }
-  }
-
-  // Core: load saved game state
-  async function loadGame() {
-    const token = getToken();
-    let saveObj = null;
-    if (token) {
-      try {
-        saveObj = await loadRemote();
-      } catch (e) {
-        console.warn("Failed to load remote save, using localStorage", e);
-        saveObj = loadLocal();
-      }
-    } else {
-      saveObj = loadLocal();
-    }
-
-    if (saveObj) {
-      window.potatoes = saveObj.potatoes || 0;
-      window.allTimePotatoes = saveObj.allTimePotatoes || 0;
-      window.buildings = saveObj.buildings || {};
-      window.upgrades = saveObj.upgrades || {};
-      window.skins = saveObj.skins || {};
-    }
   }
 
   // Update account display
@@ -210,8 +157,8 @@
     signup,
     login,
     me,
-    save: saveGame,
-    load: loadGame,
+    save: saveRemote,  // script.js will pass the full save object
+    load: loadRemote,
     setToken,
     getToken,
     updateAccountUI,
