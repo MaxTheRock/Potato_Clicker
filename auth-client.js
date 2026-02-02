@@ -80,12 +80,28 @@
     }
 
     // Helper to format numbers with commas
-    const formatScore = (num) => {
-      if (num >= 1000000) {
-        return (num / 1000000).toFixed(1) + ' million';
+    function formatScore(num) {
+      const units = [
+        { value: 1_000_000_000_000_000_000_000_000_000_000_000, label: "decillion" },
+        { value: 1_000_000_000_000_000_000_000_000_000_000, label: "nonillion" },
+        { value: 1_000_000_000_000_000_000_000_000_000, label: "octillion" },
+        { value: 1_000_000_000_000_000_000_000_000, label: "septillion" },
+        { value: 1_000_000_000_000_000_000_000, label: "sextillion" },
+        { value: 1_000_000_000_000_000_000, label: "quintillion" },
+        { value: 1_000_000_000_000_000, label: "quadrillion" },
+        { value: 1_000_000_000_000, label: "trillion" },
+        { value: 1_000_000_000, label: "billion" },
+        { value: 1_000_000, label: "million" }
+      ];
+      for (const unit of units) {
+        if (num >= unit.value) {
+          return (
+            (num / unit.value).toFixed(2).replace(/\.?0+$/, "") + " " + unit.label
+          );
+        }
       }
-      return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    };
+      return num.toLocaleString();
+    }
 
     // Helper to format rank suffix
     const getRankSuffix = (rank) => {
