@@ -92,16 +92,6 @@ app.post("/api/auth/signup", async (req, res) => {
       [username, email, hash]
     );
 
-    // Save user data to db
-    const saveData = {
-      username,
-      email
-    };
-    await pool.query(
-      "INSERT INTO saves (user_id, data) VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE SET data = $2",
-      [insert.rows[0].id, saveData]
-    );
-
     // Create token
     const user = insert.rows[0];
     const token = createToken(user);
@@ -184,14 +174,12 @@ app.post("/api/auth/save", requireAuth, async (req, res) => {
     const saveData = req.body; // expect full save object
     if (!saveData) return res.status(400).json({ error: "Missing save body" });
 
-    // Ensure saveData is properly formatted as JSON for JSONB column
-    const jsonData = JSON.stringify(saveData);
-
+    // pg library handles JSON objects directly for JSONB columns
     await pool.query(
       `INSERT INTO saves (user_id, data, updated_at)
-       VALUES ($1, $2::jsonb, now())
-       ON CONFLICT (user_id) DO UPDATE SET data = $2::jsonb, updated_at = now()`,
-      [userId, jsonData],
+       VALUES ($1, $2, now())
+       ON CONFLICT (user_id) DO UPDATE SET data = $2, updated_at = now()`,
+      [userId, saveData],
     );
 
     res.json({ ok: true });
@@ -206,7 +194,7 @@ app.get("/api/auth/load", requireAuth, async (req, res) => {
   try {
     const userId = req.userId;
     const r = await pool.query("SELECT data FROM saves WHERE user_id = $1", [userId]);
-    if (!r.rowCount) return res.status(404).json({ error: "No save found" });
+    if (!r.rowCount) return res.json(null); // No save yet, return null so game starts fresh
     res.json(r.rows[0].data);
   } catch (e) {
     console.error("load error", e);
