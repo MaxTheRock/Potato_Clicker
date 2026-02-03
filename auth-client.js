@@ -89,21 +89,21 @@
       leaderboardContainer.innerHTML =
         '<div class="other"><div class="place">—</div><div class="username">No players yet</div><div class="score">0 potatoes</div></div>';
       return;
-    }
+    } 
 
     /* ----- formatting helpers (same as original) ----- */
     function formatScore(num) {
       const units = [
-        { value: 1e30, label: "decillion" },
-        { value: 1e27, label: "nonillion" },
-        { value: 1e24, label: "octillion" },
-        { value: 1e21, label: "septillion" },
-        { value: 1e18, label: "sextillion" },
-        { value: 1e15, label: "quintillion" },
-        { value: 1e12, label: "quadrillion" },
-        { value: 1e9, label: "trillion" },
-        { value: 1e6, label: "billion" },
-        { value: 1e3, label: "million" }
+        { value: 1e33, label: "decillion" },
+        { value: 1e30, label: "nonillion" },
+        { value: 1e27, label: "octillion" },
+        { value: 1e24, label: "septillion" },
+        { value: 1e21, label: "sextillion" },
+        { value: 1e18, label: "quintillion" },
+        { value: 1e15, label: "quadrillion" },
+        { value: 1e12, label: "trillion" },
+        { value: 1e9, label: "billion" },
+        { value: 1e6, label: "million" }
       ];
       for (const u of units) {
         if (num >= u.value) {

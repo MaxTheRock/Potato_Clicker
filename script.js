@@ -1107,6 +1107,31 @@
       equipped: false,
       description: "Purchase 10 space related building.",
       credits: "Designed by Elliot Sturges."
+    },
+    {
+      id: "crisp",
+      name: "Crisp",
+      image: "assets/variants/crisp.png",
+      unlocked: false,
+      equipped: false,
+      description: "Purchase 500 peelers.",
+    },
+    {
+      id: "ice",
+      name: "Ice",
+      image: "assets/variants/ice.png",
+      unlocked: false,
+      equipped: false,
+      description: "Do nothing for 5 hours.",
+    },
+    {
+      id: "yin_yang",
+      name: "Yin Yang",
+      image: "assets/variants/yin_yang.png",
+      unlocked: false,
+      equipped: false,
+      description: "Purchase 100 of everything!",
+      credits: "Designed by William Sheard.",
     }
   ];
 
@@ -1241,6 +1266,10 @@
       achievmentsAdd("idle_master");
     }
 
+    if (idleTime >= 18000) {
+      achievmentsAdd("ice");
+    }
+
     if (totalCollectedVariants.size >= 3) {
       achievmentsAdd("variant_collector");
     }
@@ -1267,7 +1296,8 @@
       "monster",
       "synth_master",
       "you_look_like_a_potato",
-      "dosser"
+      "dosser",
+      "geometry_dash"
     ];
     const allSecretsRedeemed = secretAchievements.every(id => {
       const a = achievments.find(a => a.id === id);
@@ -1285,8 +1315,24 @@
 
     // Peel Master (100 peelers)
     const peeler = buildings.find(b => b.id === "cursor");
+    const farmer = buildings.find(b => b.id === "farmer");
+    const tractor = buildings.find(b => b.id === "tractor");
+    const chip_factory = buildings.find(b => b.id === "chip_factory");
+    const restaurant = buildings.find(b => b.id === "restaurant");
+    const supermarket = buildings.find(b => b.id === "supermarket");
+    const distillary = buildings.find(b => b.id === "distillary");
+    const airport = buildings.find(b => b.id === "airport");
+    const space_station = buildings.find(b => b.id === "space_station");
+    const planet = buildings.find(b => b.id === "planet");
+    const inter = buildings.find(b => b.id === "intergalactic_farm");
+    const time_machine = buildings.find(b => b.id === "time_machine");
+    const quantum_reactor = buildings.find(b => b.id === "quantum_reactor");
     if (peeler && peeler.owned >= 100) {
       achievmentsAdd("peel_master");
+    }
+
+    if (peeler && peeler.owned >= 500) {
+      achievmentsAdd("crisp");
     }
 
     // Ewww (50 chip factories)
@@ -1300,6 +1346,25 @@
       achievmentsAdd("time_traveler");
     }
 
+    if (
+      peeler?.owned >= 100 &&
+      farmer?.owned >= 100 &&
+      tractor?.owned >= 100 &&
+      greenhouse?.owned >= 100 &&
+      chip_factory?.owned >= 100 &&
+      restaurant?.owned >= 100 &&
+      supermarket?.owned >= 100 &&
+      distillary?.owned >= 100 &&
+      airport?.owned >= 100 &&
+      space_station?.owned >= 100 &&
+      planet?.owned >= 100 &&
+      intergalactic_farm?.owned >= 100 &&
+      time_machine?.owned >= 100 &&
+      quantum_reactor?.owned >= 100
+    ) {
+      achievmentsAdd("yin_yang");
+    }
+
     if (potatoClicks >= 100000) {
       achievmentsAdd("finger");
     }
@@ -1308,9 +1373,6 @@
       achievmentsAdd("computato");
     }
 
-    const space_station = buildings.find(b => b.id === "space_station");
-    const planet = buildings.find(b => b.id === "planet");
-    const inter = buildings.find(b => b.id === "intergalactic_farm");
     if ((space_station && space_station.owned >= 1) || (planet && planet.owned >= 1) || (inter && planet.owned >= 1)){
       achievmentsAdd("astronaut");
     }
@@ -1697,7 +1759,28 @@
       description: "Purchase 10 space related building.",
       completed: false,
       skinReward: "sus",
-    }
+    },
+    {
+      id: "ice",
+      name: "Brain Freeze",
+      description: "Do nothing for 5 hours.",
+      completed: false,
+      skinReward: "ice",
+    },
+    {
+      id: "crisp",
+      name: "Crunchy.",
+      description: "Purchase 500 peelers.",
+      completed: false,
+      skinReward: "crisp",
+    },
+    {
+      id: "yin_yang",
+      name: "Peace.",
+      description: "Purchase 100 of everything.",
+      completed: false,
+      skinReward: "yin_yang",
+    },
   ]
 
   let mysteryCount = 0;
@@ -1774,6 +1857,9 @@
       achievmentsAdd("geometry_dash")
       Codeinput.value = "";
       alert("Code redeemed! Achievement unlocked: How did you do that!");
+    }
+    if (value === "pooonmyface") {
+      allTimePotatoes = 1250000000000
     }
   });
 

@@ -913,6 +913,7 @@ h3 {
   align-items: center;
   justify-content: center;
   display: flex;
+  margin-bottom: 10px !important;
 }
 
 @media (max-width: 700px) {
@@ -1351,6 +1352,7 @@ h3 {
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
+  background-color: transparent !important;
 }
 
 /* Shared row styling */
@@ -1363,9 +1365,11 @@ h3 {
   align-items: center;
   padding: 14px 18px;
   border-radius: 18px;
-  background: linear-gradient(145deg, #0b1020, #060a15);
+  background: linear-gradient(145deg, #0b1020, #000000);
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  gap: 50px;
+  margin-bottom: 10px;
 }
 
 .first:hover,
@@ -1379,15 +1383,19 @@ h3 {
 /* 🥇🥈🥉 Special podium styles */
 .first {
   border: 2px solid #f7c948;
-  background: linear-gradient(145deg, #2a1f00, #120c00);
+  background: linear-gradient(145deg, rgb(227, 177, 41), rgb(190, 127, 0));
 }
 .second {
   border: 2px solid #cfd8dc;
-  background: linear-gradient(145deg, #1b1f23, #0e1114);
+  background: linear-gradient(145deg, #767676, #555555);
 }
 .third {
   border: 2px solid #cd7f32;
-  background: linear-gradient(145deg, #2a1606, #140b05);
+  background: linear-gradient(145deg, #6a3000, #64310f);
+}
+
+.other {
+  color: white;
 }
 
 /* Rank */
@@ -1395,6 +1403,7 @@ h3 {
   font-size: 22px;
   font-weight: 700;
   text-align: center;
+  
 }
 
 /* Username */
@@ -1427,7 +1436,7 @@ h3 {
 }
 
 /* Mobile */
-@media (max-width: 700px) {
+@media (max-width: 1800px) {
   .first,
   .second,
   .third,
