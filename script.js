@@ -2480,8 +2480,8 @@
       if (!totalCollectedVariants.has("normal")) {
         totalCollectedVariants.add("normal");
       }
-      text.textContent = `Lucky, ${formatNumber(autoClickAmount * 2000)} Potatoes!`;
-      reward = autoClickAmount * 2000;
+      text.textContent = `Lucky, ${formatNumber(autoClickAmount * 3000)} Potatoes!`;
+      reward = autoClickAmount * 3000;
     } else if (goldenPotatoVariant == "frenzy") {
       if (!totalCollectedVariants.has("frenzy")) {
         totalCollectedVariants.add("frenzy");
@@ -3198,7 +3198,7 @@
 
   function autoClick() {
     if (frenzy === true) {
-      frenzy_amount = 6;
+      frenzy_amount = 10;
     } else {
       frenzy_amount = 1;
     }
