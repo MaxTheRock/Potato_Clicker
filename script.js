@@ -1858,9 +1858,6 @@
       Codeinput.value = "";
       alert("Code redeemed! Achievement unlocked: How did you do that!");
     }
-    if (value === "pooonmyface") {
-      allTimePotatoes = 1250000000000
-    }
   });
 
   function storeCounter() {
