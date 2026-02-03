@@ -317,7 +317,7 @@
     if (!token) {
       el.textContent = "Not signed in";
       farm_name.value = "Guest";
-      await loadGame(); // load local save
+      await loadGame(); // guest = local only
       return;
     }
 
@@ -325,12 +325,11 @@
       const user = await me();
       el.textContent = user.username || user.email || "Account";
       farm_name.value = `${user.username || "Player"}'s Potato Farm`;
-      await loadGame(); // load backend save
     } catch (e) {
       el.textContent = "Not signed in";
       farm_name.value = "Guest";
       setToken(null);
-      await loadGame(); // fallback to localStorage
+      await loadGame();
     }
   }
 

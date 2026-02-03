@@ -1117,10 +1117,6 @@
   }
 
   function checkAchievements() {
-    if (potatoes >= 100000000000000) {
-      potatoes = 0;
-      autoClickAmount = 0;
-    }
     if (potatoClicks >= 1) {
       achievmentsAdd("first_click");
     }
@@ -2873,6 +2869,7 @@
           calculateAutoClick();
           updatePotatoDisplay();
           checkAchievements();
+          saveGame(true);
           requestAnimationFrame(() => {
             renderBuildings();
             renderUpgrades();
