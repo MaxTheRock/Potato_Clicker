@@ -91,6 +91,13 @@
       return;
     }
 
+    function getEquippedSkin() {
+      if (!Array.isArray(window.skins)) return "default";
+
+      const equipped = window.skins.find(s => s.equipped);
+      return equipped ? equipped.id : "default";
+    }
+
     /* ----- formatting helpers (same as original) ----- */
     function formatScore(num) {
       const units = [
@@ -125,6 +132,7 @@
     };
 
     /* ----- build HTML ----- */
+    const skinId = getEquippedSkin();
     let html = "";
     topPlayers.forEach((entry, idx) => {
       const rank = idx + 1;
@@ -137,7 +145,7 @@
         <div class="${cls}">
           <div class="place">${getRankSuffix(rank)}</div>
           <div class="username">${entry.username}</div>
-          <div class="score">${formatScore(entry.all_time_potatoes)} potatoes</div>
+          <div class="score">${formatScore(entry.all_time_potatoes)} <img src="assets/variants/${skinId}.png" alt="Potato" class="leaderboard-potato"></div>
         </div>`;
     });
 
