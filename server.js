@@ -65,7 +65,10 @@ function createToken(user) {
 }
 
 async function getUserById(id) {
-  const r = await pool.query("SELECT id, username, email, created_at FROM users WHERE id = $1", [id]);
+  const r = await pool.query(
+    "SELECT id, username, email, created_at FROM users WHERE id = $1",
+    [id],
+  );
   return r.rows[0];
 }
 
@@ -87,7 +90,7 @@ app.post("/api/auth/signup", async (req, res) => {
     // Check if user already exists
     const exists = await pool.query(
       "SELECT id FROM users WHERE email = $1 OR username = $2",
-      [email, username]
+      [email, username],
     );
     if (exists.rowCount) {
       return res.status(409).json({ error: "User already exists" });
@@ -99,7 +102,7 @@ app.post("/api/auth/signup", async (req, res) => {
     // Insert new user
     const insert = await pool.query(
       "INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING id, username, email",
-      [username, email, hash]
+      [username, email, hash],
     );
 
     // Create token
@@ -119,9 +122,13 @@ app.post("/api/auth/login", async (req, res) => {
   try {
     const fullUrl = getFullUrl(req);
     const { identifier, password } = req.body; // identifier = email or username
-    if (!identifier || !password) return res.status(400).json({ error: "Missing fields" });
+    if (!identifier || !password)
+      return res.status(400).json({ error: "Missing fields" });
 
-    const r = await pool.query("SELECT id, username, email, password_hash FROM users WHERE email = $1 OR username = $1", [identifier]);
+    const r = await pool.query(
+      "SELECT id, username, email, password_hash FROM users WHERE email = $1 OR username = $1",
+      [identifier],
+    );
     if (!r.rowCount) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -131,7 +138,11 @@ app.post("/api/auth/login", async (req, res) => {
     if (!ok) return res.status(401).json({ error: "Invalid credentials" });
 
     const token = createToken(user);
-    res.json({ token, user: { id: user.id, username: user.username, email: user.email }, fullUrl });
+    res.json({
+      token,
+      user: { id: user.id, username: user.username, email: user.email },
+      fullUrl,
+    });
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: "Server error" });
@@ -192,14 +203,19 @@ app.post("/api/auth/save", requireAuth, async (req, res) => {
       [userId, saveData],
     );
 
-    // Update leaderboard with allTimePotatoes if available
-    if (saveData.stats && saveData.stats.allTimePotatoes !== undefined) {
+    // Update leaderboard with allTimePotatoes (handle both flat and nested formats)
+    let allTimePotatoes = saveData.allTimePotatoes;
+    if (!allTimePotatoes && saveData.stats) {
+      allTimePotatoes = saveData.stats.allTimePotatoes;
+    }
+
+    if (allTimePotatoes !== undefined) {
       const user = await getUserById(userId);
       await pool.query(
         `INSERT INTO leaderboard (user_id, username, all_time_potatoes, updated_at)
          VALUES ($1, $2, $3, now())
          ON CONFLICT (user_id) DO UPDATE SET all_time_potatoes = $3, updated_at = now()`,
-        [userId, user.username, Math.floor(saveData.stats.allTimePotatoes)],
+        [userId, user.username, Math.floor(allTimePotatoes)],
       );
     }
 
@@ -214,7 +230,9 @@ app.post("/api/auth/save", requireAuth, async (req, res) => {
 app.get("/api/auth/load", requireAuth, async (req, res) => {
   try {
     const userId = req.userId;
-    const r = await pool.query("SELECT data FROM saves WHERE user_id = $1", [userId]);
+    const r = await pool.query("SELECT data FROM saves WHERE user_id = $1", [
+      userId,
+    ]);
     if (!r.rowCount) return res.json(null); // No save yet, return null so game starts fresh
     res.json(r.rows[0].data);
   } catch (e) {
@@ -231,11 +249,11 @@ app.get("/api/leaderboard", async (req, res) => {
       `SELECT username, all_time_potatoes, updated_at 
        FROM leaderboard 
        ORDER BY all_time_potatoes DESC 
-       LIMIT 10`
+       LIMIT 10`,
     );
 
     let userRank = null;
-    
+
     // If user is authenticated, get their rank
     const auth = req.headers.authorization;
     if (auth) {
@@ -243,7 +261,7 @@ app.get("/api/leaderboard", async (req, res) => {
         const token = auth.replace("Bearer ", "");
         const payload = jwt.verify(token, JWT_SECRET);
         const userId = payload.userId;
-        
+
         // Get user's rank and score
         const rankQuery = await pool.query(
           `SELECT 
@@ -252,9 +270,9 @@ app.get("/api/leaderboard", async (req, res) => {
             all_time_potatoes
            FROM leaderboard l
            WHERE user_id = $1`,
-          [userId]
+          [userId],
         );
-        
+
         if (rankQuery.rowCount > 0) {
           const userInfo = rankQuery.rows[0];
           // Only include user rank if they're not in top 10
@@ -279,4 +297,3 @@ const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
   console.log(`Auth server listening on ${PORT}`);
 });
-

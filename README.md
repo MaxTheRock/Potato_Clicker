@@ -17,13 +17,13 @@ Watch the numbers go up.
 
 ## ✨ Features
 
-- Classic clicker gameplay  
-- Buildings that generate potatoes automatically  
-- Upgrades and multipliers  
-- Golden Potato events  
-- Detailed statistics screen  
-- Version history with playable older builds  
-- Clean UI with animations and effects  
+- Classic clicker gameplay
+- Buildings that generate potatoes automatically
+- Upgrades and multipliers
+- Golden Potato events
+- Detailed statistics screen
+- Version history with playable older builds
+- Clean UI with animations and effects
 
 ---
 
@@ -66,7 +66,7 @@ By contributing, you agree to the terms of the project licence.
 
 This project is **source-available**, not open-source.
 
-- Viewing and contributing is allowed  
+- Viewing and contributing is allowed
 - Forking, redistribution, re-releasing, or monetisation is **not permitted**
 
 See **LICENSE.md** for full details.
@@ -82,8 +82,8 @@ The name, branding, and assets may not be reused.
 
 ## 📌 Status
 
-- Desktop supported ✅  
-- Mobile support ✅ 
+- Desktop supported ✅
+- Mobile support ✅
 - Actively developed 🚀
 
 ---
