@@ -2,7 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -60,15 +63,13 @@
       </div>
       <div class="nav-box-right">
         <div id="accountBox" class="nav-box" style="padding: 6px 10px">
-          <div
-            id="accountStatus"
-          >
-            &nbsp;
-          </div>
+          <div id="accountStatus">&nbsp;</div>
           <span id="accountName">Not signed in</span>
         </div>
         <div class="nav-box">
-          <button class="older-versions" id="openModalOptionsv">Older versions</button>
+          <button class="older-versions" id="openModalOptionsv">
+            Older versions
+          </button>
         </div>
       </div>
     </nav>
@@ -117,7 +118,7 @@
               <button id="potato-button" class="clicker-button">
                 <img
                   class="clicker-image"
-                  src="assets/potato.png" 
+                  src="assets/potato.png"
                   id="potatoImage"
                   alt="Potato Image"
                   draggable="false"
@@ -198,7 +199,9 @@
         <div class="modal-inner">
           <div class="modal-header">
             <h2 class="info-h2">Anouncements</h2>
-            <button class="closeButton" id="closeModalAnouncements">&times;</button>
+            <button class="closeButton" id="closeModalAnouncements">
+              &times;
+            </button>
           </div>
           <div class="general-stats">
             <img
@@ -224,12 +227,18 @@
             </p>
             <button
               id="saveButton"
-              onclick="saveGameManual(), saveGame(true)"
+              onclick="(saveGameManual(), saveGame(true))"
               class="save-load-button"
             >
               <p>Save</p>
             </button>
-            <button onclick="clearLocalData()" class="wipe-button" id="logoutButton">Logout</button>
+            <button
+              onclick="clearLocalData()"
+              class="wipe-button"
+              id="logoutButton"
+            >
+              Logout
+            </button>
           </div>
           <div class="general-stats">
             <h2 class="general-text">Account</h2>
@@ -279,7 +288,9 @@
                         type="password"
                         placeholder="Password"
                       />
-                      <button class="toggle-eye" type="button" id="loginToggle">👁️</button>
+                      <button class="toggle-eye" type="button" id="loginToggle">
+                        👁️
+                      </button>
                     </div>
                     <button type="button" id="loginButton" class="auth-button">
                       Login
@@ -308,7 +319,13 @@
                         type="password"
                         placeholder="Password"
                       />
-                      <button class="toggle-eye"type="button" id="signupToggle">👁️</button>
+                      <button
+                        class="toggle-eye"
+                        type="button"
+                        id="signupToggle"
+                      >
+                        👁️
+                      </button>
                     </div>
                     <button type="button" id="signupButton" class="auth-button">
                       Create Account
@@ -326,16 +343,57 @@
             <div class="dropdown">
               Version select
               <div class="dropdown-content">
-                <a onclick="achievmentsAdd('time_traveler')" href="/index.html" class="selected-version">Current</a>
-                <a onclick="achievmentsAdd('time_traveler')" href="/old_versions/v0.58/index.html">v0.58</a>
-                <a onclick="achievmentsAdd('time_traveler')" href="/old_versions/v0.57/index.html">v0.57</a>
-                <a onclick="achievmentsAdd('time_traveler')" href="/old_versions/v0.48/index.html">v0.48</a>
-                <a onclick="achievmentsAdd('time_traveler')" href="/old_versions/v0.47/index.html">v0.47</a>
-                <a onclick="achievmentsAdd('time_traveler')" href="/old_versions/v0.43/index.html">v0.43</a>
-                <a onclick="achievmentsAdd('time_traveler')" href="/old_versions/v0.32/index.html">v0.32</a>
-                <a onclick="achievmentsAdd('time_traveler')" href="/old_versions/v0.27/index.html">v0.27</a>
-                <a onclick="achievmentsAdd('time_traveler')" href="/old_versions/v0.21/index.html">v0.21</a>
-                <a onclick="achievmentsAdd('time_traveler')" href="/old_versions/v0.11/index.html">v0.11</a>
+                <a
+                  onclick="achievmentsAdd('time_traveler')"
+                  href="/index.html"
+                  class="selected-version"
+                  >Current</a
+                >
+                <a
+                  onclick="achievmentsAdd('time_traveler')"
+                  href="/old_versions/v0.58/index.html"
+                  >v0.58</a
+                >
+                <a
+                  onclick="achievmentsAdd('time_traveler')"
+                  href="/old_versions/v0.57/index.html"
+                  >v0.57</a
+                >
+                <a
+                  onclick="achievmentsAdd('time_traveler')"
+                  href="/old_versions/v0.48/index.html"
+                  >v0.48</a
+                >
+                <a
+                  onclick="achievmentsAdd('time_traveler')"
+                  href="/old_versions/v0.47/index.html"
+                  >v0.47</a
+                >
+                <a
+                  onclick="achievmentsAdd('time_traveler')"
+                  href="/old_versions/v0.43/index.html"
+                  >v0.43</a
+                >
+                <a
+                  onclick="achievmentsAdd('time_traveler')"
+                  href="/old_versions/v0.32/index.html"
+                  >v0.32</a
+                >
+                <a
+                  onclick="achievmentsAdd('time_traveler')"
+                  href="/old_versions/v0.27/index.html"
+                  >v0.27</a
+                >
+                <a
+                  onclick="achievmentsAdd('time_traveler')"
+                  href="/old_versions/v0.21/index.html"
+                  >v0.21</a
+                >
+                <a
+                  onclick="achievmentsAdd('time_traveler')"
+                  href="/old_versions/v0.11/index.html"
+                  >v0.11</a
+                >
               </div>
             </div>
           </div>
@@ -351,7 +409,7 @@
             <h2 class="general-text">Choose your potato skin!</h2>
             <div class="skins-container" id="skinsContainer">
               <!-- Skins will be dynamically added here -->
-          </div>
+            </div>
           </div>
         </div>
       </div>
@@ -362,7 +420,9 @@
             <button class="closeButton" id="closeModalCodes">&times;</button>
           </div>
           <div class="general-stats">
-            <h2 class="general-text">Enter a unique code to unlock special rewards!</h2>
+            <h2 class="general-text">
+              Enter a unique code to unlock special rewards!
+            </h2>
             <input
               id="codeInput"
               class="code-input"
@@ -466,7 +526,8 @@
               <li>Fixed upgrades glitch</li>
               <li>Anti cheat added!</li>
               <li>
-                Thanks to <span class="flashing">Rohan</span> for designing one of the skins!
+                Thanks to <span class="flashing">Rohan</span> for designing one
+                of the skins!
               </li>
             </ul>
           </div>
@@ -481,32 +542,34 @@
               <li>Added eye to check password before you submit</li>
               <li>Changed farm name to Username.</li>
               <li>
-                Thanks to <span class="flashing">Arthur</span> and <span class="flashing">William</span> for designing some of the skins!
+                Thanks to <span class="flashing">Arthur</span> and
+                <span class="flashing">William</span> for designing some of the
+                skins!
               </li>
               <li>Added secret skin</li>
             </ul>
           </div>
           <div class="major-update">
-            <h2 class="major-h2">29/01/26: Achievements, Skins and Accounts Update v0.57!</h2>
+            <h2 class="major-h2">
+              29/01/26: Achievements, Skins and Accounts Update v0.57!
+            </h2>
             <p class="major-p">
-              Long time no see! This update took a while because of all the bugs but here it is. Sorry for the account losses but it should be fine from now on...
+              Long time no see! This update took a while because of all the bugs
+              but here it is. Sorry for the account losses but it should be fine
+              from now on...
             </p>
             <ul class="major-ul">
               <li>Added an account system!</li>
+              <li>Sign up and login to save your progress to the cloud.</li>
               <li>
-                Sign up and login to save your progress to the cloud.
-              </li>
-              <li>
-                Added <span class="flashing">15</span> new skins, try to
-                get them all!
+                Added <span class="flashing">15</span> new skins, try to get
+                them all!
               </li>
               <li>
                 Added <span class="flashing">17</span> achievements, try to
                 unlock them all!
               </li>
-              <li>
-                Fixed tooltip issues on mobile devices.
-              </li>
+              <li>Fixed tooltip issues on mobile devices.</li>
               <li>Fixed building multiplier issue.</li>
               <li>Various bug fixes and optimizations.</li>
               <li>Removed one of the golden potato variants.</li>

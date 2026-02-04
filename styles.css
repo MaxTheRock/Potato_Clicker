@@ -316,7 +316,7 @@ section {
   padding-left: 10px;
   display: flex;
   align-items: center;
-  gap: 10px;  
+  gap: 10px;
 }
 
 .shine-container {
@@ -1367,7 +1367,9 @@ h3 {
   border-radius: 18px;
   background: linear-gradient(145deg, #0b1020, #000000);
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   gap: 50px;
   margin-bottom: 10px;
 }
@@ -1403,7 +1405,6 @@ h3 {
   font-size: 22px;
   font-weight: 700;
   text-align: center;
-  
 }
 
 /* Username */
@@ -1472,7 +1473,7 @@ h3 {
   border: #37495a solid 3px;
   padding: 5px 10px;
   cursor: pointer;
-  margin-bottom: 10px
+  margin-bottom: 10px;
 }
 
 .skin-button:hover {
@@ -1482,7 +1483,7 @@ h3 {
   padding: 5px 10px;
   color: white;
   cursor: pointer;
-  margin-bottom: 10px
+  margin-bottom: 10px;
 }
 
 .skin-div {
@@ -1499,7 +1500,7 @@ h3 {
 }
 
 @media (max-width: 700px) {
-  .skin-div{
+  .skin-div {
     max-width: 100px;
   }
   .skin-div img {
@@ -1530,7 +1531,7 @@ h3 {
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   justify-items: center;
   align-items: center;
-  margin: 20px
+  margin: 20px;
 }
 
 .locked-skin {
@@ -1557,7 +1558,9 @@ h3 {
   padding: 12px 14px;
   border-radius: 6px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
-  animation: slideIn 0.4s ease, fadeOut 0.4s ease 3.2s forwards;
+  animation:
+    slideIn 0.4s ease,
+    fadeOut 0.4s ease 3.2s forwards;
 }
 
 .achievement-title {
@@ -1663,9 +1666,9 @@ h3 {
 
 .auth-input {
   width: 100%;
-  height: 2.5em;       /* same as password input */
+  height: 2.5em; /* same as password input */
   font-size: 1em;
-  padding: 0 0.75em;   /* horizontal padding */
+  padding: 0 0.75em; /* horizontal padding */
   box-sizing: border-box;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -1677,7 +1680,7 @@ h3 {
 }
 
 .auth-status {
-  min-height: 1.5em;      /* space even if empty */
+  min-height: 1.5em; /* space even if empty */
   margin-bottom: 0.75em;
   font-size: 0.9em;
   text-align: center;

@@ -36,13 +36,13 @@
   async function signup(username, email, password) {
     return apiFetch("/signup", {
       method: "POST",
-      body: JSON.stringify({ username, email, password })
+      body: JSON.stringify({ username, email, password }),
     });
   }
   async function login(identifier, password) {
     return apiFetch("/login", {
       method: "POST",
-      body: JSON.stringify({ identifier, password })
+      body: JSON.stringify({ identifier, password }),
     });
   }
   async function me() {
@@ -89,7 +89,7 @@
       leaderboardContainer.innerHTML =
         '<div class="other"><div class="place">—</div><div class="username">No players yet</div><div class="score">0 potatoes</div></div>';
       return;
-    } 
+    }
 
     /* ----- formatting helpers (same as original) ----- */
     function formatScore(num) {
@@ -103,7 +103,7 @@
         { value: 1e15, label: "quadrillion" },
         { value: 1e12, label: "trillion" },
         { value: 1e9, label: "billion" },
-        { value: 1e6, label: "million" }
+        { value: 1e6, label: "million" },
       ];
       for (const u of units) {
         if (num >= u.value) {
@@ -115,7 +115,7 @@
       return num.toLocaleString();
     }
 
-    const getRankSuffix = r => {
+    const getRankSuffix = (r) => {
       const j = r % 10,
         k = r % 100;
       if (j === 1 && k !== 11) return r + "st";
@@ -174,16 +174,20 @@
 
     // 3️⃣ Numeric counters – keep the larger value
     const numericKeys = ["potatoes", "allTimePotatoes"];
-    numericKeys.forEach(key => {
+    numericKeys.forEach((key) => {
       const remoteVal = Number(merged[key]) || 0;
-      const localVal = localSave && Number(localSave[key]) ? Number(localSave[key]) : 0;
+      const localVal =
+        localSave && Number(localSave[key]) ? Number(localSave[key]) : 0;
       merged[key] = Math.max(remoteVal, localVal);
     });
 
     // 4️⃣ Collections – shallow‑merge (union of keys)
     const collectionKeys = ["buildings", "upgrades", "skins"];
-    collectionKeys.forEach(col => {
-      merged[col] = { ...(localSave?.[col] || {}), ...(remoteSave?.[col] || {}) };
+    collectionKeys.forEach((col) => {
+      merged[col] = {
+        ...(localSave?.[col] || {}),
+        ...(remoteSave?.[col] || {}),
+      };
     });
 
     // 5️⃣ Persist locally (full save + legacy key)
@@ -289,7 +293,7 @@
       allTimePotatoes: window.allTimePotatoes,
       buildings: window.buildings,
       upgrades: window.upgrades,
-      skins: window.skins
+      skins: window.skins,
     };
 
     // Persist locally (full save + legacy key)
@@ -299,8 +303,8 @@
     // Persist remotely if logged in
     const token = getToken();
     if (token) {
-      saveRemote(saveObj).catch(e =>
-        console.warn("Failed to save remotely", e)
+      saveRemote(saveObj).catch((e) =>
+        console.warn("Failed to save remotely", e),
       );
     }
   }
@@ -359,7 +363,7 @@
           setStatus(
             loginStatus,
             "Please enter both username/email and password.",
-            "error"
+            "error",
           );
           return;
         }
@@ -374,7 +378,8 @@
           let msg = "Login failed";
           if (e.error) {
             const err = e.error.toLowerCase();
-            if (err.includes("user not found")) msg = "Username/email not found.";
+            if (err.includes("user not found"))
+              msg = "Username/email not found.";
             else if (err.includes("invalid credentials"))
               msg = "Password incorrect. Please check and try again.";
             else msg = e.error;
@@ -450,6 +455,6 @@
     saveGame,
     // optional – expose the merge helper if you ever need it elsewhere
     mergeAndPersist,
-    handlePostAuth
+    handlePostAuth,
   };
 })();
