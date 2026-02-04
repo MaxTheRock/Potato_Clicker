@@ -2300,6 +2300,33 @@
     }
   }
 
+  async function loadGameManual() {
+    const btn = document.getElementById("loadButton");
+    if (btn) {
+      btn.disabled = true;
+      const originalText = btn.innerHTML;
+      btn.innerHTML = "<p>Loading...</p>";
+      
+      try {
+        await loadGame();
+        // Refresh UI after loading
+        updateDisplay();
+        updateStatsDisplay();
+        renderBuildingsRegular();
+        renderUpgradesRegular();
+        renderSkins();
+        applyEquippedSkin();
+      } catch (e) {
+        console.error("Manual load failed", e);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = originalText;
+        }
+      }
+    }
+  }
+
   async function loadGame() {
     const localSaveRaw = localStorage.getItem(SAVE_KEY_V2);
     const localSave = localSaveRaw ? JSON.parse(localSaveRaw) : null;
@@ -3337,4 +3364,6 @@
   window.clearLocalData = clearLocalData;
   window.storeCounter = storeCounter;
   window.saveGameManual = saveGameManual;
+  window.loadGameManual = loadGameManual;
+  window.loadGame = loadGame;
 })();
