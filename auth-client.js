@@ -210,42 +210,6 @@
   }
 
   /* --------------------------------------------------------------
-     NEW: Helper that runs after a successful login / sign‑up.
-          It loads the remote save, merges it with any local data,
-          and then updates the UI and reloads the game with new data.
-     -------------------------------------------------------------- */
-  async function handlePostAuth() {
-    const token = getToken();
-    if (!token) {
-      console.error("handlePostAuth called without a token");
-      return;
-    }
-
-    let remoteSave = null;
-    try {
-      remoteSave = await loadRemote(); // may throw
-    } catch (e) {
-      console.warn("Remote load failed – treating as empty", e);
-    }
-
-    // Merge remote + local, persist, and populate globals.
-    await mergeAndPersist(remoteSave);
-
-    // Reload the game with the merged data
-    if (window.loadGame) {
-      try {
-        await window.loadGame();
-      } catch (e) {
-        console.warn("Failed to reload game after login", e);
-      }
-    }
-
-    // Refresh UI (account banner, farm name, leaderboard, etc.)
-    await updateAccountUI();
-    await updateLeaderboardUI();
-  }
-
-  /* --------------------------------------------------------------
      *** ORIGINAL loadGame – retained for completeness ***
      -------------------------------------------------------------- */
   async function loadGame() {
@@ -381,8 +345,19 @@
           const res = await login(username, password);
           setToken(res.token);
           setStatus(loginStatus, "Logged in successfully!", "success");
-          // NEW: merge remote + local, then refresh UI
-          await handlePostAuth();
+
+          // Load game from database
+          if (window.loadGame) {
+            try {
+              await window.loadGame();
+            } catch (e) {
+              console.warn("Failed to load game after login", e);
+            }
+          }
+
+          // Update UI
+          await updateAccountUI();
+          await updateLeaderboardUI();
         } catch (e) {
           let msg = "Login failed";
           if (e.error) {
@@ -427,8 +402,19 @@
           sUser.value = "";
           sEmail.value = "";
           sPass.value = "";
-          // NEW: merge remote + local, then refresh UI
-          await handlePostAuth();
+
+          // Load game from database
+          if (window.loadGame) {
+            try {
+              await window.loadGame();
+            } catch (e) {
+              console.warn("Failed to load game after signup", e);
+            }
+          }
+
+          // Update UI
+          await updateAccountUI();
+          await updateLeaderboardUI();
         } catch (e) {
           let msg = "Sign up failed";
           if (e.error) {
@@ -464,6 +450,5 @@
     saveGame,
     // optional – expose the merge helper if you ever need it elsewhere
     mergeAndPersist,
-    handlePostAuth,
   };
 })();
