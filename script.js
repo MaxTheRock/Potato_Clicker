@@ -2283,32 +2283,37 @@
     const localSaveRaw = localStorage.getItem(SAVE_KEY_V2);
     const localSave = localSaveRaw ? JSON.parse(localSaveRaw) : null;
 
+    // If authenticated, use the merged auth API load function
     if (window.authApi && window.authApi.getToken()) {
       try {
-        const remoteSave = await window.authApi.load();
-
-        if (remoteSave && remoteSave.stats) {
-          if (
-            localSave &&
-            localSave.stats.allTimePotatoes > remoteSave.stats.allTimePotatoes
-          ) {
-            console.log("Local save has more potatoes, saving to backend");
-            await window.authApi.save(localSave);
-            loadV2(localSave);
-          } else {
-            console.log("Loaded save from backend");
-            if (localSave) {
-              localStorage.setItem(SAVE_KEY_V2, JSON.stringify(remoteSave));
-            }
-            loadV2(remoteSave);
-          }
-        } else if (localSave) {
-          console.log("No backend save found, loading local save");
-          loadV2(localSave);
-          await window.authApi.save(localSave);
-        } else {
-          migrateOldSave();
-        }
+        // Call the proper authApi.loadGame which merges remote + local
+        await window.authApi.loadGame();
+        
+        // Now apply the merged globals to script.js variables
+        potatoes = window.potatoes || 0;
+        allTimePotatoes = window.allTimePotatoes || 0;
+        buildings.forEach((b) => {
+          const data = window.buildings[b.id];
+          if (!data) return;
+          b.owned = data.owned || 0;
+          b.mystery = data.mystery !== false;
+          b.price = Math.ceil(b.basePrice * Math.pow(1.15, b.owned));
+          b.totalGenerated = data.totalGenerated || 0;
+          b.cpsMultiplier = data.cpsMultiplier || 1;
+        });
+        upgrades.forEach((u) => {
+          const data = window.upgrades[u.id];
+          if (!data) return;
+          u.unlocked = data.unlocked || false;
+          u.completed = data.completed || false;
+        });
+        skins.forEach((s) => {
+          const data = window.skins[s.id];
+          if (!data) return;
+          s.unlocked = data.unlocked || false;
+          s.equipped = data.equipped || false;
+        });
+        console.log("Loaded and merged authenticated user save");
       } catch (err) {
         console.log("Backend load failed, using local save", err);
         if (localSave) loadV2(localSave);

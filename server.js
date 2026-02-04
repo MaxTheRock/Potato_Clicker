@@ -192,14 +192,19 @@ app.post("/api/auth/save", requireAuth, async (req, res) => {
       [userId, saveData],
     );
 
-    // Update leaderboard with allTimePotatoes if available
-    if (saveData.stats && saveData.stats.allTimePotatoes !== undefined) {
+    // Update leaderboard with allTimePotatoes (handle both flat and nested formats)
+    let allTimePotatoes = saveData.allTimePotatoes;
+    if (!allTimePotatoes && saveData.stats) {
+      allTimePotatoes = saveData.stats.allTimePotatoes;
+    }
+    
+    if (allTimePotatoes !== undefined) {
       const user = await getUserById(userId);
       await pool.query(
         `INSERT INTO leaderboard (user_id, username, all_time_potatoes, updated_at)
          VALUES ($1, $2, $3, now())
          ON CONFLICT (user_id) DO UPDATE SET all_time_potatoes = $3, updated_at = now()`,
-        [userId, user.username, Math.floor(saveData.stats.allTimePotatoes)],
+        [userId, user.username, Math.floor(allTimePotatoes)],
       );
     }
 
