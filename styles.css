@@ -1736,7 +1736,7 @@ h3 {
 }
 
 .leaderboard-potato {
-  height: 24px;          /* fits the 22‑24 px font size used for .place */
+  height: 22px;          /* fits the 22‑24 px font size used for .place */
   width: auto;
   vertical-align: middle;
   margin-left: 4px;
