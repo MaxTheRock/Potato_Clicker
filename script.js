@@ -3336,4 +3336,5 @@
   window.achievmentsAdd = achievmentsAdd;
   window.clearLocalData = clearLocalData;
   window.storeCounter = storeCounter;
+  window.saveGameManual = saveGameManual;
 })();

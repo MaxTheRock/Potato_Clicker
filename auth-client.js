@@ -212,7 +212,7 @@
   /* --------------------------------------------------------------
      NEW: Helper that runs after a successful login / sign‑up.
           It loads the remote save, merges it with any local data,
-          and then updates the UI.
+          and then updates the UI and reloads the game with new data.
      -------------------------------------------------------------- */
   async function handlePostAuth() {
     const token = getToken();
@@ -230,6 +230,15 @@
 
     // Merge remote + local, persist, and populate globals.
     await mergeAndPersist(remoteSave);
+
+    // Reload the game with the merged data
+    if (window.loadGame) {
+      try {
+        await window.loadGame();
+      } catch (e) {
+        console.warn("Failed to reload game after login", e);
+      }
+    }
 
     // Refresh UI (account banner, farm name, leaderboard, etc.)
     await updateAccountUI();
