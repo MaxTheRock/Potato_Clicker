@@ -1741,3 +1741,89 @@ h3 {
   vertical-align: middle;
   margin-left: 4px;
 }
+
+.heart-container {
+  margin-top: 10px;
+  display: inline-block;  /* shrink to fit content */
+  --fill: 15%;            /* variable for the dark portion */
+  background: linear-gradient(
+    to right,
+    rgb(58, 74, 88) var(--fill),
+    transparent var(--fill)
+  );
+}
+
+.heart--price {
+  display: flex;
+  margin: -8px 0px;
+  padding-left: 13px;
+}
+
+.heart-amount {
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.time-left {
+  background: rgb(39, 55, 70);
+  color: white;
+  font-size: 12px;
+  margin: 0px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  color: rgb(0, 0, 0);
+  font-weight: bold;
+  font-size: 15px;
+  margin: 10px;
+}
+
+.v_skins-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.event-price {
+  display: flex;
+  gap: 2px;
+  font-weight: bold;
+}
+
+.event-instruction {
+  color: white;
+  margin: 20px
+}
+
+.heart-button {
+  background-color: transparent;
+  border: none;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
+
+.heart-size {
+  width: 15px;
+}
+
+@media (max-width: 700px) {
+  .heart-size {
+    width: 15px !important;
+    height: 15px !important;
+  }
+}
+
+.red {
+  color: rgb(255, 55, 55);
+}
+
+.red-other {
+  color: rgb(255, 138, 138);
+}

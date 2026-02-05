@@ -101,6 +101,15 @@
             <p id="potato-amount" class="potato-amount">0 Potatoes</p>
             <p class="potato-amount-persecond">per second: 0</p>
           </div>
+          <div class="heart-container">
+            <button class="heart-button" id="openModalAnouncements">
+              <div class="heart--price">
+              <img src="assets/heart.png" width="8%" class="heart">
+              <p class="heart-amount" id="heart_amount">0</p>
+            </div>
+            </button>
+            
+          </div>
           <div class="potato-wrapper">
             <img
               class="shine"
@@ -198,19 +207,27 @@
       <div class="modal" id="modalanouncements">
         <div class="modal-inner">
           <div class="modal-header">
-            <h2 class="info-h2">Anouncements</h2>
+            <h2 class="info-h2">Events</h2>
             <button class="closeButton" id="closeModalAnouncements">
               &times;
             </button>
           </div>
           <div class="general-stats">
+            <div class="time-left">
+              <img src="assets/timer.gif" alt="timer" width="30px">
+              <p id="event_timer">Event will end in: 0 seconds</p>
+            </div>
             <img
-              src="assets/news.png"
+              src="assets/banner.png"
               alt="Anouncement Image"
               class="anouncement-image"
               draggable="false"
               width="500"
             />
+            <h2 class="general-text">Spend your hearts on limited skins!</h2>
+            <div class="v_skins-container" id="v_skinsContainer">
+            </div>
+            <p class="event-instruction">Every time you click, you will gain 1 heart as well as some potatoes. You can then redeem the hearts by either refreshing the page or pressing the heart in the top left corner.</p>
           </div>
         </div>
       </div>
@@ -523,7 +540,24 @@
             <button class="closeButton" id="closeModal">&times;</button>
           </div>
           <div class="minor-update">
-            <h2 class="minor-h2">31/01/25: Progression Update v0.60</h2>
+            <h2 class="minor-h2 red">05/02/26: Valentine's Day Update v0.61</h2>
+            <p class="minor-p red-other">First event in Potato Clicker!</p>
+            <ul class="minor-ul">
+              <li>New currency called hearts</li>
+              <li>Hearts can be used to buy new skins!</li>
+              <li>Try to collect them all before the event ends.</li>
+              <li>Also leaderboard and saving is fully working and ready to use.</li>
+              <li>Auto saving is every 4 hours because some people like to stay AFK and increase Compute hours!!</li>
+              <li>
+                Thanks to <span class="flashing">KdntNinja</span> for making the backend work perfectly!
+              </li>
+              <li>
+                Thanks to the people who have designed some of the skins!
+              </li>
+            </ul>
+          </div>
+          <div class="minor-update">
+            <h2 class="minor-h2">31/01/26: Progression Update v0.60</h2>
             <p class="minor-p">Fixed a couple of things.</p>
             <ul class="minor-ul">
               <li>Added 5 new buildings.</li>
@@ -539,7 +573,7 @@
             </ul>
           </div>
           <div class="minor-update">
-            <h2 class="minor-h2">30/01/25: Bug fixes v0.58</h2>
+            <h2 class="minor-h2">30/01/26: Bug fixes v0.58</h2>
             <p class="minor-p">Fixed a couple of things.</p>
             <ul class="minor-ul">
               <li>Fixed buildings rendering issues</li>

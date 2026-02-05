@@ -1,6 +1,7 @@
 (() => {
   const clickerButton = document.getElementById("potato-button");
   const clickerCountDisplay = document.getElementById("potato-amount");
+  const heartsCountDisplay = document.getElementById("heart_amount");
   const titleElement = document.getElementById("title");
   const comments = document.getElementById("comment");
   const comments_mobile = document.getElementById("comment-mobile");
@@ -15,17 +16,15 @@
   const closeBtno = document.getElementById("closeModalOptions");
   const openBtnv = document.getElementById("openModalOptionsv");
   const modalo = document.getElementById("modaloptions");
-
+  const timerInterval = setInterval(updateTimer, 60 * 1000);
   const openBtnsk = document.getElementById("openModalSkins");
   const closeBtnsk = document.getElementById("closeModalSkins");
   const modalsk = document.getElementById("modalskins");
 
   const closeBtncodes = document.getElementById("closeModalCodes");
   const modalcodes = document.getElementById("modalcodes");
-
-  const closeModalAnouncements = document.getElementById(
-    "closeModalAnouncements",
-  );
+  const openModalAnouncements = document.getElementById("openModalAnouncements");
+  const closeModalAnouncements = document.getElementById("closeModalAnouncements");
   const modalanouncements = document.getElementById("modalanouncements");
 
   const potatoesCountElement = document.getElementById("potBank");
@@ -53,20 +52,22 @@
   const openOptionsMobile = document.getElementById("openModalOptions_mobile");
   const openStatsMobile = document.getElementById("openModalStats_mobile");
   const openInfoMobile = document.getElementById("openModalInfo_mobile");
-  const accountStatus = document.getElementById("accountStatus"); // <-- added
-
+  const accountStatus = document.getElementById("accountStatus");
+  const timerEl = document.getElementById("event_timer");
   const Codeinput = document.getElementById("codeInput");
   const Codebutton = document.getElementById("redeemCodeButton");
   const isTouchDevice =
     "ontouchstart" in window || navigator.maxTouchPoints > 0;
 
   const tooltip = document.getElementById("tooltip");
+  const heartContainer = document.querySelector(".heart-container");
 
   let tooltipHideTimeout = null;
   let mobileAutoHideTimeout = null;
 
   let rawPotatoes = 0;
   let potatoes = 0;
+  let hearts = 0;
   let potatoesPerSecond = 0;
   let potatoesLastSecond = 0;
   let allTimePotatoes = 0;
@@ -77,7 +78,7 @@
   let potatoClicks = 0;
   let handFarmedPotatoes = 0;
   let goldenPotatoClicks = 0;
-  let runningVersion = "v0.60";
+  let runningVersion = "v0.61";
   let autoClickAmount = 0;
   let runDurationSeconds;
   let totalUpgrades = 0;
@@ -90,7 +91,9 @@
   let idleTime = 0;
   let upgradeTime = 0;
   let lastDbSaveTime = Date.now();
-  const DB_SAVE_INTERVAL_MS = 20 * 60 * 1000; // 20 minutes
+  const DB_SAVE_INTERVAL_MS = 240 * 60 * 1000;
+  heartContainer.style.setProperty("--fill", "30%");
+  const eventTime = new Date(2026, 1, 16);
   // ================== BUILDINGS ==================
   let buildings = [
     {
@@ -1139,6 +1142,53 @@
       description: "Purchase 100 of everything!",
       credits: "Designed by William Sheard.",
     },
+    {
+      id: "rose",
+      name: "Rose",
+      image: "assets/variants/rose.png",
+      unlocked: false,
+      owned: false,
+      description: "Part of the Valentine's Day Event!",
+      credits: "Designed by William Sheard.",
+      price: 100,
+    },
+    {
+      id: "love_letter",
+      name: "Love Letter",
+      image: "assets/variants/love_letter.png",
+      unlocked: false,
+      equipped: false,
+      description: "Part of the Valentine's Day Event!",
+      price: 500,
+    },
+    {
+      id: "cupid",
+      name: "Cupid",
+      image: "assets/variants/cupid.png",
+      unlocked: false,
+      equipped: false,
+      description: "Part of the Valentine's Day Event!",
+      credits: "Designed by Rohan Launer.",
+      price: 5000,
+    },
+    {
+      id: "chocolate",
+      name: "Chocolate",
+      image: "assets/variants/chocolate.png",
+      unlocked: false,
+      equipped: false,
+      description: "Part of the Valentine's Day Event!",
+      price: 20000
+    },
+    {
+      id: "gift_box",
+      name: "Gift Box",
+      image: "assets/variants/gift_box.png",
+      unlocked: false,
+      equipped: false,
+      description: "Part of the Valentine's Day Event!",
+      price: 100000
+    }
   ];
 
   function isPC() {
@@ -1803,6 +1853,24 @@
     },
   ];
 
+  function updateTimer() {
+    const now = new Date();
+    const diff = eventTime - now;
+
+    if (diff <= 0) {
+      timerEl.textContent = "Event ended!";
+      clearInterval(timerInterval);
+      return;
+    }
+
+    const totalMinutes = Math.floor(diff / (1000 * 60));
+    const days = Math.floor(totalMinutes / (60 * 24));
+    const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
+    const minutes = totalMinutes % 60;
+
+    timerEl.textContent = `Event ends in ${days}d ${hours}h ${minutes}m `;
+  }
+
   let mysteryCount = 0;
   buildings.forEach((b) => {
     if (b.mystery && mysteryCount < 2) {
@@ -2077,6 +2145,7 @@
       titleElement.innerText =
         formatNumber(Math.floor(potatoes)) + " potatoes - Potato Clicker";
     }
+    heartsCountDisplay.innerText = formatNumber(Math.floor(hearts))
     if (frenzy || half_price_amount === 0.5) {
       clickerCountDisplay.style.color = "gold";
     } else {
@@ -2194,6 +2263,7 @@
         goldenPotatoClicks,
         buildingsOwned,
         totalUpgrades,
+        hearts,
       },
       buildings: {},
       upgrades: {},
@@ -2410,6 +2480,7 @@
     goldenPotatoClicks = s.goldenPotatoClicks;
     buildingsOwned = s.buildingsOwned;
     totalUpgrades = s.totalUpgrades;
+    hearts = typeof s.hearts === 'number' ? s.hearts : (hearts ?? 0);
 
     buildings.forEach((b) => {
       const data = save.buildings[b.id];
@@ -2511,13 +2582,13 @@
     handFarmedPotatoes += potatoesPerClick;
     allTimePotatoes += potatoesPerClick;
     potatoClicks++;
+    hearts++;
     markPlayerActivity();
     checkAchievements();
 
     updatePotatoDisplay();
     renderBuildings();
     renderUpgrades();
-
     setTimeout(() => {
       clickerButton.disabled = false;
     }, 85);
@@ -2795,6 +2866,62 @@
       // --- update affordability (NO re-render) ---
       upgradeButton.style.opacity =
         potatoes >= u.price * half_price_amount ? 1 : 0.5;
+    });
+  }
+
+  function renderEventSkins() {
+    const container = document.getElementById("v_skinsContainer");
+    if (!container) return;
+    container.innerHTML = "";
+
+    // Event skins are identified by IDs that are NOT in the original core list.
+    // For simplicity we filter by a known prefix or by a custom flag.
+    // Here we treat any skin whose ID is one of the Valentine IDs as an event skin.
+    const eventIds = ["rose","love_letter","cupid","chocolate","gift_box"];
+
+    const eventSkins = skins.filter(s => eventIds.includes(s.id));
+
+    eventSkins.forEach(s => {
+      const skinDiv = document.createElement("button");
+      skinDiv.className = `skin-div ${s.equipped ? "selected-skin" : ""}`;
+      if (!s.unlocked) skinDiv.classList.add("locked-skin");
+
+      skinDiv.innerHTML = `
+        <img src="${s.image}"
+            alt="${s.name}" width="100" class="skin-option"
+            data-skin="${s.id}" draggable="false"/>
+        <p class="skin-label">${s.name}</p>
+        <div class="event-price">
+          <img src="assets/heart.png" class="heart-size" draggable="false"/>
+          <div class="event-price">${formatNumber(s.price || 0)}</div>
+        </div>
+      `;
+
+      // Tooltip (same style as before)
+      skinDiv.addEventListener("mouseenter", () => {
+        const html = s.unlocked
+          ? `<div class="title">${s.name}</div>
+            <div>Price: ${formatNumber(s.price)} ♥</div>
+            ${s.credits ? `<div class="credits">${s.credits}</div>` : ''}`
+          : `<div class="title">???</div>
+            <div>Price: ${formatNumber(s.price)} ♥</div>`;
+        showTooltip(html, skinDiv);
+      });
+      skinDiv.addEventListener("mouseleave", hideTooltip);
+
+      // Click → purchase / equip
+      skinDiv.addEventListener("click", () => {
+        if (!s.unlocked) {
+          // Attempt to buy with hearts
+          purchaseEventSkin(s.id);
+        } else {
+          // Already owned – just equip
+          selectSkin(s.id, false);
+          updatePotatoDisplay();
+        }
+      });
+
+      container.appendChild(skinDiv);
     });
   }
 
@@ -3170,6 +3297,11 @@
     modalcodes.style.display = "none";
   });
 
+  openModalAnouncements.addEventListener("click", () => {
+    modalanouncements.classList.add("open");
+    modalanouncements.style.display = "none";
+  });
+
   closeModalAnouncements.addEventListener("click", () => {
     modalanouncements.classList.remove("open");
     modalanouncements.style.display = "none";
@@ -3203,43 +3335,56 @@
 
     // --- Potato jump (PRELOADED) ---
     const potato = preloadedSkins.get(equippedSkin.image).cloneNode(false);
-
     potato.className = "jump-image";
     potato.style.left = e.clientX - rect.left - 20 + "px";
     potato.style.top = e.clientY - rect.top - 20 + "px";
     potato.style.opacity = "1";
-
     clickArea.appendChild(potato);
 
-    // Physics
-    let velocityY = -6 - Math.random() * 2;
-    let velocityX = Math.random() * 4 - 2;
-    const gravity = 0.55;
-    let posX = e.clientX - rect.left - 20;
-    let posY = e.clientY - rect.top - 20;
+    // --- Heart jump (opposite direction) ---
+    const heart = document.createElement("img");
+    heart.src = "assets/heart.png";
+    heart.className = "jump-image";
+    heart.style.width = "30px";
+    heart.style.height = "auto";
+    heart.style.left = e.clientX - rect.left - 20 + "px";
+    heart.style.top = e.clientY - rect.top - 20 + "px";
+    heart.style.opacity = "1";
+    clickArea.appendChild(heart);
 
-    let rotation = Math.random() * 360;
-    let rotationSpeed = Math.random() * 10 - 5;
-    let opacity = 1;
+    // --- Physics function ---
+    function animateJump(element, direction = 1) {
+      let velocityY = -6 - Math.random() * 2;
+      let velocityX = (Math.random() * 4) * direction; // direction: 1 = normal, -1 = opposite
+      const gravity = 0.55;
+      let posX = e.clientX - rect.left - 20;
+      let posY = e.clientY - rect.top - 20;
+      let rotation = Math.random() * 360;
+      let rotationSpeed = Math.random() * 10 - 5;
+      let opacity = 1;
 
-    const animation = setInterval(() => {
-      velocityY += gravity;
-      posY += velocityY;
-      posX += velocityX;
+      const animation = setInterval(() => {
+        velocityY += gravity;
+        posY += velocityY;
+        posX += velocityX;
 
-      rotation += rotationSpeed;
-      opacity -= 0.05;
+        rotation += rotationSpeed;
+        opacity -= 0.05;
 
-      potato.style.transform = `rotate(${rotation}deg)`;
-      potato.style.left = posX + "px";
-      potato.style.top = posY + "px";
-      potato.style.opacity = opacity;
+        element.style.transform = `rotate(${rotation}deg)`;
+        element.style.left = posX + "px";
+        element.style.top = posY + "px";
+        element.style.opacity = opacity;
 
-      if (opacity <= 0 || posY > e.clientY - rect.top) {
-        clearInterval(animation);
-        potato.remove();
-      }
-    }, 16);
+        if (opacity <= 0 || posY > e.clientY - rect.top) {
+          clearInterval(animation);
+          element.remove();
+        }
+      }, 16);
+    }
+
+    animateJump(potato, 1);   // original direction
+    animateJump(heart, -1);   // opposite direction
   });
 
   let frenzy_amount;
@@ -3335,9 +3480,31 @@
     lastPlayerAction = Date.now();
   }
 
+  function purchaseEventSkin(id) {
+    const skin = skins.find(s => s.id === id);
+    if (!skin) return;
+
+    const cost = skin.price || 0;   // hearts required
+    if (hearts < cost) {
+      return;
+    }
+
+    // Pay the cost, unlock, then equip
+    hearts -= cost;
+    unlockSkin(id, false);   // false ⇒ we are still using the main skins array
+    selectSkin(id, false);   // equip it immediately (optional)
+
+    // Refresh UI and persist the change
+    updatePotatoDisplay();   // shows new heart count
+    renderEventSkins();      // redraw the event panel
+    saveGame(true);          // major change → DB save
+  }
+
   modalanouncements.classList.add("open");
   modalanouncements.style.display = "flex";
 
+  updateTimer();
+  renderEventSkins()
   loadGame();
   rateCounter();
   updatePotatoComments();
@@ -3347,6 +3514,7 @@
   renderUpgradesRegular();
   autoSave();
   renderSkins();
+  renderEventSkins();
   setInterval(() => {
     idleTime = Math.floor((Date.now() - lastPlayerAction) / 1000);
     console.log("idleTime:", idleTime);
