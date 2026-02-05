@@ -4,6 +4,7 @@
   const heartsCountDisplay = document.getElementById("heart_amount");
   const titleElement = document.getElementById("title");
   const comments = document.getElementById("comment");
+  const hints = document.getElementById("hints");
   const comments_mobile = document.getElementById("comment-mobile");
   const input = document.getElementById("nameInput");
   const openBtn = document.getElementById("openModal");
@@ -14,7 +15,6 @@
   const modals = document.getElementById("modalstats");
   const openBtno = document.getElementById("openModalOptions");
   const closeBtno = document.getElementById("closeModalOptions");
-  const openBtnv = document.getElementById("openModalOptionsv");
   const modalo = document.getElementById("modaloptions");
   const timerInterval = setInterval(updateTimer, 60 * 1000);
   const openBtnsk = document.getElementById("openModalSkins");
@@ -94,6 +94,77 @@
   const DB_SAVE_INTERVAL_MS = 240 * 60 * 1000;
   heartContainer.style.setProperty("--fill", "30%");
   const eventTime = new Date(2026, 1, 16);
+
+  let normal_hints = [
+    "What are you doing here!!!",
+    "Get out before I tell MaxTheRock...",
+    "You know that I can see you right?",
+    "Stop clicking the button, you might break it.",
+    "Owww, that hurts.",
+    "How did you even get here.",
+    "Who told you where this is?",
+    "I will find you eventually.",
+    "I'm not doing a very good job of guarding this...",
+    "Your here for the skins right?",
+    "Let me tell you a secret... There is nothing here!!!",
+    "I thought this game was only about clicking a potato.",
+    "Press the X in the corner (trust me)",
+    "Have you seen my key anywhere",
+    "Try to actually play the game instead of lingering here.",
+    "Get out!!!!!!",
+    "Don't make me use force!!!",
+    "So... Anyway... How has been your day?",
+    "Put your bank details in the code box and I'll give you a prize ;)",
+    "This is not the secret room you are looking for.",
+    "Congrats, you found absolutely nothing.",
+    "I swear this wasn't supposed to be discoverable.",
+    "Please pretend you didn't see this.",
+    "This area is under very serious protection.",
+    "Stop staring at the text. It gets shy.",
+    "There was content here. Then it left.",
+    "You've officially gone off-script.",
+    "Nothing to see here. Move along.",
+    "I'm running out of things to say… help.",
+    "This message was added just to annoy you.",
+    "Are you expecting lore or something?",
+    "The potato is judging you right now.",
+    "Achievement unlocked: Curiosity.",
+    "This text box is paid per letter.",
+    "You're clicking like there's a reward. There isn't.",
+    "Somewhere, a potato felt that click.",
+    "I was told to guard this. No one said how.",
+    "If you keep clicking, I might say something useful.",
+    "Spoiler alert: still nothing here.",
+    "You again?",
+    "This is why we can't have nice things.",
+    "I should really lock this better.",
+    "Are you trying to break the game?",
+    "At this point I admire the dedication."
+  ]
+
+  let special_hints = [
+    "Can I come in please??",
+    "Gary, are you there...",
+    "The timing must of been impossible for you to get here...",
+    "Get off this dossers game.",
+    "These beats are fire!!!",
+    "I really need a drink",
+    "I wonder if there is a drink made out of potatoes...",
+    "I need a real punchy drink right now",
+    "You will be dancing by the end of the week if you carry on!!"
+  ]
+
+  function rollRandomHint() {
+    let randomNumber = Math.floor(Math.random() * 10) + 1;
+    if (randomNumber >=3) {
+      hints.style.color = "white";
+      return normal_hints[Math.floor(Math.random() * normal_hints.length)];
+    } else {
+      hints.style.color = "orange";
+      return special_hints[Math.floor(Math.random() * special_hints.length)];
+    }
+  }
+
   // ================== BUILDINGS ==================
   let buildings = [
     {
@@ -1923,29 +1994,33 @@
     const value = Codeinput.value;
     if (value === "potatopunch") {
       achievmentsAdd("monster");
-      Codeinput.value = "";
       alert("Code redeemed! Achievement unlocked: Potato Punch");
-    }
-    if (value === "potatobeats") {
+      hints.textContent = "That's where my drink was!!!"
+      hints.style.color = "lightgreen";
+    } else if (value === "potatobeats") {
       achievmentsAdd("synth_master");
-      Codeinput.value = "";
       alert("Code redeemed! Achievement unlocked: Synth Master");
-    }
-    if (value === "canicomeingary") {
+      hints.textContent = "Now you can play music whilst clicking!!"
+      hints.style.color = "lightgreen";
+    } else if (value === "canicomeingary") {
       achievmentsAdd("you_look_like_a_potato");
-      Codeinput.value = "";
+      hints.textContent = "Come in..."
+      hints.style.color = "lightgreen";
       alert("Code redeemed! Achievement unlocked: You look like a potato");
-    }
-    if (value === "dossersgames") {
+    } else if (value === "dossersgames") {
       achievmentsAdd("dosser");
-      Codeinput.value = "";
       alert("Code redeemed! Achievement unlocked: Menglish");
-    }
-    if (value === "impossibletiming") {
+      hints.textContent = "Those who know..."
+      hints.style.color = "lightgreen";
+    } else if (value === "impossibletiming") {
       achievmentsAdd("geometry_dash");
-      Codeinput.value = "";
       alert("Code redeemed! Achievement unlocked: How did you do that!");
+      hints.textContent = "That really does require impossible timing!"
+      hints.style.color = "lightgreen";
+    } else {
+      hints.textContent = rollRandomHint();
     }
+    Codeinput.value = "";
   });
 
   function storeCounter() {
@@ -1962,61 +2037,120 @@
       "Your potatoes are non-existent.",
       "You have no potatoes to discuss.",
       "Your potatoes are invisible to the world.",
+      "Even the dirt is disappointed."
     ],
+
     under100: [
       "Your potatoes are being ignored.",
       "Many people overlook your potatoes.",
       "Your potatoes are not getting any attention.",
       "Your potatoes are infected.",
+      "Someone stepped on one by accident."
     ],
+
     _1000to5000: [
       "Your potatoes are getting some attention.",
       "A few people are noticing your potatoes.",
       "You are making a few sales a day.",
-      () => `A kid called one of your potatoes '${random_name()}'.`,
+      () => `A kid named ${random_name()} adopted one of your potatoes.`,
+      "At least someone believes in you."
     ],
+
     _5000to20000: [
-      "Your potatoes business is rising!",
-      "People are starting to leave reviews about your stall.",
-      "People are using your potatoes.",
-      "Your potatoes are a 7/10!",
+      "Your potato business is rising!",
+      "People are leaving reviews about your stall.",
+      "People are actually buying your potatoes.",
+      "Your potatoes are a solid 7/10.",
+      "Someone asked for seconds."
     ],
+
     _20000to100000: [
       "Your potatoes are going viral on social media!",
       "People are talking about your potatoes.",
-      "People are queuing up for some potatoes.",
-      "Your potatoes are on the newspaper!",
+      "People are queuing up for potatoes.",
+      "Your potatoes made the newspaper!",
+      "You might need more crates."
     ],
+
     _100000to500000: [
-      "You have daily customers that are visiting every day.",
-      "Your potatoes are used in everyones meals.",
-      "People are asking you for advise to start their own stalls.",
-      "Your potatoes stand out against all the other competitors.",
+      "You have regular customers now.",
+      "Your potatoes are used in everyday meals.",
+      "People ask you for business advice.",
+      "Your stall stands out from the rest.",
+      "Competitors are getting nervous."
     ],
+
     _500000to1000000: [
-      "You have been invited on the news!",
-      "Your have moved to a larger building to sell your potatoes.",
-      "Your towns flag is a giant potato!",
-      "People are traveling hours just to get a glimpse of your potatoes.",
-      "Grandma Vero enjoyed your potatoes.",
-      "Everyone loves your potatoes!!",
+      "You have been invited onto the news!",
+      "You moved into a bigger building.",
+      "Your town’s flag has a potato on it.",
+      "People travel hours to see your potatoes.",
+      "Everyone loves your potatoes!!"
     ],
-    _1000000to10000000: [
-      "The king has asked if he can try your potatoes.",
-      "People have pre-ordered your potato merch.",
-      "You should probably get off the game at this point...",
-      "'Potion Clicker' has overtaken you in sales.",
-      "Your potatoes are No.1 in the country.",
-      "Keep clicking...",
+
+    _1Mto10M: [
+      "The king requested a potato tasting.",
+      "You released official potato merch.",
+      "You should probably touch grass.",
+      "Your potatoes are No.1 nationwide.",
+      "Historians are taking notes."
     ],
-    _10000000to50000000: [
-      "Your potatoes have their own website!",
-      "Potatoes are your countries national dish.",
-      "Just keep going...",
-      "Try to get 1st on the leaderboard!",
-      "Leon likes your potatoes.",
-      "Make an account and save your potatoes.",
+
+    _10Mto50M: [
+      "Your potatoes have their own website.",
+      "Potatoes are your country’s national dish.",
+      "Schools teach about your potatoes.",
+      "Keep going… this is getting serious.",
+      "Your face is on the logo now."
     ],
+
+    _50Mto100M: [
+      "Your potatoes crossed borders.",
+      "Foreign markets demand shipments.",
+      "You hired managers for your managers.",
+      "Potato stocks are booming.",
+      "This is no longer a small business."
+    ],
+
+    _100Mto500M: [
+      "Your potatoes are globally recognised.",
+      "World leaders discuss potato policy.",
+      "You accidentally caused inflation.",
+      "Entire cities rely on your supply.",
+      "This feels excessive."
+    ],
+
+    _500Mto1B: [
+      "You are the potato monopoly.",
+      "Documentaries are being made.",
+      "Your potatoes appear in history books.",
+      "Economies collapse without you.",
+      "This has gone too far."
+    ],
+
+    _1Bto10B: [
+      "Your potatoes fund space programs.",
+      "You own islands shaped like potatoes.",
+      "Aliens requested a trade deal.",
+      "Earth is running on potatoes.",
+      "Please stop."
+    ],
+
+    _10Bto100B: [
+      "Your potatoes reached the moon.",
+      "Time travelers mention your name.",
+      "Reality bends around your farm.",
+      "Potato worship has begun.",
+      "This is getting uncomfortable."
+    ],
+
+    _100Bto1T: [
+      "Your potatoes exist beyond comprehension.",
+      "Numbers have lost meaning.",
+      "The universe acknowledges your potatoes.",
+      "You beat the game. Probably.",
+      "There is nothing left to click."
+    ]
   };
 
   function setCommentSmooth(text) {
@@ -2063,43 +2197,93 @@
         comment_types.none[
           Math.floor(Math.random() * comment_types.none.length)
         ];
+
     } else if (potatoes < 100) {
       newComment =
         comment_types.under100[
           Math.floor(Math.random() * comment_types.under100.length)
         ];
-    } else if (potatoes < 5000) {
+
+    } else if (potatoes < 5_000) {
       newComment =
         comment_types._1000to5000[
           Math.floor(Math.random() * comment_types._1000to5000.length)
         ];
-    } else if (potatoes < 20000) {
+
+    } else if (potatoes < 20_000) {
       newComment =
         comment_types._5000to20000[
           Math.floor(Math.random() * comment_types._5000to20000.length)
         ];
-    } else if (potatoes < 100000) {
+
+    } else if (potatoes < 100_000) {
       newComment =
         comment_types._20000to100000[
           Math.floor(Math.random() * comment_types._20000to100000.length)
         ];
-    } else if (potatoes < 500000) {
+
+    } else if (potatoes < 500_000) {
       newComment =
         comment_types._100000to500000[
           Math.floor(Math.random() * comment_types._100000to500000.length)
         ];
-    } else if (potatoes < 1000000) {
+
+    } else if (potatoes < 1_000_000) {
       newComment =
         comment_types._500000to1000000[
           Math.floor(Math.random() * comment_types._500000to1000000.length)
         ];
+
+    } else if (potatoes < 10_000_000) {
+      newComment =
+        comment_types._1Mto10M[
+          Math.floor(Math.random() * comment_types._1Mto10M.length)
+        ];
+
+    } else if (potatoes < 50_000_000) {
+      newComment =
+        comment_types._10Mto50M[
+          Math.floor(Math.random() * comment_types._10Mto50M.length)
+        ];
+
+    } else if (potatoes < 100_000_000) {
+      newComment =
+        comment_types._50Mto100M[
+          Math.floor(Math.random() * comment_types._50Mto100M.length)
+        ];
+
+    } else if (potatoes < 500_000_000) {
+      newComment =
+        comment_types._100Mto500M[
+          Math.floor(Math.random() * comment_types._100Mto500M.length)
+        ];
+
+    } else if (potatoes < 1_000_000_000) {
+      newComment =
+        comment_types._500Mto1B[
+          Math.floor(Math.random() * comment_types._500Mto1B.length)
+        ];
+
+    } else if (potatoes < 10_000_000_000) {
+      newComment =
+        comment_types._1Bto10B[
+          Math.floor(Math.random() * comment_types._1Bto10B.length)
+        ];
+
+    } else if (potatoes < 100_000_000_000) {
+      newComment =
+        comment_types._10Bto100B[
+          Math.floor(Math.random() * comment_types._10Bto100B.length)
+        ];
+
     } else {
       newComment =
-        comment_types._1000000to10000000[
-          Math.floor(Math.random() * comment_types._1000000to10000000.length)
+        comment_types._100Bto1T[
+          Math.floor(Math.random() * comment_types._100Bto1T.length)
         ];
     }
 
+    // handle function-based comments
     if (typeof newComment === "function") {
       newComment = newComment();
     }
@@ -3247,10 +3431,6 @@
     modalo.classList.remove("open");
   });
 
-  openBtnv.addEventListener("click", () => {
-    modalo.classList.add("open");
-  });
-
   openOptionsMobile.addEventListener("click", () => {
     modalo.classList.add("open");
     modalo.style.display = "flex";
@@ -3504,7 +3684,6 @@
   modalanouncements.style.display = "flex";
 
   updateTimer();
-  renderEventSkins()
   loadGame();
   rateCounter();
   updatePotatoComments();
