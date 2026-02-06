@@ -3720,13 +3720,4 @@
   window.saveGameManual = saveGameManual;
   window.loadGameManual = loadGameManual;
   window.loadGame = loadGame;
-
-  let lastTouchEnd = 0;
-  document.addEventListener('touchend', function (event) {
-    const now = new Date().getTime();
-    if (now - lastTouchEnd <= 300) {
-      event.preventDefault(); // prevents double-tap zoom
-    }
-    lastTouchEnd = now;
-  }, false);
 })();
