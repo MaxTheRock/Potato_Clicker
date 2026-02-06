@@ -3173,12 +3173,6 @@
     return ring < 3 ? 32 : 32 + (ring - 2) * 2;
   }
 
-  // ---------- Start orbit ----------
-  if (!peelerOrbitStarted) {
-    peelerOrbitStarted = true;
-    requestAnimationFrame(renderPeelerOrbit);
-  }
-
   function renderEventSkins() {
     const container = document.getElementById("v_skinsContainer");
     if (!container) return;
@@ -3453,8 +3447,8 @@
           potatoes -= cost;
           b.price = Math.ceil(b.price * 1.15);
 
-          if (b.id === "peeler") {
-            requestAnimationFrame(renderPeelerOrbit);
+          if (b.id === "cursor") {
+            maybeStartPeelerOrbit();
           }
 
           calculateAutoClick();
@@ -3532,6 +3526,26 @@
       (total, b) => total + b.cps * b.owned,
       0,
     );
+  }
+
+  function maybeStartPeelerOrbit() {
+    const peeler = getPeelerBuilding();   // returns the "cursor" building object
+    if (!peeler || peeler.owned < 1) return;   // nothing to orbit yet
+
+    // ---- Un‑hide the orbit container (if it was hidden) ----
+    const orbitEl = document.querySelector('.peeler-orbit');
+    if (orbitEl) {
+      orbitEl.classList.remove('hidden');   // remove a CSS “hidden” class, if present
+      orbitEl.style.display = 'block';      // fallback for plain display:none
+      orbitEl.style.visibility = 'visible';
+      orbitEl.style.opacity = '1';
+    }
+
+    // ---- Start the animation (only once) ----
+    if (!peelerOrbitStarted) {
+      peelerOrbitStarted = true;
+      requestAnimationFrame(renderPeelerOrbit);
+    }
   }
 
   goldenPotatoImage.classList.add("hidden");
@@ -3820,6 +3834,7 @@
 
   updateTimer();
   loadGame();
+  maybeStartPeelerOrbit();
   rateCounter();
   updatePotatoComments();
   updateStatsDisplay();
