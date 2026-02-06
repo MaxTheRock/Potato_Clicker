@@ -196,7 +196,7 @@ section {
 }
 
 .name-box {
-  background-color: rgb(58, 74, 88);
+  background-color: rgba(23, 31, 37, 0.641);
   padding: 10px;
   margin: 10px;
   border-style: solid;
@@ -239,6 +239,7 @@ section {
   margin-top: 50px;
   display: flex;
   justify-content: center;
+  z-index: 20;
 }
 
 @media (max-width: 1100px) {
@@ -253,7 +254,8 @@ section {
   flex-direction: column;
   align-items: center;
   color: white;
-  background-color: rgb(58, 74, 88);
+  background-color: rgba(23, 31, 37, 0.641);
+  z-index: 20;
 }
 
 .potato-amount {
@@ -1748,9 +1750,10 @@ h3 {
   --fill: 15%;            /* variable for the dark portion */
   background: linear-gradient(
     to right,
-    rgb(58, 74, 88) var(--fill),
+    rgba(23, 31, 37, 0.641) var(--fill),
     transparent var(--fill)
   );
+  z-index: 20;
 }
 
 .heart--price {
@@ -1831,4 +1834,19 @@ h3 {
 .code-hints {
   margin: 0px 0px -20px 0px;
   color: white;
+}
+
+.peeler-orbit {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.peeler {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  will-change: transform;
+  user-select: none;
 }

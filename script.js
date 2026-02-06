@@ -1194,7 +1194,7 @@
       image: "assets/variants/crisp.png",
       unlocked: false,
       equipped: false,
-      description: "Purchase 500 peelers.",
+      description: "Purchase 250 peelers.",
     },
     {
       id: "ice",
@@ -1280,12 +1280,12 @@
   }
 
   function checkAchievements() {
-    if (potatoes >= 100000000000000000) {
+    /*if (potatoes >= 100000000000000000) {
       potatoes = -9999999999999999999999;
       autoClickAmount = -999999999999999;
       allTimePotatoes = 0;
     }
-
+    */
 
     if (potatoClicks >= 1) {
       achievmentsAdd("first_click");
@@ -1476,7 +1476,7 @@
       achievmentsAdd("peel_master");
     }
 
-    if (peeler && peeler.owned >= 500) {
+    if (peeler && peeler.owned >= 250) {
       achievmentsAdd("crisp");
     }
 
@@ -1920,7 +1920,7 @@
     {
       id: "crisp",
       name: "Crunchy.",
-      description: "Purchase 500 peelers.",
+      description: "Purchase 250 peelers.",
       completed: false,
       skinReward: "crisp",
     },
@@ -3062,6 +3062,123 @@
     });
   }
 
+  let peelerOrbitStarted = false;
+  let groupStepTime = 1000; // 1 second per active peeler in group
+  let groupIndex = 0;        // current active peeler index within each group
+  const rollGroupSize = 5;   // peelers per rolling group
+
+  // ---------- Configurable variables ----------
+  const gapFirstRows = -7;   // negative = slight overlap for first 3 rows
+  const gapLaterRows = 0;    // spacing for rows after 3
+  const rollDistance = 10;    // pixels a peeler moves toward the potato
+  const bobAmount = 2;       // subtle vertical bobbing
+
+  // ---------- Main orbit function ----------
+  function renderPeelerOrbit(timestamp) {
+    const orbit = document.querySelector(".peeler-orbit");
+    if (!orbit) return;
+
+    const peeler = getPeelerBuilding();
+    const count = peeler?.owned ?? 0;
+    if (count === 0) return;
+
+    // ----------------------------
+    // Sync DOM
+    // ----------------------------
+    while (orbit.children.length > count) orbit.lastChild.remove();
+    while (orbit.children.length < count) {
+      const img = document.createElement("img");
+      img.className = "peeler";
+      img.src = peeler.icon;
+      img.draggable = false;
+      orbit.appendChild(img);
+      img.style.opacity = "0";
+      img.style.transition = "opacity 0.3s ease";
+      requestAnimationFrame(() => (img.style.opacity = "1"));
+    }
+
+    // ----------------------------
+    // Centre
+    // ----------------------------
+    const rect = orbit.getBoundingClientRect();
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2 + 30;
+
+    // ----------------------------
+    // Update which peeler in each group is active
+    // ----------------------------
+    if (timestamp) groupIndex = Math.floor(timestamp / groupStepTime) % rollGroupSize;
+
+    // ----------------------------
+    // Place peelers sequentially in rings
+    // ----------------------------
+    let placed = 0;
+    let ring = 0;
+    const baseRadius = 180;
+
+    while (placed < count) {
+      // Dynamic radius
+      const radius = baseRadius + ring * ringSpacing(ring);
+
+      // Dynamic gap
+      const gap = ring < 3 ? gapFirstRows : gapLaterRows;
+
+      const circumference = 2 * Math.PI * radius;
+      const ringCapacity = Math.floor(circumference / (32 + gap));
+      const peelersThisRing = Math.min(ringCapacity, count - placed);
+
+      for (let j = 0; j < peelersThisRing; j++) {
+        const img = orbit.children[placed];
+
+        const speed =
+          0.18 * (1 / (1 + ring * 0.35)) * (ring % 2 ? -1 : 1);
+
+        // sequential placement
+        const angle = (timestamp / 1000) * speed + (32 + gap) * j / radius;
+
+        // ----------------------------
+        // Rolling group: only 1 active per group
+        // ----------------------------
+        const group = Math.floor(placed / rollGroupSize);
+        const inGroupIndex = placed % rollGroupSize;
+        let rollOffset = 0;
+        if (inGroupIndex === groupIndex) {
+          const elapsed = (timestamp % groupStepTime) / groupStepTime;
+          const phase = Math.sin(elapsed * Math.PI); // smooth in/out
+          rollOffset = rollDistance * phase;
+        }
+
+        // subtle vertical bob
+        const bob = Math.sin((timestamp / 1000) * 2 + placed) * bobAmount;
+
+        const x = centerX + Math.cos(angle) * radius;
+        const y = centerY + Math.sin(angle) * (radius - rollOffset) + bob;
+
+        img.style.transform = `
+          translate(${x - 32 / 2}px, ${y - 32 / 2}px)
+          rotate(${angle + Math.PI / 2 + Math.PI}rad)
+        `;
+
+        placed++;
+      }
+
+      ring++;
+    }
+
+    requestAnimationFrame(renderPeelerOrbit);
+  }
+
+  // ---------- Helper: ring spacing ----------
+  function ringSpacing(ring) {
+    return ring < 3 ? 32 : 32 + (ring - 2) * 2;
+  }
+
+  // ---------- Start orbit ----------
+  if (!peelerOrbitStarted) {
+    peelerOrbitStarted = true;
+    requestAnimationFrame(renderPeelerOrbit);
+  }
+
   function renderEventSkins() {
     const container = document.getElementById("v_skinsContainer");
     if (!container) return;
@@ -3335,6 +3452,10 @@
           b.owned++;
           potatoes -= cost;
           b.price = Math.ceil(b.price * 1.15);
+
+          if (b.id === "peeler") {
+            requestAnimationFrame(renderPeelerOrbit);
+          }
 
           calculateAutoClick();
           updatePotatoDisplay();
@@ -3692,6 +3813,11 @@
   modalanouncements.classList.add("open");
   modalanouncements.style.display = "flex";
 
+  function getPeelerBuilding() {
+    return buildings.find((b) => b.id === "cursor");
+  }
+
+
   updateTimer();
   loadGame();
   rateCounter();
@@ -3703,6 +3829,7 @@
   autoSave();
   renderSkins();
   renderEventSkins();
+  requestAnimationFrame(renderPeelerOrbit);
   setInterval(() => {
     idleTime = Math.floor((Date.now() - lastPlayerAction) / 1000);
     console.log("idleTime:", idleTime);
@@ -3729,4 +3856,5 @@
   window.saveGameManual = saveGameManual;
   window.loadGameManual = loadGameManual;
   window.loadGame = loadGame;
+  window.getPeelerBuilding = getPeelerBuilding;
 })();
