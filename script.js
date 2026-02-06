@@ -1259,6 +1259,15 @@
       equipped: false,
       description: "Part of the Valentine's Day Event!",
       price: 100000
+    },
+    {
+      id: "heart",
+      name: "Heart",
+      image: "assets/variants/heart.png",
+      unlocked: false,
+      equipped: false,
+      description: "Part of the Valentine's Day Event!",
+      price: 500000
     }
   ];
 
@@ -3061,7 +3070,7 @@
     // Event skins are identified by IDs that are NOT in the original core list.
     // For simplicity we filter by a known prefix or by a custom flag.
     // Here we treat any skin whose ID is one of the Valentine IDs as an event skin.
-    const eventIds = ["rose","love_letter","cupid","chocolate","gift_box"];
+    const eventIds = ["rose","love_letter","cupid","chocolate","gift_box", "heart"];
 
     const eventSkins = skins.filter(s => eventIds.includes(s.id));
 
