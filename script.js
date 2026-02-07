@@ -1268,7 +1268,16 @@
       equipped: false,
       description: "Part of the Valentine's Day Event!",
       price: 500000
-    }
+    },
+    {
+      id: "grass",
+      name: "Grass",
+      image: "assets/variants/grass.png",
+      unlocked: false,
+      equipped: false,
+      description: "Purchase 100 farmers!",
+      credits: "Designed by Gabriel D'Agostino.",
+    },
   ];
 
   function isPC() {
@@ -1478,6 +1487,10 @@
 
     if (peeler && peeler.owned >= 250) {
       achievmentsAdd("crisp");
+    }
+
+    if (farmer.owned >= 100) {
+      achievmentsAdd("grass")
     }
 
     // Ewww (50 chip factories)
@@ -1930,6 +1943,13 @@
       description: "Purchase 100 of everything.",
       completed: false,
       skinReward: "yin_yang",
+    },
+    {
+      id: "grass",
+      name: "Click some Grass",
+      description: "Purchase 100 farmers.",
+      completed: false,
+      skinReward: "grass",
     },
   ];
 
@@ -3170,7 +3190,7 @@
 
   // ---------- Helper: ring spacing ----------
   function ringSpacing(ring) {
-    return ring < 3 ? 32 : 32 + (ring - 2) * 2;
+    return ring < 3 ? 31 : 32 + (ring - 2) * 2;
   }
 
   function renderEventSkins() {
@@ -3830,37 +3850,41 @@
   function getPeelerBuilding() {
     return buildings.find((b) => b.id === "cursor");
   }
-
-
   updateTimer();
-  loadGame();
-  maybeStartPeelerOrbit();
-  rateCounter();
-  updatePotatoComments();
-  updateStatsDisplay();
-  autoClick();
-  renderBuildingsRegular();
-  renderUpgradesRegular();
-  autoSave();
-  renderSkins();
-  renderEventSkins();
-  requestAnimationFrame(renderPeelerOrbit);
-  setInterval(() => {
-    idleTime = Math.floor((Date.now() - lastPlayerAction) / 1000);
-    console.log("idleTime:", idleTime);
-  }, 1000);
-  setInterval(() => {
-    upgradeTime++;
-  }, 1000);
-  console.log(`
-    ---------------------------------------------------------------
-    Potato Clicker!
-    ---------------------------------------------------------------
-    This is the potato clicker console. Don't mess around here unless you know what you are doing as you may accidentally wipe your game save
+  (async () => {
+    const overlay = document.getElementById('loadingOverlay');
+    
+    await loadGame();
+    maybeStartPeelerOrbit();
+    rateCounter();
+    updatePotatoComments();
+    updateStatsDisplay();
+    autoClick();
+    renderBuildingsRegular();
+    renderUpgradesRegular();
+    autoSave();
+    renderSkins();
+    renderEventSkins();
+    requestAnimationFrame(renderPeelerOrbit);
+    setInterval(() => {
+      idleTime = Math.floor((Date.now() - lastPlayerAction) / 1000);
+      console.log("idleTime:", idleTime);
+    }, 1000);
+    setInterval(() => {
+      upgradeTime++;
+    }, 1000);
+    console.log(`
+      ---------------------------------------------------------------
+      Potato Clicker!
+      ---------------------------------------------------------------
+      This is the potato clicker console. Don't mess around here unless you know what you are doing as you may accidentally wipe your game save
 
-    Have fun and get clicking!
-      - MaxTheRock
-  `);
+      Have fun and get clicking!
+        - MaxTheRock
+    `);
+    overlay.classList.add('hidden');
+    setTimeout(() => overlay.remove(), 500);
+  })();
 
   document.addEventListener("contextmenu", (e) => e.preventDefault());
 
