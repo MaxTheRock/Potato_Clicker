@@ -155,16 +155,31 @@ section {
     overflow: hidden;
   }
 }
-
 .pixelated-background {
+  transform: translateZ(0);
+  position: relative; /* required for ::before */
+  
+  /* Define CSS variable on parent */
+  --overlay-alpha: 0; /* start fully bright */
+}
+
+.pixelated-background::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
   background-image: url("assets/background.png");
-  background-size: cover;
+  background-size: 960px 960px; /* make image larger */
   background-position: center;
   background-repeat: no-repeat;
   image-rendering: pixelated;
+
+  /* Use parent's variable */
+  background-color: rgba(0, 0, 0, var(--overlay-alpha));
+  background-blend-mode: multiply;
+
   will-change: transform;
-  transform: translateZ(0);
-  background-size: 960px 960px;
+  z-index: -1;
 }
 
 .clicking-section {
@@ -1020,11 +1035,11 @@ h3 {
 
 .gold-potato {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  top: 0;
+  left: 0;
   width: 100px;
   height: auto;
-  z-index: 1000;
+  z-index: 9999;
   filter: drop-shadow(0px 0px 10px rgb(238, 255, 0));
   animation: jiggle 10s infinite;
 }
@@ -1964,6 +1979,7 @@ h3 {
   background-size: 600px 150px;
   margin-top: -80px;
   margin-right: -164px;
+  margin-bottom: 12px
   
 }
 
@@ -1986,4 +2002,8 @@ h3 {
     rgba(0, 0, 0, 0),      /* top: fully transparent */
     rgba(0, 0, 0, 0.5)     /* bottom: 50% opacity black */
   );
+}
+
+#goldenPotatoImage {
+  position: fixed;
 }

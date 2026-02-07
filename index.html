@@ -200,13 +200,6 @@
               <!-- Buildings will be dynamically added here -->
             </div>
           </div>
-          <img
-            src="assets/golden_potato.png"
-            alt="Golden Potato"
-            id="golden-potato"
-            draggable="false"
-            class="gold-potato"
-          />
         </section>
       </div>
       <div class="modal" id="modalanouncements">
@@ -276,6 +269,10 @@
               onclick="light_darkToggle()"
               class="save-load-button"
             >Dark Mode</button>
+            <p class="options-p">
+              Background darkness:
+            </p>
+            <input type="range" id="darkenSlider" min="0" max="1" step="0.01" value="0">
           </div>
           <div class="general-stats">
             <h2 class="general-text">Account</h2>
@@ -512,6 +509,7 @@
               <li>Responisive hopefully 🤞</li>
               <li>More comments.</li>
               <li>Loading screen just so you don't jump straight in with like 50 assets missing.</li>
+              <li>Background darkness slider for people with sore eyes.</li>
             </ul>
           </div>
           <div class="minor-update">
@@ -802,6 +800,13 @@
         </div>
       </div>
     </main>
+    <img
+      src="assets/golden_potato.png"
+      alt="Golden Potato"
+      id="golden-potato"
+      draggable="false"
+      class="gold-potato"
+    />
     <div id="achievement-container"></div>
     <div id="tooltip" class="tooltip hidden"></div>
     <script src="auth-client.js"></script>

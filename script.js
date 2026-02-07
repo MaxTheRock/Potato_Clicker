@@ -61,6 +61,18 @@
   const heartContainer = document.querySelector(".heart-container");
   const MODE_STORAGE_KEY = "potato_clicker_mode";
 
+  document.addEventListener("DOMContentLoaded", () => {
+    const slider = document.getElementById("darkenSlider");
+    const backgrounds = document.querySelectorAll(".pixelated-background");
+
+    slider.addEventListener("input", () => {
+      backgrounds.forEach(bg => {
+        bg.style.setProperty("--overlay-alpha", slider.value);
+      });
+      backgroundAlpha = Number(slider.value);
+    });
+    saveGame(true);
+  });
   /**
    * Write the current mode to localStorage.
    * @param {"light"|"dark"} m
@@ -79,7 +91,7 @@
 
   let tooltipHideTimeout = null;
   let mobileAutoHideTimeout = null;
-
+  let comment_count = 0;
   let rawPotatoes = 0;
   let potatoes = 0;
   let hearts = 0;
@@ -107,6 +119,7 @@
   let idleTime = 0;
   let upgradeTime = 0;
   let lastDbSaveTime = Date.now();
+  let backgroundAlpha = 1;
   const DB_SAVE_INTERVAL_MS = 240 * 60 * 1000;
   heartContainer.style.setProperty("--fill", "30%");
   const eventTime = new Date(2026, 1, 16);
@@ -1294,6 +1307,23 @@
       description: "Purchase 100 farmers!",
       credits: "Designed by Gabriel D'Agostino.",
     },
+    {
+      id: "noll_sport",
+      name: "Noll Sport",
+      image: "assets/variants/noll_sport.png",
+      unlocked: false,
+      equipped: false,
+      description: "A secret is required to unlock this skin.",
+      credits: "Designed by Noll Clark & William Sheard.",
+    },
+    {
+      id: "bruh",
+      name: "Bruh",
+      image: "assets/variants/bruh.png",
+      unlocked: false,
+      equipped: false,
+      description: "Cycle through 50 comments without refreshing.",
+    },
   ];
 
   function isPC() {
@@ -1546,6 +1576,10 @@
     }
     if (space_station.owned + planet.owned + inter.owned >= 10) {
       achievmentsAdd("sus");
+    }
+
+    if (comment_count >= 50) {
+      achievmentsAdd("bruh");
     }
   }
 
@@ -1957,6 +1991,20 @@
       completed: false,
       skinReward: "grass",
     },
+    {
+      id: "noll_sport",
+      name: "Let's get sporty!!",
+      description: "A secret is required to unlock this skin.",
+      completed: false,
+      skinReward: "noll_sport",
+    },
+    {
+      id: "bruh",
+      name: "BRUH",
+      description: "Cycle through 50 comments without refreshing.",
+      completed: false,
+      skinReward: "bruh",
+    },
   ];
 
   function updateTimer() {
@@ -2051,6 +2099,11 @@
       achievmentsAdd("geometry_dash");
       alert("Code redeemed! Achievement unlocked: How did you do that!");
       hints.textContent = "That really does require impossible timing!"
+      hints.style.color = "lightgreen";
+    } else if (value === "basketballrat") {
+      achievmentsAdd("noll_sport");
+      alert("Code redeemed! Achievement unlocked: Let's get sporty!");
+      hints.textContent = "What are you waiting for?!?!"
       hints.style.color = "lightgreen";
     } else {
       hints.textContent = rollRandomHint();
@@ -2223,6 +2276,7 @@
     saveGame(true);
   }
   async function updatePotatoComments() {
+    comment_count++;
     setTimeout(updatePotatoComments, 10000);
 
     let newComment;
@@ -2481,6 +2535,7 @@
         buildingsOwned,
         totalUpgrades,
         hearts,
+        backgroundAlpha,
       },
       buildings: {},
       upgrades: {},
@@ -2685,6 +2740,16 @@
     buildingsOwned = s.buildingsOwned;
     totalUpgrades = s.totalUpgrades;
     hearts = typeof s.hearts === 'number' ? s.hearts : (hearts ?? 0);
+    backgroundAlpha = typeof s.backgroundAlpha === 'number' ? s.backgroundAlpha: 1;
+
+    const slider = document.getElementById("darkenSlider");
+    const backgrounds = document.querySelectorAll(".pixelated-background");
+    if (slider && backgrounds.length) {
+      slider.value = backgroundAlpha;
+      backgrounds.forEach(bg => {
+        bg.style.setProperty("--overlay-alpha", backgroundAlpha);
+      });
+    }
 
     buildings.forEach((b) => {
       const data = save.buildings[b.id];
@@ -2801,8 +2866,11 @@
     return Math.random() * (max - min) + min;
   }
 
-  const GOLDEN_DELAY = randomMinutes(10, 20) * 60_000;
-  const GOLDEN_VISIBLE_TIME = 10 * 1000;
+  const GOLDEN_VISIBLE_TIME = 10 * 1000; // visible for 10s
+
+  // ✅ 10–20 minutes
+  const GOLDEN_DELAY_MIN = 10 * 60 * 1000;
+  const GOLDEN_DELAY_MAX = 20 * 60 * 1000;
 
   let spawnTimeout = null;
   let hideTimeout = null;
@@ -2810,45 +2878,34 @@
   let goldenPotatoVariants = ["normal", "frenzy", "half_price"];
   let totalCollectedVariants = new Set();
 
+  // -------------------- CLICK HANDLER --------------------
   goldenPotatoImage.addEventListener("click", (e) => {
     markPlayerActivity();
-    let goldenPotatoVariant =
+
+    const variant =
       goldenPotatoVariants[
         Math.floor(Math.random() * goldenPotatoVariants.length)
       ];
+
     const text = document.createElement("div");
     text.className = "text";
+
     let reward = 0;
-    if (goldenPotatoVariant == "normal") {
-      if (!totalCollectedVariants.has("normal")) {
-        totalCollectedVariants.add("normal");
-      }
-      text.textContent = `Lucky, ${formatNumber(autoClickAmount * 3000)} Potatoes!`;
+
+    if (variant === "normal") {
+      totalCollectedVariants.add("normal");
       reward = autoClickAmount * 3000;
-    } else if (goldenPotatoVariant == "frenzy") {
-      if (!totalCollectedVariants.has("frenzy")) {
-        totalCollectedVariants.add("frenzy");
-      }
-      text.textContent = `3 Minute Frenzy!`;
+      text.textContent = `Lucky, ${formatNumber(reward)} Potatoes!`;
+    } else if (variant === "frenzy") {
+      totalCollectedVariants.add("frenzy");
       frenzy = true;
-      setTimeout(
-        () => {
-          frenzy = false;
-        },
-        3 * 60 * 1000,
-      );
-    } else if (goldenPotatoVariant == "half_price") {
-      if (!totalCollectedVariants.has("half_price")) {
-        totalCollectedVariants.add("half_price");
-      }
-      text.textContent = `3 Minute Half Price!`;
+      text.textContent = `3 Minute Frenzy!`;
+      setTimeout(() => (frenzy = false), 3 * 60 * 1000);
+    } else if (variant === "half_price") {
+      totalCollectedVariants.add("half_price");
       half_price_amount = 0.5;
-      setTimeout(
-        () => {
-          half_price_amount = 1;
-        },
-        3 * 60 * 1000,
-      );
+      text.textContent = `3 Minute Half Price!`;
+      setTimeout(() => (half_price_amount = 1), 3 * 60 * 1000);
     }
 
     text.style.left = e.clientX + (Math.random() * 40 - 20) + "px";
@@ -2863,38 +2920,49 @@
     updatePotatoDisplay();
     renderBuildings();
     renderUpgrades();
+
     hideGoldenPotato();
-    scheduleNextGoldenPotato();
   });
 
+  // -------------------- SHOW / HIDE --------------------
   function showGoldenPotato() {
     goldenPotatoImage.classList.remove("hidden");
     goldenPotatoImage.classList.add("shown");
 
-    const x =
-      Math.random() * (window.innerWidth - goldenPotatoImage.offsetWidth);
-    const y =
-      Math.random() * (window.innerHeight - goldenPotatoImage.offsetHeight);
+    const padding = 20;
+    const maxX = window.innerWidth - goldenPotatoImage.offsetWidth - padding;
+    const maxY = window.innerHeight - goldenPotatoImage.offsetHeight - padding;
+
+    const x = Math.random() * maxX + padding;
+    const y = Math.random() * maxY + padding;
 
     goldenPotatoImage.style.left = `${x}px`;
     goldenPotatoImage.style.top = `${y}px`;
+    goldenPotatoImage.style.transform = "none";
 
-    hideTimeout = setTimeout(() => {
-      hideGoldenPotato();
-      scheduleNextGoldenPotato();
-    }, GOLDEN_VISIBLE_TIME);
+    hideTimeout = setTimeout(hideGoldenPotato, GOLDEN_VISIBLE_TIME);
   }
 
   function hideGoldenPotato() {
     goldenPotatoImage.classList.add("hidden");
     goldenPotatoImage.classList.remove("shown");
     clearTimeout(hideTimeout);
+    scheduleNextGoldenPotato();
   }
 
+  // -------------------- SPAWN --------------------
   function scheduleNextGoldenPotato() {
     clearTimeout(spawnTimeout);
-    spawnTimeout = setTimeout(showGoldenPotato, GOLDEN_DELAY);
+
+    const delay =
+      Math.random() * (GOLDEN_DELAY_MAX - GOLDEN_DELAY_MIN) +
+      GOLDEN_DELAY_MIN;
+
+    spawnTimeout = setTimeout(showGoldenPotato, delay);
   }
+
+  // -------------------- INITIAL SPAWN --------------------
+  scheduleNextGoldenPotato();
 
   function showTooltip(html, anchorElement) {
     clearTimeout(tooltipHideTimeout);
@@ -3063,7 +3131,7 @@
       }
 
       upgradeButton.style.opacity =
-        potatoes >= u.price * half_price_amount ? 1 : 0.5;
+        potatoes >= u.price * half_price_amount ? 1 : 0.8;
     });
   }
 
