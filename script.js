@@ -32,9 +32,7 @@
   const runStartTimeElement = document.getElementById("runStart");
   const buildingsOwnedElement = document.getElementById("buildingsOwned");
   const potatoesPerSecondElement = document.getElementById("potatoesPerSecond");
-  const rawPotatoesPerSecondElement = document.getElementById(
-    "rawPotatoesPerSecond",
-  );
+  const rawPotatoesPerSecondElement = document.getElementById("rawPotatoesPerSecond");
   const potatoesPerClickElement = document.getElementById("potatoesPerClick");
   const potatoClicksElement = document.getElementById("potatoClicks");
   const handFarmedPotatoesElement =
@@ -61,6 +59,23 @@
 
   const tooltip = document.getElementById("tooltip");
   const heartContainer = document.querySelector(".heart-container");
+  const MODE_STORAGE_KEY = "potato_clicker_mode";
+
+  /**
+   * Write the current mode to localStorage.
+   * @param {"light"|"dark"} m
+   */
+  function storeMode(m) {
+    try { localStorage.setItem(MODE_STORAGE_KEY, m); } catch (_) {}
+  }
+  function loadSavedMode() {
+    try {
+      const saved = localStorage.getItem(MODE_STORAGE_KEY);
+      return saved === "dark" ? "dark" : "light";
+    } catch (_) {
+      return "light";
+    }
+  }
 
   let tooltipHideTimeout = null;
   let mobileAutoHideTimeout = null;
@@ -68,6 +83,7 @@
   let rawPotatoes = 0;
   let potatoes = 0;
   let hearts = 0;
+  let mode = loadSavedMode();
   let potatoesPerSecond = 0;
   let potatoesLastSecond = 0;
   let allTimePotatoes = 0;
@@ -78,7 +94,7 @@
   let potatoClicks = 0;
   let handFarmedPotatoes = 0;
   let goldenPotatoClicks = 0;
-  let runningVersion = "v0.61";
+  let runningVersion = "v0.68";
   let autoClickAmount = 0;
   let runDurationSeconds;
   let totalUpgrades = 0;
@@ -1289,12 +1305,11 @@
   }
 
   function checkAchievements() {
-    /*if (potatoes >= 100000000000000000) {
+    if (potatoes >= 100000000000000000) {
       potatoes = -9999999999999999999999;
       autoClickAmount = -999999999999999;
       allTimePotatoes = 0;
     }
-    */
 
     if (potatoClicks >= 1) {
       achievmentsAdd("first_click");
@@ -1372,7 +1387,6 @@
       achievmentsAdd("overclock");
     }
 
-    // Rock skin: 100 buildings
     if (buildingsOwned >= 10) {
       achievmentsAdd("buidling_enthusiast");
     }
@@ -1392,7 +1406,6 @@
       achievmentsAdd("building_legend");
     }
 
-    // Upgrades
     if (totalUpgrades >= 1) {
       achievmentsAdd("upgrade_novice");
     }
@@ -1410,7 +1423,6 @@
       achievmentsAdd("upgrade_master");
     }
 
-    // Pixel skin: 10 skins unlocked
     const unlockedSkins = skins.filter((s) => s.unlocked).length;
     if (unlockedSkins >= 10) {
       achievmentsAdd("4K");
@@ -1440,12 +1452,10 @@
       achievmentsAdd("monochrome_potatoes");
     }
 
-    // Rainbow skin: all skins unlocked
     if (unlockedSkins === skins.length - 1) {
       achievmentsAdd("collector");
     }
 
-    // Check if all secret codes have been redeemed
     const secretAchievements = [
       "monster",
       "synth_master",
@@ -1460,14 +1470,12 @@
     if (allSecretsRedeemed) {
       achievmentsAdd("let_me_in");
     }
-
-    // Smash achievement (20 greenhouses)
+  
     const greenhouse = buildings.find((b) => b.id === "greenhouse");
     if (greenhouse && greenhouse.owned >= 20) {
       achievmentsAdd("smash");
     }
 
-    // Peel Master (100 peelers)
     const peeler = buildings.find((b) => b.id === "cursor");
     const farmer = buildings.find((b) => b.id === "farmer");
     const tractor = buildings.find((b) => b.id === "tractor");
@@ -1493,13 +1501,11 @@
       achievmentsAdd("grass")
     }
 
-    // Ewww (50 chip factories)
     const chipFactory = buildings.find((b) => b.id === "chip_factory");
     if (chipFactory && chipFactory.owned >= 50) {
       achievmentsAdd("ewww");
     }
 
-    // Time Traveler (version change)
     if (window.versionTraveled) {
       achievmentsAdd("time_traveler");
     }
@@ -2214,7 +2220,7 @@
     showAchievementPopup(a.name, a.description, rewardText);
     console.log(`Achievement unlocked: ${a.name}`);
 
-    saveGame(true); // Major change: achievement unlocked
+    saveGame(true);
   }
   async function updatePotatoComments() {
     setTimeout(updatePotatoComments, 10000);
@@ -2312,7 +2318,6 @@
         ];
     }
 
-    // handle function-based comments
     if (typeof newComment === "function") {
       newComment = newComment();
     }
@@ -2461,7 +2466,6 @@
     });
   }
 
-  // NEW: build save object helper
   function getSaveObject() {
     const save = {
       version: runningVersion,
@@ -2512,13 +2516,11 @@
     return save;
   }
 
-  // Save to localStorage only (fast, continuous)
   function saveLocal() {
     const save = getSaveObject();
     localStorage.setItem(SAVE_KEY_V2, JSON.stringify(save));
   }
 
-  // Save to database (slower, less frequent)
   async function saveToDb(showStatus = false) {
     const save = getSaveObject();
 
@@ -2528,7 +2530,6 @@
         lastDbSaveTime = Date.now();
         console.log("DB save successful");
 
-        // Update leaderboard after successful save
         if (window.authApi.updateLeaderboardUI) {
           window.authApi.updateLeaderboardUI();
         }
@@ -2551,17 +2552,14 @@
     }
   }
 
-  // Save both local and DB (for major changes)
   async function saveGame(majorChange = false) {
-    // Always save locally
     saveLocal();
 
-    // Save to DB on major changes or every 20 minutes
+
     if (majorChange) {
       console.log("Major change detected - saving to DB");
       await saveToDb(true);
     } else if (window.authApi && window.authApi.getToken()) {
-      // Check if it's been 20 minutes since last DB save
       const timeSinceLastDbSave = Date.now() - lastDbSaveTime;
       if (timeSinceLastDbSave >= DB_SAVE_INTERVAL_MS) {
         console.log("20 minutes elapsed - saving to DB");
@@ -2570,14 +2568,12 @@
     }
   }
 
-  // Manual save wrapper for button (gives immediate feedback)
   function saveGameManual() {
     const btn = document.getElementById("saveButton");
     if (btn) {
       btn.disabled = true;
       const originalText = btn.innerHTML;
       btn.innerHTML = "<p>Saving...</p>";
-      // Manual save always saves to DB
       saveLocal();
       Promise.resolve(saveToDb(true))
         .catch(() => {})
@@ -2599,7 +2595,6 @@
       
       try {
         await loadGame();
-        // Refresh UI after loading
         updateDisplay();
         updateStatsDisplay();
         renderBuildingsRegular();
@@ -2621,16 +2616,13 @@
     const localSaveRaw = localStorage.getItem(SAVE_KEY_V2);
     const localSave = localSaveRaw ? JSON.parse(localSaveRaw) : null;
 
-    // If authenticated, fetch remote save and merge with local
     if (window.authApi && window.authApi.getToken()) {
       try {
         const remoteSave = await window.authApi.load();
 
-        // If we have a remote save, decide which one to use
         if (remoteSave && remoteSave.stats) {
           let saveToLoad = remoteSave;
 
-          // Compare all-time potatoes to determine which save is more advanced
           if (localSave && localSave.stats) {
             const remoteAllTime = remoteSave.stats.allTimePotatoes || 0;
             const localAllTime = localSave.stats.allTimePotatoes || 0;
@@ -2640,7 +2632,6 @@
                 "Local save is more advanced, using local and saving to backend",
               );
               saveToLoad = localSave;
-              // Save local to backend
               await window.authApi.save(localSave);
             } else {
               console.log(
@@ -2785,7 +2776,6 @@
     const now = Date.now();
     recentClicks.push(now);
 
-    // keep last 30 seconds
     recentClicks = recentClicks.filter((t) => now - t <= 30000);
     window.clicksLast30Seconds = recentClicks.length;
 
@@ -2927,7 +2917,6 @@
     tooltip.style.left = left + "px";
     tooltip.style.top = top + "px";
 
-    // 📱 Mobile: auto-hide after 5 seconds
     if (isTouchDevice) {
       mobileAutoHideTimeout = setTimeout(() => {
         hideTooltipImmediate();
@@ -2953,7 +2942,6 @@
   function renderUpgrades() {
     const container = document.getElementById("upgrades");
 
-    // --- unlock logic (UNCHANGED, just moved to top) ---
     upgrades.forEach((u) => {
       const buildingMap = {
         peeler: "cursor",
@@ -2993,7 +2981,6 @@
 
     const visibleIds = new Set(visible.map((u) => u.id));
 
-    // --- remove upgrades no longer visible ---
     for (const [id, btn] of renderedUpgrades) {
       if (!visibleIds.has(id)) {
         btn.remove();
@@ -3001,7 +2988,6 @@
       }
     }
 
-    // --- add / update visible upgrades ---
     visible.forEach((u) => {
       let upgradeButton = renderedUpgrades.get(u.id);
 
@@ -3067,33 +3053,30 @@
           calculateAutoClick();
           updatePotatoDisplay();
           renderBuildings();
-          renderUpgrades();
           checkAchievements();
-          saveGame(true); // Major change: upgrade bought
+          saveGame(true);
+          requestAnimationFrame(() => renderUpgrades());
         });
 
         renderedUpgrades.set(u.id, upgradeButton);
         container.appendChild(upgradeButton);
       }
 
-      // --- update affordability (NO re-render) ---
       upgradeButton.style.opacity =
         potatoes >= u.price * half_price_amount ? 1 : 0.5;
     });
   }
 
   let peelerOrbitStarted = false;
-  let groupStepTime = 1000; // 1 second per active peeler in group
-  let groupIndex = 0;        // current active peeler index within each group
-  const rollGroupSize = 5;   // peelers per rolling group
+  let groupStepTime = 1000;
+  let groupIndex = 0;
+  const rollGroupSize = 5;
 
-  // ---------- Configurable variables ----------
-  const gapFirstRows = -7;   // negative = slight overlap for first 3 rows
-  const gapLaterRows = 0;    // spacing for rows after 3
-  const rollDistance = 10;    // pixels a peeler moves toward the potato
-  const bobAmount = 2;       // subtle vertical bobbing
+  const gapFirstRows = -7;
+  const gapLaterRows = 0;
+  const rollDistance = 10;
+  const bobAmount = 2;
 
-  // ---------- Main orbit function ----------
   function renderPeelerOrbit(timestamp) {
     const orbit = document.querySelector(".peeler-orbit");
     if (!orbit) return;
@@ -3101,10 +3084,6 @@
     const peeler = getPeelerBuilding();
     const count = peeler?.owned ?? 0;
     if (count === 0) return;
-
-    // ----------------------------
-    // Sync DOM
-    // ----------------------------
     while (orbit.children.length > count) orbit.lastChild.remove();
     while (orbit.children.length < count) {
       const img = document.createElement("img");
@@ -3116,31 +3095,19 @@
       img.style.transition = "opacity 0.3s ease";
       requestAnimationFrame(() => (img.style.opacity = "1"));
     }
-
-    // ----------------------------
-    // Centre
-    // ----------------------------
     const rect = orbit.getBoundingClientRect();
     const centerX = rect.width / 2;
     const centerY = rect.height / 2 + 30;
 
-    // ----------------------------
-    // Update which peeler in each group is active
-    // ----------------------------
     if (timestamp) groupIndex = Math.floor(timestamp / groupStepTime) % rollGroupSize;
 
-    // ----------------------------
-    // Place peelers sequentially in rings
-    // ----------------------------
     let placed = 0;
     let ring = 0;
     const baseRadius = 180;
 
     while (placed < count) {
-      // Dynamic radius
       const radius = baseRadius + ring * ringSpacing(ring);
 
-      // Dynamic gap
       const gap = ring < 3 ? gapFirstRows : gapLaterRows;
 
       const circumference = 2 * Math.PI * radius;
@@ -3153,22 +3120,17 @@
         const speed =
           0.18 * (1 / (1 + ring * 0.35)) * (ring % 2 ? -1 : 1);
 
-        // sequential placement
         const angle = (timestamp / 1000) * speed + (32 + gap) * j / radius;
 
-        // ----------------------------
-        // Rolling group: only 1 active per group
-        // ----------------------------
         const group = Math.floor(placed / rollGroupSize);
         const inGroupIndex = placed % rollGroupSize;
         let rollOffset = 0;
         if (inGroupIndex === groupIndex) {
           const elapsed = (timestamp % groupStepTime) / groupStepTime;
-          const phase = Math.sin(elapsed * Math.PI); // smooth in/out
+          const phase = Math.sin(elapsed * Math.PI);
           rollOffset = rollDistance * phase;
         }
 
-        // subtle vertical bob
         const bob = Math.sin((timestamp / 1000) * 2 + placed) * bobAmount;
 
         const x = centerX + Math.cos(angle) * radius;
@@ -3188,7 +3150,6 @@
     requestAnimationFrame(renderPeelerOrbit);
   }
 
-  // ---------- Helper: ring spacing ----------
   function ringSpacing(ring) {
     return ring < 3 ? 31 : 32 + (ring - 2) * 2;
   }
@@ -3198,9 +3159,6 @@
     if (!container) return;
     container.innerHTML = "";
 
-    // Event skins are identified by IDs that are NOT in the original core list.
-    // For simplicity we filter by a known prefix or by a custom flag.
-    // Here we treat any skin whose ID is one of the Valentine IDs as an event skin.
     const eventIds = ["rose","love_letter","cupid","chocolate","gift_box", "heart"];
 
     const eventSkins = skins.filter(s => eventIds.includes(s.id));
@@ -3221,7 +3179,6 @@
         </div>
       `;
 
-      // Tooltip (same style as before)
       skinDiv.addEventListener("mouseenter", () => {
         const html = s.unlocked
           ? `<div class="title">${s.name}</div>
@@ -3233,13 +3190,10 @@
       });
       skinDiv.addEventListener("mouseleave", hideTooltip);
 
-      // Click → purchase / equip
       skinDiv.addEventListener("click", () => {
         if (!s.unlocked) {
-          // Attempt to buy with hearts
           purchaseEventSkin(s.id);
         } else {
-          // Already owned – just equip
           selectSkin(s.id, false);
           updatePotatoDisplay();
         }
@@ -3306,7 +3260,7 @@
       skinDiv.addEventListener("mouseleave", hideTooltip);
 
       skinDiv.addEventListener("click", () => {
-        if (!s.unlocked) return; // Prevent selecting locked skins
+        if (!s.unlocked) return;
         selectSkin(s.id);
         updatePotatoDisplay();
       });
@@ -3337,7 +3291,7 @@
     }
     renderSkins();
     renderBuildings();
-    saveGame(true); // Major change: skin equipped
+    saveGame(true);
   }
 
   function unlockUpgrade(id) {
@@ -3368,7 +3322,6 @@
     visible.forEach((b) => {
       let buildingButton = document.getElementById(`building-${b.id}`);
 
-      /* ---------------- CREATE ONCE ---------------- */
       if (!buildingButton) {
         buildingButton = document.createElement("button");
         buildingButton.className = "building-container";
@@ -3376,7 +3329,6 @@
         buildingButton.style.webkitTapHighlightColor = "transparent";
         container.appendChild(buildingButton);
 
-        // ICON
         const iconDiv = document.createElement("div");
         iconDiv.className = "building-icon";
 
@@ -3386,7 +3338,6 @@
         img.draggable = false;
         iconDiv.appendChild(img);
 
-        // INFO
         const infoDiv = document.createElement("div");
         infoDiv.className = "building-info";
         infoDiv.innerHTML = `
@@ -3407,7 +3358,6 @@
 
         let tooltipTimeout;
 
-        // DESKTOP (hover)
         if (!isTouch) {
           buildingButton.addEventListener("mouseenter", () => {
             const html = b.mystery
@@ -3429,7 +3379,6 @@
           buildingButton.addEventListener("mouseleave", hideTooltip);
         }
 
-        // MOBILE (tap, auto-hide after 5s)
         else {
           buildingButton.addEventListener("click", () => {
             const html = b.mystery
@@ -3447,7 +3396,6 @@
 
             showTooltip(html, buildingButton);
 
-            // reset timer if tapped again
             clearTimeout(tooltipTimeout);
             tooltipTimeout = setTimeout(() => {
               hideTooltip();
@@ -3455,7 +3403,6 @@
           });
         }
 
-        // CLICK
         buildingButton.addEventListener("click", () => {
           markPlayerActivity();
 
@@ -3482,7 +3429,6 @@
         });
       }
 
-      /* ---------------- UPDATE ONLY ---------------- */
       const displayPrice = b.price * half_price_amount;
 
       const img = buildingButton.querySelector(".building-image");
@@ -3491,7 +3437,6 @@
       const ownedEl = buildingButton.querySelector(".amount-owned");
       const potatoIcon = buildingButton.querySelector(".potato-icon");
 
-      // Mystery logic
       let displayName = b.name;
       let displayIcon = b.realIcon;
 
@@ -3502,27 +3447,24 @@
         b.mystery = false;
       }
 
-      // Update text (cheap, no flicker)
       nameEl.textContent = displayName;
       priceEl.textContent = formatNumber(displayPrice);
       ownedEl.textContent = b.owned;
 
-      // Update images only if changed
       if (!img.src.endsWith(displayIcon)) img.src = displayIcon;
       if (!potatoIcon.src.endsWith(equippedSkin.image)) {
         potatoIcon.src = equippedSkin.image;
       }
 
-      // Affordability styles (only when changed)
       const canAfford = potatoes >= displayPrice;
       if (buildingButton.dataset.affordable !== String(canAfford)) {
         buildingButton.dataset.affordable = String(canAfford);
 
         const priceWrapper = buildingButton.querySelector(".building-price");
         priceWrapper.style.color = canAfford ? "lightgreen" : "rgb(209,73,73)";
-        buildingButton.style.backgroundColor = canAfford
-          ? "#37495a"
-          : "#212d38";
+        buildingButton.style.filter = canAfford
+          ? "brightness(100%)"
+          : "brightness(60%)";
         buildingButton.style.cursor = canAfford ? "pointer" : "default";
       }
     });
@@ -3536,7 +3478,6 @@
     renderBuildings();
     renderUpgrades();
 
-    // Call the save function from the server.js file
     window.authApi.save();
   }
 
@@ -3549,7 +3490,7 @@
   }
 
   function maybeStartPeelerOrbit() {
-    const peeler = getPeelerBuilding();   // returns the "cursor" building object
+    const peeler = getPeelerBuilding();
     if (!peeler || peeler.owned < 1) return;   // nothing to orbit yet
 
     // ---- Un‑hide the orbit container (if it was hidden) ----
@@ -3850,6 +3791,31 @@
   function getPeelerBuilding() {
     return buildings.find((b) => b.id === "cursor");
   }
+
+  function light_darkToggle() {
+    const backgrounds = document.querySelectorAll(".pixelated-background");
+    const storeBanners = document.querySelectorAll(".store-sign");
+    const storeBannersText = document.querySelectorAll(".store-title");
+    const button_toggle = document.querySelector("#modeToggle");
+
+    if (mode === "light") {
+      backgrounds.forEach(bg => bg.style.backgroundImage = "url('assets/background_dark.png')");
+      storeBanners.forEach(sb => sb.style.backgroundImage = "url('assets/store-banner_dark.png')");
+      storeBannersText.forEach(st => st.style.color = "white");
+      mode = "dark";
+      button_toggle.textContent = "Light Mode";
+    } else {
+      backgrounds.forEach(bg => bg.style.backgroundImage = "url('assets/background.png')");
+      storeBanners.forEach(sb => sb.style.backgroundImage = "url('assets/store-banner.png')");
+      storeBannersText.forEach(st => st.style.color = "black");
+      mode = "light";
+      button_toggle.textContent = "Dark Mode";
+    }
+
+    storeMode(mode);
+    saveGame(true);
+  }
+
   updateTimer();
   (async () => {
     const overlay = document.getElementById('loadingOverlay');
@@ -3883,6 +3849,18 @@
         - MaxTheRock
     `);
     overlay.classList.add('hidden');
+
+    if (mode === "dark") {
+      const backgrounds = document.querySelectorAll(".pixelated-background");
+      const storeBanners = document.querySelectorAll(".store-sign");
+      const storeBannersText = document.querySelectorAll(".store-title");
+      const button_toggle = document.querySelector("#modeToggle");
+
+      backgrounds.forEach(bg => bg.style.backgroundImage = "url('assets/background_dark.png')");
+      storeBanners.forEach(sb => sb.style.backgroundImage = "url('assets/store-banner_dark.png')");
+      storeBannersText.forEach(st => st.style.color = "white");
+      button_toggle.textContent = "Light Mode";
+    }
     setTimeout(() => overlay.remove(), 500);
   })();
 
@@ -3896,4 +3874,6 @@
   window.loadGameManual = loadGameManual;
   window.loadGame = loadGame;
   window.getPeelerBuilding = getPeelerBuilding;
+  window.clickerButton = document.getElementById("clickerButton");
+  window.light_darkToggle = light_darkToggle;
 })();

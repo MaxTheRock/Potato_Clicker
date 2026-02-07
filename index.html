@@ -85,7 +85,7 @@
 
     <main>
       <div class="main-inner">
-        <section class="clicking-section">
+        <section class="clicking-section pixelated-background">
           <div id="nameBoxContainer" class="name-box-container">
             <input
               id="nameInput"
@@ -137,6 +137,7 @@
               </button>
             </div>
           </div>
+          <div class="gradient"></div>
           <div class="version-box-container">
             <div>
               <p id="version" class="version-text">v0.00</p>
@@ -154,7 +155,7 @@
           </div>
         </section>
 
-        <section class="game-section">
+        <section class="game-section pixelated-background">
           <div class="middle-top">
             <div class="left-middle-buttons">
               <button id="openModalOptions" class="middle-buttons">
@@ -172,11 +173,13 @@
           <div class="divider"></div>
         </section>
 
-        <section class="upgrade-section">
-          <button class="store-title-button" onclick="storeCounter()">
-            <h1 class="store-title">Store</h1>
-          </button>
-          <div class="divider"></div>
+        <section class="upgrade-section pixelated-background">
+          <div class="store-sign">
+            <button class="store-title-button" onclick="storeCounter()">
+              <h1 class="store-title">Store</h1>
+            </button>
+          </div>
+          <div class="blank-divider"></div>
           <div class="upgrades-container" id="upgrades">
             <!-- Upgrades will be dynamically added here -->
           </div>
@@ -265,6 +268,14 @@
             >
               Logout
             </button>
+            <p class="options-p">
+              Dark/Light mode toggle.
+            </p>
+            <button
+              id="modeToggle"
+              onclick="light_darkToggle()"
+              class="save-load-button"
+            >Dark Mode</button>
           </div>
           <div class="general-stats">
             <h2 class="general-text">Account</h2>
@@ -481,6 +492,27 @@
           <div class="modal-header">
             <h2 class="info-h2">Information</h2>
             <button class="closeButton" id="closeModal">&times;</button>
+          </div>
+          <div class="major-update">
+            <h2 class="major-h2">
+              07/02/26: Main UI Update v0.68
+            </h2>
+            <p class="major-p">
+              Complete UI change, looks way better but still needs slight tweaks to be at its optimum!
+            </p>
+            <ul class="major-ul">
+              <li>New Background and Wood texture.</li>
+              <li>Peelers finally go around the potato.</li>
+              <li>
+                Light/Dark mode toggle!
+              </li>
+              <li>
+                Semi-transparent buttons and info.
+              </li>
+              <li>Responisive hopefully 🤞</li>
+              <li>More comments.</li>
+              <li>Loading screen just so you don't jump straight in with like 50 assets missing.</li>
+            </ul>
           </div>
           <div class="minor-update">
             <h2 class="minor-h2 red">05/02/26: Valentine's Day Update v0.61</h2>
@@ -773,6 +805,7 @@
     <div id="achievement-container"></div>
     <div id="tooltip" class="tooltip hidden"></div>
     <script src="auth-client.js"></script>
+    <script src="autoclicker-detector.js"></script>
     <script src="script.js"></script>
   </body>
 </html>
