@@ -119,7 +119,7 @@
   let idleTime = 0;
   let upgradeTime = 0;
   let lastDbSaveTime = Date.now();
-  let backgroundAlpha = 1;
+  let backgroundAlpha = 0.1;
   const DB_SAVE_INTERVAL_MS = 240 * 60 * 1000;
   heartContainer.style.setProperty("--fill", "30%");
   const eventTime = new Date(2026, 1, 16);
@@ -2740,7 +2740,7 @@
     buildingsOwned = s.buildingsOwned;
     totalUpgrades = s.totalUpgrades;
     hearts = typeof s.hearts === 'number' ? s.hearts : (hearts ?? 0);
-    backgroundAlpha = typeof s.backgroundAlpha === 'number' ? s.backgroundAlpha: 1;
+    backgroundAlpha = typeof s.backgroundAlpha === 'number' ? s.backgroundAlpha: 0.1;
 
     const slider = document.getElementById("darkenSlider");
     const backgrounds = document.querySelectorAll(".pixelated-background");
@@ -3009,45 +3009,43 @@
 
   function renderUpgrades() {
     const container = document.getElementById("upgrades");
+    if (!container) return;
 
-    upgrades.forEach((u) => {
-      const buildingMap = {
-        peeler: "cursor",
-        farmer: "farmer",
-        tractor: "tractor",
-        greenhouse: "greenhouse",
-        chipfactory: "chip_factory",
-        restaurant: "restaurant",
-        supermarket: "supermarket",
-        distillary: "distillary",
-        airport: "airport",
-        spacestation: "space_station",
-        planet: "planet",
-        intergalacticfarm: "intergalactic_farm",
-        timemachine: "time_machine",
-        quantumreactor: "quantum_reactor",
-      };
+    const buildingMap = {
+      peeler: "cursor",
+      farmer: "farmer",
+      tractor: "tractor",
+      greenhouse: "greenhouse",
+      chipfactory: "chip_factory",
+      restaurant: "restaurant",
+      supermarket: "supermarket",
+      distillary: "distillary",
+      airport: "airport",
+      spacestation: "space_station",
+      planet: "planet",
+      intergalacticfarm: "intergalactic_farm",
+      timemachine: "time_machine",
+      quantumreactor: "quantum_reactor",
+    };
 
+    upgrades.forEach(u => {
       for (const key in buildingMap) {
-        const building = buildings.find((b) => b.id === buildingMap[key]);
+        const building = buildings.find(b => b.id === buildingMap[key]);
         if (!building) continue;
-
         if (u.id.includes(`${key}x2_1`) || u.id.includes(`${key}x2_2`))
           u.unlocked = building.owned >= 1 && !u.completed;
-
         if (u.id.includes(`${key}x2_3`))
           u.unlocked = building.owned >= 10 && !u.completed;
-
         if (u.id.includes(`${key}x2_4`))
           u.unlocked = building.owned >= 20 && !u.completed;
       }
     });
 
     const visible = upgrades
-      .filter((u) => u.unlocked && !u.completed)
+      .filter(u => u.unlocked && !u.completed)
       .sort((a, b) => a.price - b.price);
 
-    const visibleIds = new Set(visible.map((u) => u.id));
+    const visibleIds = new Set(visible.map(u => u.id));
 
     for (const [id, btn] of renderedUpgrades) {
       if (!visibleIds.has(id)) {
@@ -3056,7 +3054,7 @@
       }
     }
 
-    visible.forEach((u) => {
+    visible.forEach(u => {
       let upgradeButton = renderedUpgrades.get(u.id);
 
       if (!upgradeButton) {
@@ -3082,17 +3080,19 @@
             upgradeButton,
           );
         });
-
         upgradeButton.addEventListener("mouseleave", hideTooltip);
 
         upgradeButton.addEventListener("click", () => {
-          upgradeTime = 0;
-          if (potatoes < u.price * half_price_amount) return;
+          const cost = u.price * half_price_amount;
+          if (potatoes < cost) return;
 
-          potatoes -= u.price * half_price_amount;
+          potatoes -= cost;
           u.completed = true;
           u.unlocked = false;
           totalUpgrades++;
+
+          upgradeButton.style.opacity = 0.4;
+          updatePotatoDisplay();
 
           const effects = {
             peeler: "cursor",
@@ -3113,25 +3113,28 @@
 
           for (const key in effects) {
             if (u.id.includes(key)) {
-              buildings.find((b) => b.id === effects[key]).cpsMultiplier *= 2;
+              const b = buildings.find(b => b.id === effects[key]);
+              if (b) b.cpsMultiplier *= 2;
               if (key === "peeler") potatoesPerClick *= 2;
             }
           }
 
           calculateAutoClick();
-          updatePotatoDisplay();
-          renderBuildings();
-          checkAchievements();
-          saveGame(true);
-          requestAnimationFrame(() => renderUpgrades());
+
+          requestAnimationFrame(() => {
+            renderBuildings();
+            renderUpgrades();
+          });
+
+          scheduleSave();
         });
 
         renderedUpgrades.set(u.id, upgradeButton);
         container.appendChild(upgradeButton);
       }
 
-      upgradeButton.style.opacity =
-        potatoes >= u.price * half_price_amount ? 1 : 0.8;
+      const canAfford = potatoes >= u.price * half_price_amount;
+      upgradeButton.style.opacity = canAfford ? 1 : 0.8;
     });
   }
 
@@ -3384,10 +3387,10 @@
     const isTouch = "ontouchstart" in window;
 
     const visible = buildings
-      .filter((b) => b.unlocked)
+      .filter(b => b.unlocked)
       .sort((a, b) => a.sort - b.sort);
 
-    visible.forEach((b) => {
+    visible.forEach(b => {
       let buildingButton = document.getElementById(`building-${b.id}`);
 
       if (!buildingButton) {
@@ -3395,7 +3398,6 @@
         buildingButton.className = "building-container";
         buildingButton.id = `building-${b.id}`;
         buildingButton.style.webkitTapHighlightColor = "transparent";
-        container.appendChild(buildingButton);
 
         const iconDiv = document.createElement("div");
         iconDiv.className = "building-icon";
@@ -3423,82 +3425,63 @@
 
         buildingButton.appendChild(iconDiv);
         buildingButton.appendChild(infoDiv);
-
-        let tooltipTimeout;
+        container.appendChild(buildingButton);
 
         if (!isTouch) {
           buildingButton.addEventListener("mouseenter", () => {
             const html = b.mystery
-              ? `
-                <div class="title">???</div>
-                <div>Price: ${formatNumber(b.price)}</div>
-              `
-              : `
-                <div class="title">${b.name}</div>
+              ? `<div class="title">???</div><div>Price: ${formatNumber(b.price)}</div>`
+              : `<div class="title">${b.name}</div>
                 <div>Price: ${formatNumber(b.price)}</div>
                 <div>Owned: ${b.owned}</div>
                 <div>Total generated: ${Math.floor(b.totalGenerated)}</div>
-                <div>Income/sec: ${Math.floor(b.cps * b.owned * 10) / 10}</div>
-              `;
-
+                <div>Income/sec: ${Math.floor(b.cps * b.owned * 10) / 10}</div>`;
             showTooltip(html, buildingButton);
           });
-
           buildingButton.addEventListener("mouseleave", hideTooltip);
-        }
-
-        else {
+        } else {
+          let tooltipTimeout;
           buildingButton.addEventListener("click", () => {
             const html = b.mystery
-              ? `
-                <div class="title">???</div>
-                <div>Price: ${formatNumber(b.price)}</div>
-              `
-              : `
-                <div class="title">${b.name}</div>
+              ? `<div class="title">???</div><div>Price: ${formatNumber(b.price)}</div>`
+              : `<div class="title">${b.name}</div>
                 <div>Price: ${formatNumber(b.price)}</div>
                 <div>Owned: ${b.owned}</div>
                 <div>Total generated: ${Math.floor(b.totalGenerated)}</div>
-                <div>Income/sec: ${Math.floor(b.cps * b.owned * 10) / 10}</div>
-              `;
-
+                <div>Income/sec: ${Math.floor(b.cps * b.owned * 10) / 10}</div>`;
             showTooltip(html, buildingButton);
-
             clearTimeout(tooltipTimeout);
-            tooltipTimeout = setTimeout(() => {
-              hideTooltip();
-            }, 5000);
+            tooltipTimeout = setTimeout(hideTooltip, 5000);
           });
         }
 
         buildingButton.addEventListener("click", () => {
-          markPlayerActivity();
-
           const cost = b.price * half_price_amount;
           if (b.mystery || potatoes < cost) return;
 
-          buildingsOwned++;
-          b.owned++;
           potatoes -= cost;
+          b.owned++;
           b.price = Math.ceil(b.price * 1.15);
+          buildingsOwned++;
 
-          if (b.id === "cursor") {
-            maybeStartPeelerOrbit();
-          }
+          buildingButton.dataset.affordable = "false";
+          buildingButton.style.filter = "brightness(60%)";
 
-          calculateAutoClick();
           updatePotatoDisplay();
-          checkAchievements();
-          saveGame(true);
+          calculateAutoClick();
+
+          if (b.id === "cursor") maybeStartPeelerOrbit();
+
           requestAnimationFrame(() => {
             renderBuildings();
             renderUpgrades();
           });
+
+          scheduleSave();
         });
       }
 
       const displayPrice = b.price * half_price_amount;
-
       const img = buildingButton.querySelector(".building-image");
       const nameEl = buildingButton.querySelector(".building-name");
       const priceEl = buildingButton.querySelector(".price-value");
@@ -3518,21 +3501,15 @@
       nameEl.textContent = displayName;
       priceEl.textContent = formatNumber(displayPrice);
       ownedEl.textContent = b.owned;
-
       if (!img.src.endsWith(displayIcon)) img.src = displayIcon;
-      if (!potatoIcon.src.endsWith(equippedSkin.image)) {
-        potatoIcon.src = equippedSkin.image;
-      }
+      if (!potatoIcon.src.endsWith(equippedSkin.image)) potatoIcon.src = equippedSkin.image;
 
       const canAfford = potatoes >= displayPrice;
       if (buildingButton.dataset.affordable !== String(canAfford)) {
         buildingButton.dataset.affordable = String(canAfford);
-
         const priceWrapper = buildingButton.querySelector(".building-price");
         priceWrapper.style.color = canAfford ? "lightgreen" : "rgb(209,73,73)";
-        buildingButton.style.filter = canAfford
-          ? "brightness(100%)"
-          : "brightness(60%)";
+        buildingButton.style.filter = canAfford ? "brightness(100%)" : "brightness(60%)";
         buildingButton.style.cursor = canAfford ? "pointer" : "default";
       }
     });
@@ -3858,6 +3835,18 @@
 
   function getPeelerBuilding() {
     return buildings.find((b) => b.id === "cursor");
+  }
+
+  let pendingSave = false;
+  function scheduleSave() {
+    if (pendingSave) return;               // already queued
+    pendingSave = true;
+    // give the UI a few ms to paint, then save
+    setTimeout(() => {
+      pendingSave = false;
+      // localStorage is sync – we keep it, DB is async
+      saveGame(true).catch(console.warn);
+    }, 200);                               // 0.2 s is enough for the click animation
   }
 
   function light_darkToggle() {
