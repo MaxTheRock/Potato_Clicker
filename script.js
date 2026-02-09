@@ -1224,7 +1224,7 @@
       image: "assets/variants/crisp.png",
       unlocked: false,
       equipped: false,
-      description: "Purchase 250 peelers.",
+      description: "Purchase 200 peelers.",
     },
     {
       id: "ice",
@@ -1531,7 +1531,7 @@
       achievmentsAdd("peel_master");
     }
 
-    if (peeler && peeler.owned >= 250) {
+    if (peeler && peeler.owned >= 200) {
       achievmentsAdd("crisp");
     }
 
@@ -1981,7 +1981,7 @@
     {
       id: "crisp",
       name: "Crunchy.",
-      description: "Purchase 250 peelers.",
+      description: "Purchase 200 peelers.",
       completed: false,
       skinReward: "crisp",
     },
