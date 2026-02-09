@@ -2007,3 +2007,20 @@ h3 {
 #goldenPotatoImage {
   position: fixed;
 }
+
+.building-container-middle {
+  background-image: url("assets/farmer_background.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: repeat;
+  image-rendering: pixelated;
+  will-change: transform;
+  transform: translateZ(0);
+  background-size: 600px 150px;
+  width: auto;
+  height: 150px;
+  margin: 10px;
+  border: rgba(0, 0, 0, 0.315) 4px solid;
+  border-radius: 20px;
+  display:none;
+}

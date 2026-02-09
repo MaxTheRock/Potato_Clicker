@@ -60,6 +60,7 @@
   const tooltip = document.getElementById("tooltip");
   const heartContainer = document.querySelector(".heart-container");
   const MODE_STORAGE_KEY = "potato_clicker_mode";
+  const middle_buildings = document.getElementById("building_middle");
 
   document.addEventListener("DOMContentLoaded", () => {
     const slider = document.getElementById("darkenSlider");
@@ -1332,6 +1333,13 @@
     );
     const hasFinePointer = window.matchMedia("(pointer:fine)").matches;
     return hasFinePointer && !isMobileUA;
+  }
+
+  function checkBuildingMiddle() {
+    const farmer = buildings.find((b) => b.id === "farmer");
+    if (farmer.owned >= 1) {
+      middle_buildings.style.display = "block";
+    }
   }
 
   function checkAchievements() {
@@ -3475,6 +3483,7 @@
           requestAnimationFrame(() => {
             renderBuildings();
             renderUpgrades();
+            checkBuildingMiddle();
           });
 
           scheduleSave();
@@ -3889,6 +3898,7 @@
     renderSkins();
     renderEventSkins();
     requestAnimationFrame(renderPeelerOrbit);
+    checkBuildingMiddle()
     setInterval(() => {
       idleTime = Math.floor((Date.now() - lastPlayerAction) / 1000);
       console.log("idleTime:", idleTime);
