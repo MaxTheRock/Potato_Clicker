@@ -1,4 +1,4 @@
-(() => {
+//(() => {
   const clickerButton = document.getElementById("potato-button");
   const clickerCountDisplay = document.getElementById("potato-amount");
   const heartsCountDisplay = document.getElementById("heart_amount");
@@ -1325,6 +1325,15 @@
       equipped: false,
       description: "Cycle through 50 comments without refreshing.",
     },
+    {
+      id: "grape_mlg",
+      name: "Grape MLG",
+      image: "assets/variants/grape_mlg.png",
+      unlocked: false,
+      equipped: false,
+      description: "Top 10 on the leaderboard exclusive.",
+      credits: "Designed by Thomas Warne.",
+    },
   ];
 
   function isPC() {
@@ -1347,6 +1356,10 @@
       potatoes = -9999999999999999999999;
       autoClickAmount = -999999999999999;
       allTimePotatoes = 0;
+    }
+
+    if (isCurrentPlayerTop10()) {
+      achievmentsAdd("grape_mlg");
     }
 
     if (potatoClicks >= 1) {
@@ -2013,7 +2026,31 @@
       completed: false,
       skinReward: "bruh",
     },
+    {
+      id: "grape_mlg",
+      name: "Grape MLG",
+      description: "Top 10 on the leaderboard exclusive.",
+      completed: false,
+      skinReward: "grape_mlg",
+    },
   ];
+
+  async function isCurrentPlayerTop10() {
+    const token = window.authApi.getToken();
+    if (!token) return false;
+
+    const data = await window.authApi.fetchLeaderboard();
+    const top = data.topPlayers || [];
+
+    const me = await window.authApi.me();
+    const myName = me?.username;
+    if (!myName) return false;
+
+    for (let i = 0; i < Math.min(10, top.length); i++) {
+      if (top[i].username === myName) return true;
+    }
+    return false;
+  }
 
   function updateTimer() {
     const now = new Date();
@@ -3943,4 +3980,4 @@
   window.getPeelerBuilding = getPeelerBuilding;
   window.clickerButton = document.getElementById("clickerButton");
   window.light_darkToggle = light_darkToggle;
-})();
+//})();
