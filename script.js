@@ -3539,7 +3539,8 @@
 
       if (b.mystery && potatoes < displayPrice) {
         displayName = "???";
-        displayIcon = "assets/mystery.png";
+        img.style.filter = "brightness(0)";
+        img.style.opacity = "0.7";
       } else {
         b.mystery = false;
       }
