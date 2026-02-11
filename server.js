@@ -196,14 +196,17 @@ function requireAuth(req, res, next) {
 }
 
 /* -------------------------------------------------------------
-   Save / Load routes
+   Save / Load routes (minified JSON for maximal compression)
    ------------------------------------------------------------- */
 app.post("/api/auth/save", requireAuth, async (req, res) => {
   try {
     const userId = req.userId;
-    const saveData = req.body;
-    if (!saveData) return res.status(400).json({ error: "Missing save body" });
+    if (!req.body) return res.status(400).json({ error: "Missing save body" });
 
+    // 1️⃣ Minify JSON (maximal compression but still readable in SQL)
+    const saveData = JSON.stringify(req.body);
+
+    // 2️⃣ Save to database
     await pool.query(
       `INSERT INTO saves (user_id, data, updated_at)
        VALUES ($1, $2, now())
@@ -211,10 +214,10 @@ app.post("/api/auth/save", requireAuth, async (req, res) => {
       [userId, saveData],
     );
 
-    // Update leaderboard with allTimePotatoes (flat or nested format)
-    let allTimePotatoes = saveData.allTimePotatoes;
-    if (!allTimePotatoes && saveData.stats) {
-      allTimePotatoes = saveData.stats.allTimePotatoes;
+    // 3️⃣ Update leaderboard
+    let allTimePotatoes = req.body.allTimePotatoes;
+    if (!allTimePotatoes && req.body.stats) {
+      allTimePotatoes = req.body.stats.allTimePotatoes;
     }
 
     if (allTimePotatoes !== undefined) {
@@ -241,7 +244,9 @@ app.get("/api/auth/load", requireAuth, async (req, res) => {
       userId,
     ]);
     if (!r.rowCount) return res.json(null);
-    res.json(r.rows[0].data);
+
+    // Parse minified JSON back into JS object
+    res.json(JSON.parse(r.rows[0].data));
   } catch (e) {
     console.error("load error", e);
     res.status(500).json({ error: "Server error" });
@@ -249,42 +254,36 @@ app.get("/api/auth/load", requireAuth, async (req, res) => {
 });
 
 /* -------------------------------------------------------------
-   Leaderboard route – now includes `equippedSkin`
+   Leaderboard route – includes `equippedSkin`
    ------------------------------------------------------------- */
 app.get("/api/leaderboard", async (req, res) => {
   try {
-    /* -------------------- 1️⃣ Top 10 (with user_id) -------------------- */
     const topResult = await pool.query(
       `SELECT user_id, username, all_time_potatoes, updated_at
        FROM leaderboard
        ORDER BY all_time_potatoes DESC
        LIMIT 30`,
     );
-    const topPlayers = topResult.rows; // array of objects
+    const topPlayers = topResult.rows;
 
-    /* -------------------- 2️⃣ Pull saves for those users -------------------- */
     const userIds = topPlayers.map((p) => p.user_id);
-    let savesMap = {}; // user_id → saved JSON (or null)
+    let savesMap = {};
     if (userIds.length) {
       const savesRes = await pool.query(
-        `SELECT user_id, data
-         FROM saves
-         WHERE user_id = ANY($1::int[])`,
+        `SELECT user_id, data FROM saves WHERE user_id = ANY($1::int[])`,
         [userIds],
       );
       savesRes.rows.forEach((row) => {
-        savesMap[row.user_id] = row.data; // data is already a JS object
+        savesMap[row.user_id] = JSON.parse(row.data);
       });
     }
 
-    /* -------------------- 3️⃣ Attach equippedSkin to each top player -------------------- */
     topPlayers.forEach((p) => {
       const save = savesMap[p.user_id];
       p.equippedSkin = getEquippedSkin(save);
-      delete p.user_id; // we don't need to expose the raw DB id
+      delete p.user_id;
     });
 
-    /* -------------------- 4️⃣ Logged‑in user's rank (if any) -------------------- */
     let userRank = null;
     const auth = req.headers.authorization;
     if (auth) {
@@ -307,12 +306,11 @@ app.get("/api/leaderboard", async (req, res) => {
         if (rankQuery.rowCount > 0) {
           const info = rankQuery.rows[0];
           if (info.rank > 10) {
-            // Pull this user's save to get the equipped skin
             const saveRes = await pool.query(
               `SELECT data FROM saves WHERE user_id = $1`,
               [userId],
             );
-            const saveData = saveRes.rowCount ? saveRes.rows[0].data : null;
+            const saveData = saveRes.rowCount ? JSON.parse(saveRes.rows[0].data) : null;
             info.equippedSkin = getEquippedSkin(saveData);
             delete info.user_id;
             userRank = info;
@@ -323,7 +321,6 @@ app.get("/api/leaderboard", async (req, res) => {
       }
     }
 
-    /* -------------------- 5️⃣ Send response -------------------- */
     res.json({ topPlayers, userRank });
   } catch (e) {
     console.error("leaderboard error", e);

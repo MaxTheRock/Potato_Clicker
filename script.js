@@ -3613,6 +3613,7 @@
   });
 
   openBtns.addEventListener("click", () => {
+    saveGame(true);
     modals.classList.add("open");
   });
 
@@ -3634,6 +3635,7 @@
   });
 
   openStatsMobile.addEventListener("click", () => {
+    saveGame(true);
     modals.classList.add("open");
     modals.style.display = "flex";
   });
