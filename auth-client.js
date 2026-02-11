@@ -225,21 +225,33 @@
   /* --------------------------------------------------------------
      *** ORIGINAL loadGame – retained for completeness ***
      -------------------------------------------------------------- */
-  async function loadGame() {
+    async function loadGame() {
     const token = getToken();
     let saveObj = null;
 
-    // 1️⃣ Try remote save first (if logged in)
+    // 1️⃣ If we have a token, try the remote store first.
     if (token) {
       try {
-        saveObj = await loadRemote(); // may throw
+        // This will throw if the server returns an error or the request
+        // cannot be completed (e.g., network outage).
+        saveObj = await loadRemote();
+
+        // Remote succeeded – refresh the local cache so the browser
+        // still has a recent copy (helps offline reloads after a
+        // successful login).
+        localStorage.setItem(LOCAL_SAVE_KEY, JSON.stringify(saveObj));
+        localStorage.setItem("allTimePotatoes", saveObj.allTimePotatoes);
       } catch (e) {
-        console.warn("Remote load failed – falling back to localStorage", e);
-        saveObj = null;
+        console.warn(
+          "Remote load failed – falling back to localStorage",
+          e,
+        );
+        // Keep saveObj == null so we fall through to the local branch.
       }
     }
 
-    // 2️⃣ If remote didn't give us anything, load from localStorage
+    // 2️⃣ If we are *not* signed‑in, or remote load failed,
+    //    read the locally‑saved game.
     if (!saveObj) {
       const localRaw = localStorage.getItem(LOCAL_SAVE_KEY);
       if (localRaw) {
@@ -252,7 +264,7 @@
       }
     }
 
-    // 3️⃣ Initialise globals with safe defaults
+    // 3️⃣ Initialise globals with safe defaults.
     window.potatoes = (saveObj && saveObj.potatoes) || 0;
     window.buildings = (saveObj && saveObj.buildings) || {};
     window.upgrades = (saveObj && saveObj.upgrades) || {};
@@ -266,6 +278,8 @@
     window.allTimePotatoes = bestAllTime;
     if (!saveObj) saveObj = {};
     saveObj.allTimePotatoes = bestAllTime;
+
+    // Keep the legacy key in sync (helps older code paths).
     localStorage.setItem(LOCAL_SAVE_KEY, JSON.stringify(saveObj));
     localStorage.setItem("allTimePotatoes", bestAllTime);
   }
