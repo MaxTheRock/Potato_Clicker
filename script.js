@@ -1334,6 +1334,15 @@
       description: "Top 10 on the leaderboard exclusive.",
       credits: "Designed by Thomas Warne.",
     },
+    {
+      id: "navy",
+      name: "The Navy",
+      image: "assets/variants/navy.png",
+      unlocked: false,
+      equipped: false,
+      description: "As always, Navy sings second.",
+      credits: "Designed by William Gravenor.",
+    },
   ];
 
   function isPC() {
@@ -2033,6 +2042,13 @@
       completed: false,
       skinReward: "grape_mlg",
     },
+    {
+      id: "navy",
+      name: "The Navy",
+      description: "As always, Navy sings second.",
+      completed: false,
+      skinReward: "navy",
+    },
   ];
 
   async function isCurrentPlayerTop10() {
@@ -2149,6 +2165,11 @@
       achievmentsAdd("noll_sport");
       alert("Code redeemed! Achievement unlocked: Let's get sporty!");
       hints.textContent = "What are you waiting for?!?!"
+      hints.style.color = "lightgreen";
+    } else if (value === "flynavy") {
+      achievmentsAdd("navy");
+      alert("Code redeemed! Achievement unlocked: Fly Navy!");
+      hints.textContent = "Navy sings second!"
       hints.style.color = "lightgreen";
     } else {
       hints.textContent = rollRandomHint();
