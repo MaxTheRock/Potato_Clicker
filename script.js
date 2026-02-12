@@ -1333,6 +1333,15 @@
       equipped: false,
       description: "Top 10 on the leaderboard exclusive.",
       credits: "Designed by Thomas Warne.",
+     {
+      id: "gonavybeatarmy",
+      name: "The Navy",
+      image: "assets/variants/gonavybeatarmy.png",
+      unlocked: false,
+      equipped: false,
+      description: "An ode to the USNC and the Midshipmen.",
+      credits: "Designed by William Gravenor.",
+    },
     },
   ];
 
