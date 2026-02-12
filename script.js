@@ -61,7 +61,8 @@
   const heartContainer = document.querySelector(".heart-container");
   const MODE_STORAGE_KEY = "potato_clicker_mode";
   const middle_buildings = document.getElementById("building_middle");
-
+  const sell_button = document.getElementById("sell_button");
+  const buy_button = document.getElementById("buy_button");
   document.addEventListener("DOMContentLoaded", () => {
     const slider = document.getElementById("darkenSlider");
     const backgrounds = document.querySelectorAll(".pixelated-background");
@@ -121,6 +122,7 @@
   let upgradeTime = 0;
   let lastDbSaveTime = Date.now();
   let backgroundAlpha = 0.1;
+  let selling = false;
   const DB_SAVE_INTERVAL_MS = 240 * 60 * 1000;
   heartContainer.style.setProperty("--fill", "30%");
   const eventTime = new Date(2026, 1, 16);
@@ -3484,7 +3486,7 @@
               <span class="price-value"></span>
             </p>
           </div>
-          <div class="building-amount">
+          <div class="building-amount ${selling ? "sell" : ""}">
             <p class="amount-owned"></p>
           </div>
         `;
@@ -3522,19 +3524,54 @@
         }
 
         buildingButton.addEventListener("click", () => {
+          if (b.mystery) return;
+
           const cost = b.price * half_price_amount;
-          if (b.mystery || potatoes < cost) return;
+
+          // =====================
+          // SELLING MODE
+          // =====================
+          if (selling) {
+            if (b.owned <= 0) return;
+
+            // Reverse the price scaling first
+            const previousPrice = Math.floor(b.price / 1.15);
+
+            // 75% refund
+            const refund = Math.floor(previousPrice * 0.75);
+
+            potatoes += refund;
+            b.owned--;
+            b.price = previousPrice;
+            buildingsOwned--;
+
+            // Remove its production
+            calculateAutoClick();
+
+            updatePotatoDisplay();
+
+            requestAnimationFrame(() => {
+              renderBuildings();
+              renderUpgrades();
+              checkBuildingMiddle();
+            });
+
+            scheduleSave();
+            return;
+          }
+
+          // =====================
+          // BUYING MODE
+          // =====================
+          if (potatoes < cost) return;
 
           potatoes -= cost;
           b.owned++;
           b.price = Math.ceil(b.price * 1.15);
           buildingsOwned++;
 
-          buildingButton.dataset.affordable = "false";
-          buildingButton.style.filter = "brightness(60%)";
-
-          updatePotatoDisplay();
           calculateAutoClick();
+          updatePotatoDisplay();
 
           if (b.id === "cursor") maybeStartPeelerOrbit();
 
@@ -3545,7 +3582,7 @@
           });
 
           scheduleSave();
-        });
+});
       }
 
       const displayPrice = b.price * half_price_amount;
@@ -3553,8 +3590,13 @@
       const nameEl = buildingButton.querySelector(".building-name");
       const priceEl = buildingButton.querySelector(".price-value");
       const ownedEl = buildingButton.querySelector(".amount-owned");
+      const amountWrapper = buildingButton.querySelector(".building-amount");
       const potatoIcon = buildingButton.querySelector(".potato-icon");
 
+      // toggle sell class
+      amountWrapper.classList.toggle("sell", selling);
+
+      // display name and icon
       let displayName = b.name;
       let displayIcon = b.realIcon;
 
@@ -3567,18 +3609,41 @@
       }
 
       nameEl.textContent = displayName;
-      priceEl.textContent = formatNumber(displayPrice);
       ownedEl.textContent = b.owned;
+
       if (!img.src.endsWith(displayIcon)) img.src = displayIcon;
       if (!potatoIcon.src.endsWith(equippedSkin.image)) potatoIcon.src = equippedSkin.image;
 
-      const canAfford = potatoes >= displayPrice;
-      if (buildingButton.dataset.affordable !== String(canAfford)) {
-        buildingButton.dataset.affordable = String(canAfford);
-        const priceWrapper = buildingButton.querySelector(".building-price");
-        priceWrapper.style.color = canAfford ? "lightgreen" : "rgb(209,73,73)";
-        buildingButton.style.filter = canAfford ? "brightness(100%)" : "brightness(60%)";
-        buildingButton.style.cursor = canAfford ? "pointer" : "default";
+      // =====================
+      // PRICE DISPLAY & COLOR
+      // =====================
+      let displayValue = displayPrice;
+      let isSellMode = selling && b.owned > 0;
+
+      if (isSellMode) {
+        const previousPrice = Math.floor(b.price / 1.15);
+        const refund = Math.floor(previousPrice * 0.75);
+        displayValue = refund;
+      }
+
+      priceEl.textContent = formatNumber(displayValue);
+
+      const priceWrapper = buildingButton.querySelector(".building-price");
+
+      if (isSellMode) {
+        // selling always green
+        priceWrapper.style.color = "lightgreen";
+        buildingButton.style.filter = "brightness(100%)";
+        buildingButton.style.cursor = "pointer";
+      } else {
+        // buying logic
+        const canAfford = potatoes >= displayPrice;
+        if (buildingButton.dataset.affordable !== String(canAfford)) {
+          buildingButton.dataset.affordable = String(canAfford);
+          priceWrapper.style.color = canAfford ? "lightgreen" : "rgb(209,73,73)";
+          buildingButton.style.filter = canAfford ? "brightness(100%)" : "brightness(60%)";
+          buildingButton.style.cursor = canAfford ? "pointer" : "default";
+        }
       }
     });
   }
@@ -3943,6 +4008,22 @@
     saveGame(true);
   }
 
+  function sellPressed() {
+    console.log("Sell");
+    buy_button.classList.remove("selected");
+    sell_button.classList.add("selected");
+    selling = true;
+    renderBuildings()
+  }
+
+  function buyPressed() {
+    console.log("Buy");
+    sell_button.classList.remove("selected");
+    buy_button.classList.add("selected");
+    selling = false;
+    renderBuildings()
+  }
+
   updateTimer();
   (async () => {
     const overlay = document.getElementById('loadingOverlay');
@@ -4004,4 +4085,6 @@
   window.getPeelerBuilding = getPeelerBuilding;
   window.clickerButton = document.getElementById("clickerButton");
   window.light_darkToggle = light_darkToggle;
+  window.sellPressed = sellPressed;
+  window.buyPressed = buyPressed;
 //})();

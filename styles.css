@@ -171,7 +171,7 @@ section {
   background-image: url("assets/background.png");
   background-size: 960px 960px; /* make image larger */
   background-position: center;
-  background-repeat: no-repeat;
+  background-repeat: repeat;
   image-rendering: pixelated;
 
   /* Use parent's variable */
@@ -705,12 +705,6 @@ h3 {
   padding-bottom: 10px;
 }
 
-@media (max-width: 700px) {
-  .buy-sell-selector {
-    display: none;
-  }
-}
-
 .buy-sell-label {
   display: flex;
   flex-direction: column;
@@ -741,10 +735,23 @@ h3 {
   display: flex;
   justify-content: center;
   margin-top: 5px;
+  gap: 2vw;
 }
 
+@media (min-width: 370px) and (max-width: 700px) {
+  .multiplier-container {
+    gap: 15vw;
+  }
+}
+
+@media (max-width: 369px) {
+  .multiplier-container {
+    gap: 10vw;
+  }
+}
+
+
 .multiplier {
-  padding: 0px 50px 0px 5px;
   color: rgba(255, 255, 255, 0.747);
   font-weight: bold;
   background-color: transparent;
@@ -2023,4 +2030,8 @@ h3 {
   border: rgba(0, 0, 0, 0.315) 4px solid;
   border-radius: 20px;
   display:none;
+}
+
+.sell {
+  color: red;
 }
