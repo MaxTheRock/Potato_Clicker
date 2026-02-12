@@ -2159,6 +2159,11 @@
       alert("Code redeemed! Achievement unlocked: Let's get sporty!");
       hints.textContent = "What are you waiting for?!?!"
       hints.style.color = "lightgreen";
+    } else if (value === "gonavybeatarmy") {
+      achievmentsAdd("Navak Aviation");
+      alert("Code redeemed! Achievement unlocked: The Navy");
+      hints.textContent = "Navy sings second!"
+      hints.style.color = "lightgreen";
     } else {
       hints.textContent = rollRandomHint();
     }
