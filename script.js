@@ -91,6 +91,28 @@
     }
   }
 
+  // AUDIO
+  const clickSound = new Audio("audio/pop.wav");
+  const achievementSound = new Audio("audio/achievement.mp3");
+  const buySound = new Audio("audio/buy.mp3");
+  const errorSound = new Audio("audio/error.mp3");
+  const upgradeSound = new Audio("audio/upgrade.mp3");
+  const randomSounds = [];
+
+  for (let i = 1; i <= 13; i++) {
+    const audio = new Audio(`audio/random/${i}.mp3`);
+    audio.preload = "auto";
+    randomSounds.push(audio);
+  }
+
+  function playRandomSound() {
+    const index = Math.floor(Math.random() * randomSounds.length);
+    const sound = randomSounds[index];
+    sound.volume = sfxVolume;
+    sound.currentTime = 0.5;
+    sound.play().catch(() => {});
+  }
+
   let tooltipHideTimeout = null;
   let mobileAutoHideTimeout = null;
   let comment_count = 0;
@@ -108,7 +130,7 @@
   let potatoClicks = 0;
   let handFarmedPotatoes = 0;
   let goldenPotatoClicks = 0;
-  let runningVersion = "v0.68";
+  let runningVersion = "v0.70";
   let autoClickAmount = 0;
   let runDurationSeconds;
   let totalUpgrades = 0;
@@ -123,6 +145,7 @@
   let lastDbSaveTime = Date.now();
   let backgroundAlpha = 0.1;
   let selling = false;
+  let sfxVolume = 1;
   const DB_SAVE_INTERVAL_MS = 240 * 60 * 1000;
   heartContainer.style.setProperty("--fill", "30%");
   const eventTime = new Date(2026, 1, 16);
@@ -313,7 +336,7 @@
     },
     {
       id: "distillary",
-      name: "Distillary",
+      name: "Distillery",
       price: 330000000,
       basePrice: 330000000,
       owned: 0,
@@ -2324,7 +2347,9 @@
   function achievmentsAdd(id) {
     const a = achievments.find((a) => a.id === id);
     if (!a || a.completed) return;
-
+    achievementSound.volume = sfxVolume;
+    achievementSound.currentTime = 0;
+    achievementSound.play();
     a.completed = true;
 
     let rewardText = null;
@@ -2892,6 +2917,19 @@
     saveGame();
   }
 
+  function getEquippedSkinId() {
+    const raw = localStorage.getItem("potato_clicker_save_v2");
+    if (!raw) return "default";
+
+    try {
+      const save = JSON.parse(raw);
+      const equipped = save.skins?.find(s => s.equipped);
+      return equipped?.id || "default";
+    } catch {
+      return "default";
+    }
+  }
+
   function clearLocalData() {
     if (
       confirm(
@@ -2906,6 +2944,15 @@
   }
 
   clickerButton.addEventListener("click", function () {
+    const skinId = getEquippedSkinId();
+    if (skinId === "synth") {
+      playRandomSound();
+    } else {
+      clickSound.volume = sfxVolume;
+      clickSound.currentTime = 0.0057;
+      clickSound.play();
+    }
+    
     const now = Date.now();
     recentClicks.push(now);
 
@@ -3152,8 +3199,15 @@
 
         upgradeButton.addEventListener("click", () => {
           const cost = u.price * half_price_amount;
-          if (potatoes < cost) return;
-
+          if (potatoes < cost) {
+            errorSound.volume = sfxVolume;
+            errorSound.currentTime = 0.5;
+            errorSound.play();
+            return
+          };
+          upgradeSound.volume = sfxVolume;
+          upgradeSound.currentTime = 0.5;
+          upgradeSound.play();
           potatoes -= cost;
           u.completed = true;
           u.unlocked = false;
@@ -3524,7 +3578,12 @@
         }
 
         buildingButton.addEventListener("click", () => {
-          if (b.mystery) return;
+          if (b.mystery) {
+            errorSound.volume = sfxVolume;
+            errorSound.currentTime = 0.5;
+            errorSound.play();
+            return
+          };
 
           const cost = b.price * half_price_amount;
 
@@ -3562,8 +3621,15 @@
           // =====================
           // BUYING MODE
           // =====================
-          if (potatoes < cost) return;
-
+          if (potatoes < cost) {
+            errorSound.volume = sfxVolume;
+            errorSound.currentTime = 0.5;
+            errorSound.play();
+            return
+          };
+          buySound.volume = sfxVolume;
+          buySound.currentTime = 0.7;
+          buySound.play();
           potatoes -= cost;
           b.owned++;
           b.price = Math.ceil(b.price * 1.15);
@@ -3605,6 +3671,7 @@
         img.style.opacity = "0.7";
       } else {
         b.mystery = false;
+        img.style.filter = "brightness(1)";
       }
 
       nameEl.textContent = displayName;
@@ -3641,12 +3708,11 @@
       } else {
         // buying logic
         const canAfford = potatoes >= displayPrice;
-        if (buildingButton.dataset.affordable !== String(canAfford)) {
-          buildingButton.dataset.affordable = String(canAfford);
-          priceWrapper.style.color = canAfford ? "lightgreen" : "rgb(209,73,73)";
-          buildingButton.style.filter = canAfford ? "brightness(100%)" : "brightness(60%)";
-          buildingButton.style.cursor = canAfford ? "pointer" : "default";
-        }
+
+        buildingButton.dataset.affordable = String(canAfford);
+        priceWrapper.style.color = canAfford ? "lightgreen" : "rgb(209,73,73)";
+        buildingButton.style.filter = canAfford ? "brightness(100%)" : "brightness(60%)";
+        buildingButton.style.cursor = canAfford ? "pointer" : "default";
       }
     });
   }
@@ -3669,6 +3735,14 @@
       0,
     );
   }
+
+  const sfxSlider = document.getElementById("sfxVolume");
+
+  sfxSlider.addEventListener("input", () => {
+    sfxVolume = parseFloat(sfxSlider.value);
+
+    localStorage.setItem("sfxVolume", sfxVolume);
+  });
 
   function maybeStartPeelerOrbit() {
     const peeler = getPeelerBuilding();
@@ -4044,6 +4118,11 @@
     renderEventSkins();
     requestAnimationFrame(renderPeelerOrbit);
     checkBuildingMiddle()
+    const savedVol = localStorage.getItem("sfxVolume");
+    if (savedVol !== null) {
+      sfxVolume = parseFloat(savedVol);
+      sfxSlider.value = sfxVolume;
+    }
     setInterval(() => {
       idleTime = Math.floor((Date.now() - lastPlayerAction) / 1000);
       console.log("idleTime:", idleTime);
