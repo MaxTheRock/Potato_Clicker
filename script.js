@@ -3534,18 +3534,17 @@
           if (selling) {
             if (b.owned <= 0) return;
 
-            // Reverse the price scaling first
             const previousPrice = Math.floor(b.price / 1.15);
 
-            // 75% refund
-            const refund = Math.floor(previousPrice * 0.75);
+            let refund = Math.floor(previousPrice * 0.75);
+
+            refund = Math.floor(refund * half_price_amount);
 
             potatoes += refund;
             b.owned--;
             b.price = previousPrice;
             buildingsOwned--;
 
-            // Remove its production
             calculateAutoClick();
 
             updatePotatoDisplay();
@@ -3622,7 +3621,11 @@
 
       if (isSellMode) {
         const previousPrice = Math.floor(b.price / 1.15);
-        const refund = Math.floor(previousPrice * 0.75);
+
+        let refund = Math.floor(previousPrice * 0.75);
+
+        refund = Math.floor(refund * half_price_amount);
+
         displayValue = refund;
       }
 
