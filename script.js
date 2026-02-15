@@ -1,7 +1,7 @@
-//(() => {
+(() => {
   const clickerButton = document.getElementById("potato-button");
   const clickerCountDisplay = document.getElementById("potato-amount");
-  const heartsCountDisplay = document.getElementById("heart_amount");
+  //const heartsCountDisplay = document.getElementById("heart_amount");
   const titleElement = document.getElementById("title");
   const comments = document.getElementById("comment");
   const hints = document.getElementById("hints");
@@ -16,15 +16,15 @@
   const openBtno = document.getElementById("openModalOptions");
   const closeBtno = document.getElementById("closeModalOptions");
   const modalo = document.getElementById("modaloptions");
-  const timerInterval = setInterval(updateTimer, 60 * 1000);
+  //const timerInterval = setInterval(updateTimer, 60 * 1000);
   const openBtnsk = document.getElementById("openModalSkins");
   const closeBtnsk = document.getElementById("closeModalSkins");
   const modalsk = document.getElementById("modalskins");
 
   const closeBtncodes = document.getElementById("closeModalCodes");
   const modalcodes = document.getElementById("modalcodes");
-  const openModalAnouncements = document.getElementById("openModalAnouncements");
-  const closeModalAnouncements = document.getElementById("closeModalAnouncements");
+  //const openModalAnouncements = document.getElementById("openModalAnouncements");
+  //const closeModalAnouncements = document.getElementById("closeModalAnouncements");
   const modalanouncements = document.getElementById("modalanouncements");
 
   const potatoesCountElement = document.getElementById("potBank");
@@ -54,11 +54,10 @@
   const timerEl = document.getElementById("event_timer");
   const Codeinput = document.getElementById("codeInput");
   const Codebutton = document.getElementById("redeemCodeButton");
-  const isTouchDevice =
-    "ontouchstart" in window || navigator.maxTouchPoints > 0;
+  const isTouchDevice = ("ontouchstart" in window || navigator.maxTouchPoints > 0) && window.innerWidth <= 700;
 
   const tooltip = document.getElementById("tooltip");
-  const heartContainer = document.querySelector(".heart-container");
+  //const heartContainer = document.querySelector(".heart-container");
   const MODE_STORAGE_KEY = "potato_clicker_mode";
   const middle_buildings = document.getElementById("building_middle");
   const sell_button = document.getElementById("sell_button");
@@ -118,7 +117,7 @@
   let comment_count = 0;
   let rawPotatoes = 0;
   let potatoes = 0;
-  let hearts = 0;
+  //let hearts = 0;
   let mode = loadSavedMode();
   let potatoesPerSecond = 0;
   let potatoesLastSecond = 0;
@@ -147,7 +146,7 @@
   let selling = false;
   let sfxVolume = 1;
   const DB_SAVE_INTERVAL_MS = 240 * 60 * 1000;
-  heartContainer.style.setProperty("--fill", "30%");
+  //heartContainer.style.setProperty("--fill", "30%");
   const eventTime = new Date(2026, 1, 16);
 
   let normal_hints = [
@@ -2092,7 +2091,7 @@
     }
     return false;
   }
-
+  /*
   function updateTimer() {
     const now = new Date();
     const diff = eventTime - now;
@@ -2110,7 +2109,7 @@
 
     timerEl.textContent = `Event ends in ${days}d ${hours}h ${minutes}m `;
   }
-
+  */
   let mysteryCount = 0;
   buildings.forEach((b) => {
     if (b.mystery && mysteryCount < 2) {
@@ -2510,7 +2509,7 @@
       titleElement.innerText =
         formatNumber(Math.floor(potatoes)) + " potatoes - Potato Clicker";
     }
-    heartsCountDisplay.innerText = formatNumber(Math.floor(hearts))
+    //heartsCountDisplay.innerText = formatNumber(Math.floor(hearts))
     if (frenzy || half_price_amount === 0.5) {
       clickerCountDisplay.style.color = "gold";
     } else {
@@ -2627,7 +2626,7 @@
         goldenPotatoClicks,
         buildingsOwned,
         totalUpgrades,
-        hearts,
+        //hearts,
         backgroundAlpha,
       },
       buildings: {},
@@ -2832,7 +2831,7 @@
     goldenPotatoClicks = s.goldenPotatoClicks;
     buildingsOwned = s.buildingsOwned;
     totalUpgrades = s.totalUpgrades;
-    hearts = typeof s.hearts === 'number' ? s.hearts : (hearts ?? 0);
+    //hearts = typeof s.hearts === 'number' ? s.hearts : (hearts ?? 0);
     backgroundAlpha = typeof s.backgroundAlpha === 'number' ? s.backgroundAlpha: 0.1;
 
     const slider = document.getElementById("darkenSlider");
@@ -2930,6 +2929,21 @@
     }
   }
 
+  function clampTooltipPosition(x, y, tooltipRect) {
+    const margin = 12;                         // distance from window edges
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    // Horizontal – stay inside the window
+    let left = Math.min(Math.max(margin, x), vw - tooltipRect.width - margin);
+    // Try to place below the cursor; if there is no room, flip above
+    let top = y + 20;
+    if (top + tooltipRect.height + margin > vh) top = y - tooltipRect.height - 8;
+    top = Math.max(margin, Math.min(top, vh - tooltipRect.height - margin));
+
+    return { left, top };
+  }
+
   function clearLocalData() {
     if (
       confirm(
@@ -2965,7 +2979,7 @@
     handFarmedPotatoes += potatoesPerClick;
     allTimePotatoes += potatoesPerClick;
     potatoClicks++;
-    hearts++;
+    //hearts++;
     markPlayerActivity();
     checkAchievements();
 
@@ -3080,44 +3094,80 @@
   scheduleNextGoldenPotato();
 
   function showTooltip(html, anchorElement) {
-    clearTimeout(tooltipHideTimeout);
-    clearTimeout(mobileAutoHideTimeout);
+    // 1️⃣  Cancel any pending hide timers (fast mouse moves)
+    clearTimeout(tooltip._hideTimer);
+    clearTimeout(tooltip._mobileHideTimer);
 
+    // 2️⃣  Fill content and make it visible
     tooltip.innerHTML = html;
     tooltip.classList.remove("hidden");
     tooltip.classList.add("shown");
 
-    const rect = anchorElement.getBoundingClientRect();
-    const tooltipWidth = tooltip.offsetWidth;
+    // 3️⃣  Initial placement – use the *current* mouse position.
+    //     If the call comes from a keyboard/script we fall back to the centre of the element.
+    const fallbackX = anchorElement.getBoundingClientRect().left +
+                      anchorElement.getBoundingClientRect().width / 2;
+    const fallbackY = anchorElement.getBoundingClientRect().top +
+                      anchorElement.getBoundingClientRect().height / 2;
 
-    let left = rect.left - tooltipWidth - 10;
-    let top = rect.top;
+    // These will be updated on every mousemove (desktop)
+    let lastX = fallbackX;
+    let lastY = fallbackY;
 
-    if (left < 8) {
-      left = rect.right + 10;
+    const place = () => {
+      const { left, top } = clampTooltipPosition(
+        lastX,
+        lastY,
+        tooltip.getBoundingClientRect()
+      );
+      tooltip.style.left = `${left}px`;
+      tooltip.style.top  = `${top}px`;
+    };
+    place();   // initial placement
+
+    // 4️⃣  Desktop – attach a live mousemove listener
+    if (!isTouchDevice) {
+      const mouseMove = (e) => {
+        lastX = e.clientX;
+        lastY = e.clientY;
+        place();
+      };
+      tooltip._mouseMoveHandler = mouseMove;
+      document.addEventListener("mousemove", mouseMove);
+    } else {
+      // 5️⃣  Mobile – hide when the user taps anywhere outside the tooltip
+      const tapAway = (e) => {
+        if (!tooltip.contains(e.target)) hideTooltipImmediate();
+      };
+      tooltip._tapAwayHandler = tapAway;
+      document.addEventListener("touchstart", tapAway);
     }
+  }
 
-    tooltip.style.left = left + "px";
-    tooltip.style.top = top + "px";
 
-    if (isTouchDevice) {
-      mobileAutoHideTimeout = setTimeout(() => {
-        hideTooltipImmediate();
-      }, 5000);
-    }
+  function hideTooltip() {
+    tooltip._hideTimer = setTimeout(() => {
+      hideTooltipImmediate();
+    }, 80);
   }
 
   function hideTooltipImmediate() {
-    clearTimeout(tooltipHideTimeout);
-    clearTimeout(mobileAutoHideTimeout);
+    clearTimeout(tooltip._hideTimer);
+    clearTimeout(tooltip._mobileHideTimer);
+
+    // Remove desktop mouse‑move listener
+    if (tooltip._mouseMoveHandler) {
+      document.removeEventListener("mousemove", tooltip._mouseMoveHandler);
+      tooltip._mouseMoveHandler = null;
+    }
+    // Remove mobile tap‑away listener
+    if (tooltip._tapAwayHandler) {
+      document.removeEventListener("touchstart", tooltip._tapAwayHandler);
+      tooltip._tapAwayHandler = null;
+    }
 
     tooltip.classList.remove("shown");
     tooltip.classList.add("hidden");
-  }
-
-  function hideTooltip() {
-    tooltip.classList.remove("shown");
-    setTimeout(() => tooltip.classList.add("hidden"), 150);
   }
 
   const renderedUpgrades = new Map();
@@ -3396,69 +3446,112 @@
     });
   }
 
+  
+
   function renderSkins() {
     const container = document.getElementById("skinsContainer");
+    if (!container) return;
+
     container.innerHTML = "";
 
+    // Reliable touch detection
+    const isTouch = ("ontouchstart" in window || navigator.maxTouchPoints > 0) && window.innerWidth <= 700;
+
+    // Currently equipped skin
+    const equippedSkin = getEquippedSkin();
+
     skins.forEach((s) => {
-      const skinDiv = document.createElement("button");
-      skinDiv.className = `skin-div ${s.equipped ? "selected-skin" : ""}`;
-      if (!s.unlocked) skinDiv.classList.add("locked-skin");
+      // Create button
+      const skinBtn = document.createElement("button");
+      skinBtn.className = `skin-div ${s.equipped ? "selected-skin" : ""}`;
+      if (!s.unlocked) skinBtn.classList.add("locked-skin");
 
-      skinDiv.innerHTML = `
-          <img
-            src="${s.unlocked ? s.image : "assets/mystery_potato.png"}"
-            alt="${s.name}"
-            width="100"
-            class="skin-option"
-            data-skin="${s.id}"
-            draggable="false"
-          />
-          <p class="skin-label">${s.unlocked ? s.name : "???"}</p>
-        `;
+      // Inner markup
+      skinBtn.innerHTML = `
+        <img
+          src="${s.unlocked ? s.image : "assets/mystery_potato.png"}"
+          alt="${s.name}"
+          width="100"
+          class="skin-option"
+          data-skin="${s.id}"
+          draggable="false"
+        />
+        <p class="skin-label">${s.unlocked ? s.name : "???"}</p>
+      `;
 
-      skinDiv.addEventListener("mouseenter", () => {
-        if (s.credits) {
-          if (s.unlocked) {
-            const html = `
-                <div class="title">${s.name}</div>
-                <div>${s.description}</div>
-                <div class="credits">${s.credits}</div>
-              `;
-            showTooltip(html, skinDiv);
-          } else {
-            const html = `
-                <div class="title">???</div>
-                <div>${s.description}</div>
-                <div class="credits">Designed by: *********</div>
-              `;
-            showTooltip(html, skinDiv);
+      // -----------------------------
+      // Tooltip / hover logic
+      // -----------------------------
+      if (!isTouch) {
+        // Desktop hover
+        skinBtn.addEventListener("mouseenter", () => {
+          const html = s.unlocked
+            ? `<div class="title">${s.name}</div><div>${s.description}</div>`
+            : `<div class="title">???</div><div>${s.description}</div>`;
+          showTooltip(html, skinBtn);
+        });
+        skinBtn.addEventListener("mouseleave", hideTooltip);
+      } else {
+        // Mobile tap shows tooltip
+        let ignoreNextClick = false;
+
+        skinBtn.addEventListener("touchstart", (e) => {
+          e.stopPropagation(); // prevent immediate close
+          ignoreNextClick = true;
+
+          const html = s.unlocked
+            ? `<div class="title">${s.name}</div><div>${s.description}</div>`
+            : `<div class="title">???</div><div>${s.description}</div>`;
+          showTooltip(html, skinBtn);
+
+          setTimeout(() => (ignoreNextClick = false), 300);
+        });
+
+        // Mobile click also uses same ignoreNextClick
+        skinBtn.addEventListener("click", () => {
+          if (ignoreNextClick) return;
+
+          if (!s.unlocked) {
+            // Flash red to indicate locked
+            skinBtn.style.filter = "brightness(0.5) hue-rotate(0deg)";
+            setTimeout(() => (skinBtn.style.filter = ""), 200);
+            return;
           }
-        } else {
-          if (s.unlocked) {
-            const html = `
-                <div class="title">${s.name}</div>
-                <div>${s.description}</div>
-              `;
-            showTooltip(html, skinDiv);
-          } else {
-            const html = `
-                <div class="title">???</div>
-                <div>${s.description}</div>
-              `;
-            showTooltip(html, skinDiv);
+
+          selectSkin(s.id);
+          updatePotatoDisplay();
+          renderSkins();
+        });
+      }
+
+      // -----------------------------
+      // Desktop click (unlocked) for selection
+      // -----------------------------
+      if (!isTouch) {
+        skinBtn.addEventListener("click", () => {
+          if (!s.unlocked) {
+            // Flash red
+            skinBtn.style.filter = "brightness(0.5) hue-rotate(0deg)";
+            setTimeout(() => (skinBtn.style.filter = ""), 200);
+            return;
           }
-        }
-      });
-      skinDiv.addEventListener("mouseleave", hideTooltip);
 
-      skinDiv.addEventListener("click", () => {
-        if (!s.unlocked) return;
-        selectSkin(s.id);
-        updatePotatoDisplay();
-      });
+          selectSkin(s.id);
+          updatePotatoDisplay();
+          renderSkins();
+        });
+      }
 
-      container.appendChild(skinDiv);
+      // -----------------------------
+      // Update image and label
+      // -----------------------------
+      const img = skinBtn.querySelector("img");
+      const label = skinBtn.querySelector(".skin-label");
+
+      img.src = s.unlocked ? s.image : "assets/mystery_potato.png";
+      label.textContent = s.unlocked ? s.name : "???";
+
+      container.appendChild(skinBtn);
     });
   }
 
@@ -3562,7 +3655,6 @@
           });
           buildingButton.addEventListener("mouseleave", hideTooltip);
         } else {
-          let tooltipTimeout;
           buildingButton.addEventListener("click", () => {
             const html = b.mystery
               ? `<div class="title">???</div><div>Price: ${formatNumber(b.price)}</div>`
@@ -3572,8 +3664,6 @@
                 <div>Total generated: ${Math.floor(b.totalGenerated)}</div>
                 <div>Income/sec: ${Math.floor(b.cps * b.owned * 10) / 10}</div>`;
             showTooltip(html, buildingButton);
-            clearTimeout(tooltipTimeout);
-            tooltipTimeout = setTimeout(hideTooltip, 5000);
           });
         }
 
@@ -3647,8 +3737,8 @@
           });
 
           scheduleSave();
-});
-      }
+    });
+  }
 
       const displayPrice = b.price * half_price_amount;
       const img = buildingButton.querySelector(".building-image");
@@ -3838,7 +3928,7 @@
     modalcodes.classList.remove("open");
     modalcodes.style.display = "none";
   });
-
+  /*
   openModalAnouncements.addEventListener("click", () => {
     modalanouncements.classList.add("open");
     modalanouncements.style.display = "none";
@@ -3848,7 +3938,7 @@
     modalanouncements.classList.remove("open");
     modalanouncements.style.display = "none";
   });
-
+  */
   const preloadedSkins = new Map();
 
   function preloadSkin(imageSrc) {
@@ -3877,56 +3967,43 @@
 
     // --- Potato jump (PRELOADED) ---
     const potato = preloadedSkins.get(equippedSkin.image).cloneNode(false);
+
     potato.className = "jump-image";
     potato.style.left = e.clientX - rect.left - 20 + "px";
     potato.style.top = e.clientY - rect.top - 20 + "px";
     potato.style.opacity = "1";
+
     clickArea.appendChild(potato);
 
-    // --- Heart jump (opposite direction) ---
-    const heart = document.createElement("img");
-    heart.src = "assets/heart.png";
-    heart.className = "jump-image";
-    heart.style.width = "30px";
-    heart.style.height = "auto";
-    heart.style.left = e.clientX - rect.left - 20 + "px";
-    heart.style.top = e.clientY - rect.top - 20 + "px";
-    heart.style.opacity = "1";
-    clickArea.appendChild(heart);
+    // Physics
+    let velocityY = -6 - Math.random() * 2;
+    let velocityX = Math.random() * 4 - 2;
+    const gravity = 0.55;
+    let posX = e.clientX - rect.left - 20;
+    let posY = e.clientY - rect.top - 20;
 
-    // --- Physics function ---
-    function animateJump(element, direction = 1) {
-      let velocityY = -6 - Math.random() * 2;
-      let velocityX = (Math.random() * 4) * direction; // direction: 1 = normal, -1 = opposite
-      const gravity = 0.55;
-      let posX = e.clientX - rect.left - 20;
-      let posY = e.clientY - rect.top - 20;
-      let rotation = Math.random() * 360;
-      let rotationSpeed = Math.random() * 10 - 5;
-      let opacity = 1;
+    let rotation = Math.random() * 360;
+    let rotationSpeed = Math.random() * 10 - 5;
+    let opacity = 1;
 
-      const animation = setInterval(() => {
-        velocityY += gravity;
-        posY += velocityY;
-        posX += velocityX;
+    const animation = setInterval(() => {
+      velocityY += gravity;
+      posY += velocityY;
+      posX += velocityX;
 
-        rotation += rotationSpeed;
-        opacity -= 0.05;
+      rotation += rotationSpeed;
+      opacity -= 0.05;
 
-        element.style.transform = `rotate(${rotation}deg)`;
-        element.style.left = posX + "px";
-        element.style.top = posY + "px";
-        element.style.opacity = opacity;
+      potato.style.transform = `rotate(${rotation}deg)`;
+      potato.style.left = posX + "px";
+      potato.style.top = posY + "px";
+      potato.style.opacity = opacity;
 
-        if (opacity <= 0 || posY > e.clientY - rect.top) {
-          clearInterval(animation);
-          element.remove();
-        }
-      }, 16);
-    }
-
-    animateJump(potato, 1);   // original direction
-    animateJump(heart, -1);   // opposite direction
+      if (opacity <= 0 || posY > e.clientY - rect.top) {
+        clearInterval(animation);
+        potato.remove();
+      }
+    }, 16);
   });
 
   let frenzy_amount;
@@ -4021,7 +4098,7 @@
   function markPlayerActivity() {
     lastPlayerAction = Date.now();
   }
-
+  /*
   function purchaseEventSkin(id) {
     const skin = skins.find(s => s.id === id);
     if (!skin) return;
@@ -4044,7 +4121,7 @@
 
   modalanouncements.classList.add("open");
   modalanouncements.style.display = "flex";
-
+  */
   function getPeelerBuilding() {
     return buildings.find((b) => b.id === "cursor");
   }
@@ -4101,7 +4178,7 @@
     renderBuildings()
   }
 
-  updateTimer();
+  //updateTimer();
   (async () => {
     const overlay = document.getElementById('loadingOverlay');
     
@@ -4169,4 +4246,7 @@
   window.light_darkToggle = light_darkToggle;
   window.sellPressed = sellPressed;
   window.buyPressed = buyPressed;
-//})();
+  window.showTooltip = showTooltip;
+  window.hideTooltip = hideTooltip;
+  window.hideTooltipImmediate = hideTooltipImmediate;
+})();

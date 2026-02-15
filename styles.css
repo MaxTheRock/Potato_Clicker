@@ -1275,45 +1275,31 @@ h3 {
 }
 
 .tooltip {
-  position: fixed;
+  position: fixed;               /* important – lets us set left/top */
   background: #1e2a35;
   border: 1px solid #3c556d;
   border-radius: 6px;
   padding: 8px 10px;
   color: #e6e6e6;
   font-size: 13px;
-  pointer-events: none;
+  pointer-events: none;         /* mouse events pass through */
   z-index: 9999999;
   max-width: 220px;
   opacity: 0;
-  transition:
-    opacity 0.15s ease,
-    transform 0.15s ease;
   transform: translateY(4px);
+  transition:
+    opacity .15s ease,
+    transform .15s ease;
 }
+.tooltip.shown { opacity:1; transform:translateY(0); }
+.tooltip.hidden { opacity:0; }
+.tooltip .title   { font-weight:bold; margin-bottom:4px; }
+.tooltip .price   { color:#ffd966; margin-top:4px; }
+.tooltip .effect  { color:#9fdc9f; margin-top:2px; }
 
-.tooltip.shown {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.tooltip.hidden {
-  display: none;
-}
-
-.tooltip .title {
-  font-weight: bold;
-  margin-bottom: 4px;
-}
-
-.tooltip .price {
-  color: #ffd966;
-  margin-top: 4px;
-}
-
-.tooltip .effect {
-  color: #9fdc9f;
-  margin-top: 2px;
+.tooltip {
+  left: 12px;
+  top: 12px;
 }
 
 .username,
@@ -2034,4 +2020,9 @@ h3 {
 
 .sell {
   color: red;
+}
+
+.skin-div img,
+.skin-div p {
+  pointer-events: none; /* let the button itself handle hover */
 }
