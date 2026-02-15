@@ -3595,7 +3595,7 @@
 
             const previousPrice = Math.floor(b.price / 1.15);
 
-            let refund = Math.floor(previousPrice * 0.75);
+            let refund = Math.floor(previousPrice * 0.50);
 
             refund = Math.floor(refund * half_price_amount);
 
@@ -3689,7 +3689,7 @@
       if (isSellMode) {
         const previousPrice = Math.floor(b.price / 1.15);
 
-        let refund = Math.floor(previousPrice * 0.75);
+        let refund = Math.floor(previousPrice * 0.50);
 
         refund = Math.floor(refund * half_price_amount);
 
