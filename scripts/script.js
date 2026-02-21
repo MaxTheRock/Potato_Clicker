@@ -110,14 +110,6 @@
 
       const maxLegitGain = (autoClickAmount * 10 * elapsed) + (potatoClicks * window.potatoesPerClick);
 
-      if (allTimeDelta < 0) {
-          flagCheater("allTimePotatoes decreased");
-      }
-
-      if (potatoDelta > maxLegitGain * 20) {
-          flagCheater("impossible potato gain rate");
-      }
-
       lastPotatoCheck = now;
       lastPotatoAmount = potatoes;
       lastAllTimeAmount = allTimePotatoes;
