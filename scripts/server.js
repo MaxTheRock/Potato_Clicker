@@ -295,13 +295,13 @@ app.get("/api/leaderboard", async (req, res) => {
 
         const rankQuery = await pool.query(
           `SELECT
-             (SELECT COUNT(*) + 1 FROM leaderboard WHERE all_time_potatoes > l.all_time_potatoes) AS rank,
-             username,
-             all_time_potatoes,
-             l.user_id
-           FROM leaderboard l
-           WHERE user_id = $1`,
-          [userId],
+            (SELECT COUNT(*) + 1 FROM leaderboard WHERE all_time_potatoes > l.all_time_potatoes) AS rank,
+            username,
+            all_time_potatoes,
+            l.user_id::text
+          FROM leaderboard l
+          WHERE user_id = $1::bigint`,
+          [String(userId)],
         );
 
         if (rankQuery.rowCount > 0) {
@@ -310,7 +310,7 @@ app.get("/api/leaderboard", async (req, res) => {
             // Pull this user's save to get the equipped skin
             const saveRes = await pool.query(
               `SELECT data FROM saves WHERE user_id = $1`,
-              [userId],
+              [String(userId)],
             );
             const saveData = saveRes.rowCount ? saveRes.rows[0].data : null;
             info.equippedSkin = getEquippedSkin(saveData);
