@@ -13,8 +13,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Serve frontend from project root so frontend and API share same origin
-app.use(express.static(path.join(__dirname)));
-app.get("/", (req, res) => res.sendFile(path.join(__dirname, "index.html")));
+app.use(express.static(path.join(__dirname, "..")));
+app.get("/", (req, res) => res.sendFile(path.join(__dirname, "..", "index.html")));
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
