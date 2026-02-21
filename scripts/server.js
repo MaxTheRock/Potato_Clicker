@@ -29,7 +29,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "change-me";
 async function ensureTables() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
-      id SERIAL PRIMARY KEY,
+      id BIGINT PRIMARY KEY,
       username TEXT UNIQUE NOT NULL,
       email TEXT UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
@@ -39,7 +39,7 @@ async function ensureTables() {
 
   await pool.query(`
     CREATE TABLE IF NOT EXISTS saves (
-      user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+      user_id BIGINT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
       data JSONB NOT NULL,
       updated_at TIMESTAMPTZ DEFAULT now()
     )
@@ -47,9 +47,9 @@ async function ensureTables() {
 
   await pool.query(`
     CREATE TABLE IF NOT EXISTS leaderboard (
-      user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+      user_id BIGINT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
       username TEXT NOT NULL,
-      all_time_potatoes BIGINT NOT NULL DEFAULT 0,
+      all_time_potatoes NUMERIC NOT NULL DEFAULT 0,
       updated_at TIMESTAMPTZ DEFAULT now()
     )
   `);
