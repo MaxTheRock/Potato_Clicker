@@ -268,8 +268,8 @@ app.get("/api/leaderboard", async (req, res) => {
     if (userIds.length) {
       const savesRes = await pool.query(
         `SELECT user_id, data
-         FROM saves
-         WHERE user_id = ANY($1::int[])`,
+        FROM saves
+        WHERE user_id = ANY($1::bigint[])`,
         [userIds],
       );
       savesRes.rows.forEach((row) => {
