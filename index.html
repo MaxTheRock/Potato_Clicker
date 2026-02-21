@@ -169,8 +169,15 @@
             <div class="comments">
               <h3 id="comment">Nobody is talking about your potatoes.</h3>
             </div>
-            <div class="right-middle-buttons">
+            <div class="left-middle-buttons">
               <button id="openModal" class="middle-buttons">Info</button>
+              <div class="rebirth-container">
+                <button id="openModalRebirth" class="middle-buttons-rebirth">Rebirth</button>
+                <div class="rebirth-cont">
+                  <div class="rebirth-bar" id="rebirth_bar"></div>
+                  <div class="rebirth-level" id="rebirth_level">+1</div>
+                </div>
+              </div>
             </div>
           </div>
           <div class="divider"></div>
@@ -251,7 +258,7 @@
             </p>
             <button
               id="saveButton"
-              onclick="(saveGameManual(), saveGame(true))"
+              onclick="(saveGameManual())"
               class="save-load-button"
             >
               <p>Save</p>
@@ -399,6 +406,30 @@
           </div>
         </div>
       </div>
+      <div class="modal-rebirth" id="modalrebirth">
+          <div class="modal-inner-mindmap" id="mindmapViewport">
+            <div>
+              <div class="rebirth-stats">
+                <div class="stats-box">
+                  <h2>Replanting level:</h2>
+                  <h2 id="replanting_level_count">0</h2>
+                </div>
+                <div class="stats-box">
+                  <h2>Spud Shards:</h2>
+                  <h2>
+                    <img src="assets/spudShard.png" width="10px">
+                    <span id="spud_shard_count">0</span>
+                  </h2>
+                </div>
+                <button class="rebirth-confirm">RE-PLANT</button>
+                <button class="closeButton-gold" id="closeModalRebirth">&times;</button>
+              </div>
+            </div>
+            <canvas id="mindmapLines"></canvas>
+            <div id="mindmapOverlay"></div>
+            <div id="mindmapWorld"></div>
+          </div>
+      </div>
       <div class="modal" id="modalcodes">
         <div class="modal-inner">
           <div class="modal-header">
@@ -419,6 +450,31 @@
               placeholder="Enter your code here"
             />
             <button id="redeemCodeButton" class="redeem-code-button">
+              Redeem Code
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="modal" id="modalcodesgolden">
+        <div class="modal-inner">
+          <div class="modal-header">
+            <h2 class="info-h2"><span class="gold-text">The Deluxe Vault</span></h2>
+            <button class="closeButton" id="closeModalGolden">&times;</button>
+          </div>
+          <div class="general-stats">
+            <h2 class="general-text">
+              This vault only accepts the fanciest codes.
+            </h2>
+            <div class="code-hints">
+              <h3>Top-secret. Handle with care</h3>
+            </div>
+            <input
+              id="codeInputGolden"
+              class="code-input"
+              type="text"
+              placeholder="Enter your deluxe code here"
+            />
+            <button id="redeemCodeButtonGolden" class="redeem-code-button">
               Redeem Code
             </button>
           </div>
@@ -503,6 +559,30 @@
           <div class="modal-header">
             <h2 class="info-h2">Information</h2>
             <button class="closeButton" id="closeModal">&times;</button>
+          </div>
+          <div class="major-update">
+            <h2 class="major-h2">
+              21/02/26: Rebirth Update v0.78
+            </h2>
+            <p class="major-p">
+              New rebirth system so progress can be more achievable!
+            </p>
+            <ul class="major-ul">
+              <li>New currency: Spud Shards</li>
+              <li>Rebirth animations will be done in future!</li>
+              <li>
+                Updated anti-cheat system to be more reliable.
+              </li>
+              <li>
+                The maths for the spud shards is weird so don't ask, it's something to do with all time potatoes.
+              </li>
+              <li>Updated save mechanism to lower database usage.</li>
+              <li>New <span class="gold-text">secret</span> vault! (No clues this time...)</li>
+              <li>Sorry for the long wait, I'm preparing for GCSE mocks so I will probably slow down development for another week or two.</li>
+              <li>
+                <span class="flashing">I'll just add flashing text here because why not.</span>
+              </li>
+            </ul>
           </div>
           <div class="minor-update">
             <h2 class="minor-h2">14/02/26: SFX Update v0.70</h2>
@@ -836,8 +916,9 @@
     />
     <div id="achievement-container"></div>
     <div id="tooltip" class="tooltip hidden"></div>
-    <script src="auth-client.js"></script>
-    <script src="autoclicker-detector.js"></script>
-    <script src="script.js"></script>
+    <script src="scripts/auth-client.js"></script>
+    <script src="scripts/autoclicker-detector.js"></script>
+    <script src="scripts/script.js"></script>
+    <script src="scripts/rebirth.js"></script>
   </body>
 </html>

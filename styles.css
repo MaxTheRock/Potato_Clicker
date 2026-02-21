@@ -33,6 +33,7 @@ nav {
   font-size: 12px;
   display: flex;
   align-items: center;
+  position: relative;
   z-index: 1001;
 }
 
@@ -521,6 +522,71 @@ section {
   margin: 10px 10px 0px 10px;
 }
 
+.middle-buttons-rebirth {
+  font-size: 14px;
+  background-color: rgba(0, 0, 0, 0.407);
+  border-radius: 10px 10px 0px 0px;
+  border: 2px solid #cfcfcf00;
+  color: #e3e3e3;
+  padding: 7px 2px 2px 2px;
+  cursor: pointer;
+  width: 100%;
+}
+.middle-buttons-rebirth:hover {
+  background-color: #6c819615;
+  color: rgb(255, 255, 255);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+  border-color: rgb(255, 255, 255);
+}
+
+#rebirth_bar {
+  --fill-percent: 0%;
+  width: 100%;
+  height:10px;
+  border: 1px solid rgba(12, 11, 10, 0.598);
+  background:
+  linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.3) 0%, 
+    rgba(255,255,255,0) 50%, 
+    rgba(255,255,255,0.3) 100%
+  ) 0 0 / var(--fill-percent) 100% no-repeat,
+  linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.1) 0%, 
+    rgba(0,0,0,0) 50%, 
+    rgba(0,0,0,0.1) 100%
+  ) 0 0 / var(--fill-percent) 100% no-repeat,
+  linear-gradient(
+    to right,
+    #0787ff 0%,
+    #0787ff var(--fill-percent),
+    rgba(0,0,0,0.18) var(--fill-percent),
+    rgba(0,0,0,0.18) 100%
+  );
+}
+
+.rebirth-level {
+  margin-top: -10px;
+  margin-left: -1px;
+  padding: 1px 3px;
+  margin-right: -3px;
+  border: 1px solid black;
+  background-color: rgb(37, 20, 15);
+  color:#c9e5ff;
+  display: none;
+}
+
+.rebirth-cont {
+  display: flex;
+}
+
+.rebirth-container {
+  margin: 10px 10px 0px 10px;
+}
+
 .mobile-buttons {
   background-color: #00000073;
   font-size: 16px;
@@ -782,6 +848,18 @@ h3 {
   z-index: 10000;
 }
 
+.modal-rebirth {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+
 .modal.open {
   display: flex !important;
 }
@@ -829,6 +907,17 @@ h3 {
   cursor: pointer;
   color: rgb(143, 188, 255);
   font-weight: bold;
+}
+
+.closeButton-gold {
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: rgb(210, 198, 142);
+  font-weight: bold;
+  margin-top: 10px;
+  margin-bottom: -10px;
 }
 
 .info-h2 {
@@ -2025,4 +2114,216 @@ h3 {
 .skin-div img,
 .skin-div p {
   pointer-events: none; /* let the button itself handle hover */
+}
+
+#mindmapViewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  cursor: grab;
+
+  background-image: url("assets/rebirth_background.jpg");
+  background-size: 512px 512px;
+  background-position: center;
+  background-repeat: repeat;
+  image-rendering: pixelated;
+}
+
+#mindmapWorld {
+  position: absolute;
+  transform-origin: 0 0;
+}
+
+#mindmapLines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+#mindmapOverlay {
+  position: absolute;
+  inset: 0;
+  background-image: url("assets/rebirth_background.jpg");
+  background-size: 512px 512px;
+  background-position: center;
+  background-repeat: repeat;
+  image-rendering: pixelated;
+  pointer-events: none;
+  opacity: 0.5; /* adjust as needed */
+}
+
+.mindmap-node {
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  background: #000000b3;
+  border: 3px solid #d9ff001e;
+  border-radius: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  user-select: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  transition: 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mindmap-node:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0px 20px rgba(255, 213, 79, 0.6);
+  border-color: #fff;
+  z-index: 10;
+}
+
+.mindmap-node img {
+  width: 70%;
+  height: 70%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+#mindmapViewport {
+  width: 100%;
+  height: 100%;
+  margin-top: 60px
+}
+
+.modal-inner-mindmap {
+  background: none;
+  border-radius: 10px;
+  overflow-y: auto;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+  width: 100%;
+  height: 100%;
+}
+
+.quote {
+  margin-top: 5px;
+  font-style: italic;
+  color: rgba(232, 232, 232, 0.512);
+}
+
+.rebirth-stats {
+  position: relative;
+  z-index: 10;
+  background-image: url("assets/ascendBox.png");
+  background-size: 344px 163px;
+  background-position: center;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  color:rgb(255, 255, 126);
+  display: grid;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+  margin-top: -4px
+}
+
+.stats-box {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  padding: 5px 50px;
+  text-align: center;
+  background-image: url("assets/darkNoise.jpg");
+  background-size: 512px 512px;
+  background-position: center;
+  background-repeat: repeat;
+  image-rendering: pixelated;
+}
+
+.stats-box:first-child {
+  margin-top: 7px;
+}
+
+.stats-box h2 {
+  margin: 0;
+  font-size: 13px;
+}
+
+.stats-box h2:last-child {
+  font-size: 15px;
+  color: #ffd54f;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  display: flex;
+  gap: 2px;
+}
+
+.rebirth-confirm {
+  background-color: rgb(255, 63, 63);
+  color: rgb(219, 208, 138);
+  font-weight: bold;
+  font-size: 20px;
+  margin: 0px 20px;
+  border: 3px solid transparent;
+  border-radius: 5px;
+  margin-top: 1px;
+  background:
+    linear-gradient(#ff5353, #6a1010) padding-box,
+    linear-gradient(135deg, #f5d060, #fff5a0, #a67c00, #f5d060, #fff5a0) border-box;
+  background-size: 200% 200%;
+  animation: shimmer 3s linear infinite;
+  box-shadow:
+    0 0 10px rgba(245, 208, 96, 0.4),
+    0 0 30px rgba(166, 124, 0, 0.2);
+}
+
+@keyframes shimmer {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+#modalrebirth {
+  width: 100%;
+  height: 100%;
+}
+
+.mindmap-node.node-purchased {
+  border-color: #ffd54f;
+  box-shadow: 0 0 16px rgba(255, 213, 79, 0.7);
+  cursor: default;
+}
+
+.mindmap-node.node-purchased img {
+  filter: none;
+  opacity: 1;
+}
+
+/* Node that is reachable but not yet bought */
+.mindmap-node.node-unlocked {
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+}
+
+.mindmap-node.node-unlocked img {
+  filter: none;
+  opacity: 1;
+}
+
+.mindmap-node.node-unlocked:hover {
+  border-color: #fff;
+  box-shadow: 0 0 20px rgba(255, 213, 79, 0.6);
+}
+
+/* Node that is locked / not yet reachable */
+.mindmap-node.node-locked {
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.mindmap-node.node-locked img {
+  filter: brightness(0.25) saturate(0);
+  opacity: 0.5;
+}
+
+.mindmap-node.node-locked:hover {
+  transform: none;
+  box-shadow: none;
 }

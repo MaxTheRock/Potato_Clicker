@@ -16,13 +16,18 @@
   const openBtno = document.getElementById("openModalOptions");
   const closeBtno = document.getElementById("closeModalOptions");
   const modalo = document.getElementById("modaloptions");
+  const modalr = document.getElementById("modalrebirth");
   //const timerInterval = setInterval(updateTimer, 60 * 1000);
   const openBtnsk = document.getElementById("openModalSkins");
   const closeBtnsk = document.getElementById("closeModalSkins");
+  const openBtnr = document.getElementById("openModalRebirth");
+  const closeBtnr = document.getElementById("closeModalRebirth");
   const modalsk = document.getElementById("modalskins");
 
   const closeBtncodes = document.getElementById("closeModalCodes");
   const modalcodes = document.getElementById("modalcodes");
+  const closeBtncodesgolden = document.getElementById("closeModalGolden");
+  const modalcodesgolden = document.getElementById("modalcodesgolden");
   //const openModalAnouncements = document.getElementById("openModalAnouncements");
   //const closeModalAnouncements = document.getElementById("closeModalAnouncements");
   const modalanouncements = document.getElementById("modalanouncements");
@@ -53,7 +58,9 @@
   const accountStatus = document.getElementById("accountStatus");
   const timerEl = document.getElementById("event_timer");
   const Codeinput = document.getElementById("codeInput");
+  const CodeinputGolden = document.getElementById("codeInputGolden");
   const Codebutton = document.getElementById("redeemCodeButton");
+  const CodebuttonGolden = document.getElementById("redeemCodeButtonGolden");
   const isTouchDevice = ("ontouchstart" in window || navigator.maxTouchPoints > 0) && window.innerWidth <= 700;
 
   const tooltip = document.getElementById("tooltip");
@@ -75,7 +82,6 @@
     saveGame(true);
   });
   /**
-   * Write the current mode to localStorage.
    * @param {"light"|"dark"} m
    */
   function storeMode(m) {
@@ -88,6 +94,47 @@
     } catch (_) {
       return "light";
     }
+  }
+
+  // CHEAT
+  let lastPotatoCheck = Date.now();
+  let lastPotatoAmount = 0;
+  let lastAllTimeAmount = 0;
+
+  function cheatDetection() {
+      const now = Date.now();
+      const elapsed = (now - lastPotatoCheck) / 1000;
+
+      const potatoDelta = potatoes - lastPotatoAmount;
+      const allTimeDelta = allTimePotatoes - lastAllTimeAmount;
+
+      const maxLegitGain = (autoClickAmount * 10 * elapsed) + (potatoClicks * window.potatoesPerClick);
+
+      if (allTimeDelta < 0) {
+          flagCheater("allTimePotatoes decreased");
+      }
+
+      if (potatoDelta > maxLegitGain * 20) {
+          flagCheater("impossible potato gain rate");
+      }
+
+      lastPotatoCheck = now;
+      lastPotatoAmount = potatoes;
+      lastAllTimeAmount = allTimePotatoes;
+
+      setTimeout(cheatDetection, 5000);
+  }
+
+  function flagCheater(reason) {
+      console.warn("Cheat detected:", reason);
+      potatoes = 0;
+      autoClickAmount = 0;
+      allTimePotatoes = 0;
+      window.potatoesPerClick = 1;
+      window._basePotatoesPerClick = 1;
+      buildings.forEach(b => { b.owned = 0; b.cpsMultiplier = 1; });
+      calculateAutoClick();
+      saveGame(true);
   }
 
   // AUDIO
@@ -122,14 +169,16 @@
   let potatoesPerSecond = 0;
   let potatoesLastSecond = 0;
   let allTimePotatoes = 0;
+  window.allTimePotatoes = allTimePotatoes;
   let runStartTime = Date.now();
   let buildingsOwned = 0;
   let rawPotatoesPerSecond = 0;
   let potatoesPerClick = 1;
+  window.potatoesPerClick = potatoesPerClick;
   let potatoClicks = 0;
   let handFarmedPotatoes = 0;
   let goldenPotatoClicks = 0;
-  let runningVersion = "v0.70";
+  let runningVersion = "v0.78";
   let autoClickAmount = 0;
   let runDurationSeconds;
   let totalUpgrades = 0;
@@ -145,9 +194,19 @@
   let backgroundAlpha = 0.1;
   let selling = false;
   let sfxVolume = 1;
+  window.sfxVolume = sfxVolume;
+  window.rp = 0;
   const DB_SAVE_INTERVAL_MS = 240 * 60 * 1000;
   //heartContainer.style.setProperty("--fill", "30%");
   const eventTime = new Date(2026, 1, 16);
+
+  // PERKS
+  let building_discount = 1;
+  window.building_discount = building_discount;
+  let production_percent = 1;
+  window.production_percent = production_percent;
+  let golden_timing_perk = 1;
+  window.golden_timing_perk = golden_timing_perk;
 
   let normal_hints = [
     "What are you doing here!!!",
@@ -1179,7 +1238,7 @@
       image: "assets/variants/upside-down.png",
       unlocked: false,
       equipped: false,
-      description: "Travel back to a different version of the game.",
+      description: "Sell a building.",
     },
     {
       id: "potion",
@@ -1367,6 +1426,30 @@
       description: "As always, Navy sings second.",
       credits: "Designed by William Gravenor.",
     },
+    {
+      id: "golden_bruh",
+      name: "Golden Bruh",
+      image: "assets/variants/golden_bruh.png",
+      unlocked: false,
+      equipped: false,
+      description: "A golden secret is required to unlock this skin.",
+    },
+    {
+      id: "golden_astronaut",
+      name: "Golden Astronaut",
+      image: "assets/variants/golden_astronaut.png",
+      unlocked: false,
+      equipped: false,
+      description: "A golden secret is required to unlock this skin.",
+    },
+    {
+      id: "missing_texture",
+      name: "Missing Texture",
+      image: "assets/variants/missing_texture.png",
+      unlocked: false,
+      equipped: false,
+      description: "1% chance to unlock every second.",
+    },
   ];
 
   function isPC() {
@@ -1385,15 +1468,7 @@
   }
 
   function checkAchievements() {
-    if (potatoes >= 100000000000000000) {
-      potatoes = -9999999999999999999999;
-      autoClickAmount = -999999999999999;
-      allTimePotatoes = 0;
-    }
-
-    if (isCurrentPlayerTop10()) {
-      achievmentsAdd("grape_mlg");
-    }
+    cheatDetection();
 
     if (potatoClicks >= 1) {
       achievmentsAdd("first_click");
@@ -1554,7 +1629,7 @@
     if (allSecretsRedeemed) {
       achievmentsAdd("let_me_in");
     }
-  
+
     const greenhouse = buildings.find((b) => b.id === "greenhouse");
     if (greenhouse && greenhouse.owned >= 20) {
       achievmentsAdd("smash");
@@ -1635,6 +1710,8 @@
     if (comment_count >= 50) {
       achievmentsAdd("bruh");
     }
+
+    checkIfTop10();
   }
 
   let achievments = [
@@ -1962,9 +2039,9 @@
       skinReward: "sweet",
     },
     {
-      id: "time_traveler",
-      name: "Time Traveler",
-      description: "Travel back to a different version of the game.",
+      id: "seller",
+      name: "Seller",
+      description: "Sell a building",
       completed: false,
       skinReward: "upside-down",
     },
@@ -2073,23 +2150,51 @@
       completed: false,
       skinReward: "navy",
     },
+    {
+      id: "golden_bruh",
+      name: "Golden Bruh",
+      description: "A golden secret is required to unlock this skin.",
+      completed: false,
+      skinReward: "golden_bruh",
+    },
+    {
+      id: "golden_astronaut",
+      name: "Golden Astronaut",
+      description: "A golden secret is required to unlock this skin.",
+      completed: false,
+      skinReward: "golden_astronaut",
+    },
+    {
+      id: "missing_texture",
+      name: "Golden Astronaut",
+      description: "What a lucky person!",
+      completed: false,
+      skinReward: "missing_texture",
+    },
   ];
 
-  async function isCurrentPlayerTop10() {
-    const token = window.authApi.getToken();
-    if (!token) return false;
+  let _isTop10 = false;
 
-    const data = await window.authApi.fetchLeaderboard();
-    const top = data.topPlayers || [];
+  async function checkIfTop10() {
+      const token = window.authApi?.getToken();
+      if (!token) return;
 
-    const me = await window.authApi.me();
-    const myName = me?.username;
-    if (!myName) return false;
+      try {
+          const [data, me] = await Promise.all([
+              window.authApi.fetchLeaderboard(),
+              window.authApi.me()
+          ]);
 
-    for (let i = 0; i < Math.min(10, top.length); i++) {
-      if (top[i].username === myName) return true;
-    }
-    return false;
+          const top = data?.topPlayers || [];
+          const myName = me?.username;
+          if (!myName) return;
+
+          _isTop10 = top.slice(0, 10).some(p => p.username === myName);
+
+          if (_isTop10) achievmentsAdd("grape_mlg");
+      } catch (e) {
+          console.warn("Top10 check failed", e);
+      }
   }
   /*
   function updateTimer() {
@@ -2199,6 +2304,18 @@
       hints.textContent = rollRandomHint();
     }
     Codeinput.value = "";
+  });
+
+  CodebuttonGolden.addEventListener("click", () => {
+    const value = CodeinputGolden.value;
+    if (value === "D3LUXEBRUH") {
+      achievmentsAdd("golden_bruh");
+      alert("Code redeemed! Achievement unlocked: Golden Bruh");
+    } else if (value === "ASTR0N_AU_T") {
+      achievmentsAdd("golden_astronaut");
+      alert("Code redeemed! Achievement unlocked: Golden Astronaut");
+    }
+    CodeinputGolden.value = "";
   });
 
   function storeCounter() {
@@ -2520,7 +2637,7 @@
   function rateCounter() {
     document.querySelector(".potato-amount-persecond").innerText =
       "per second: " +
-      (Math.floor(autoClickAmount * 10 * frenzy_amount) / 10).toLocaleString();
+      (Math.floor(autoClickAmount * 10 * frenzy_amount * window.production_percent) / 10).toLocaleString();
     setTimeout(rateCounter, 1000);
     if (frenzy || half_price_amount === 0.5) {
       document.querySelector(".potato-amount-persecond").style.color = "gold";
@@ -2575,7 +2692,7 @@
     potatoesPerSecondElement.innerText =
       "Potatoes per second: " + Math.floor(autoClickAmount * 10) / 10;
     potatoesPerClickElement.innerText =
-      "Potatoes per click: " + formatNumber(potatoesPerClick);
+      "Potatoes per click: " + formatNumber(window.potatoesPerClick || potatoesPerClick);
     potatoClicksElement.innerText = "Potato clicks: " + potatoClicks;
     handFarmedPotatoesElement.innerText =
       "Hand-farmed potatoes: " + formatNumber(handFarmedPotatoes);
@@ -2628,6 +2745,8 @@
         totalUpgrades,
         //hearts,
         backgroundAlpha,
+        rp: window.rp,
+        rebirthPersistedPurchased: window._rebirthPersistedPurchased || [],
       },
       buildings: {},
       upgrades: {},
@@ -2715,22 +2834,42 @@
     }
   }
 
+  let _lastManualSave = 0;
+const MANUAL_SAVE_COOLDOWN_MS = 30 * 1000;
+
   function saveGameManual() {
-    const btn = document.getElementById("saveButton");
-    if (btn) {
-      btn.disabled = true;
-      const originalText = btn.innerHTML;
-      btn.innerHTML = "<p>Saving...</p>";
-      saveLocal();
-      Promise.resolve(saveToDb(true))
-        .catch(() => {})
-        .finally(() => {
+      const btn = document.getElementById("saveButton");
+      const now = Date.now();
+      const remaining = MANUAL_SAVE_COOLDOWN_MS - (now - _lastManualSave);
+
+      if (remaining > 0) {
           if (btn) {
-            btn.disabled = false;
-            btn.innerHTML = originalText;
+              const originalText = btn.innerHTML;
+              btn.innerHTML = `<p>Wait ${Math.ceil(remaining / 1000)}s</p>`;
+              setTimeout(() => { if (btn) btn.innerHTML = originalText; }, 1500);
           }
-        });
-    }
+          return;
+      }
+
+      _lastManualSave = now;
+
+      // Cancel any pending debounced save since we're saving now
+      clearTimeout(_dbSaveDebounceTimer);
+
+      if (btn) {
+          btn.disabled = true;
+          const originalText = btn.innerHTML;
+          btn.innerHTML = "<p>Saving...</p>";
+          saveLocal();
+          Promise.resolve(saveToDb(true))
+              .catch(() => {})
+              .finally(() => {
+                  if (btn) {
+                      btn.disabled = false;
+                      btn.innerHTML = originalText;
+                  }
+              });
+      }
   }
 
   async function loadGameManual() {
@@ -2825,6 +2964,8 @@
     allTimePotatoes = s.allTimePotatoes;
     runStartTime = s.runStartedAt;
     potatoesPerClick = s.potatoesPerClick;
+    window.potatoesPerClick = potatoesPerClick;
+    window._basePotatoesPerClick = potatoesPerClick;
     autoClickAmount = s.autoClickAmount;
     potatoClicks = s.potatoClicks;
     handFarmedPotatoes = s.handFarmedPotatoes;
@@ -2832,6 +2973,8 @@
     buildingsOwned = s.buildingsOwned;
     totalUpgrades = s.totalUpgrades;
     //hearts = typeof s.hearts === 'number' ? s.hearts : (hearts ?? 0);
+    window.rp = typeof s.rp === 'number' ? s.rp : 0;
+    window._rebirthPersistedPurchased = Array.isArray(s.rebirthPersistedPurchased) ? s.rebirthPersistedPurchased : [];
     backgroundAlpha = typeof s.backgroundAlpha === 'number' ? s.backgroundAlpha: 0.1;
 
     const slider = document.getElementById("darkenSlider");
@@ -2974,10 +3117,12 @@
     window.clicksLast30Seconds = recentClicks.length;
 
     clickerButton.disabled = true;
-    potatoes += Math.floor(potatoesPerClick * 10) / 10;
-    rawPotatoes += potatoesPerClick;
-    handFarmedPotatoes += potatoesPerClick;
-    allTimePotatoes += potatoesPerClick;
+    const ppc = window.potatoesPerClick || potatoesPerClick;
+    potatoes += Math.floor(ppc * 10) / 10;
+    rawPotatoes += ppc;
+    handFarmedPotatoes += ppc;
+    allTimePotatoes += ppc;
+    window.allTimePotatoes = allTimePotatoes;
     potatoClicks++;
     //hearts++;
     markPlayerActivity();
@@ -2999,7 +3144,6 @@
 
   // ✅ 10–20 minutes
   const GOLDEN_DELAY_MIN = 10 * 60 * 1000;
-  const GOLDEN_DELAY_MAX = 20 * 60 * 1000;
 
   let spawnTimeout = null;
   let hideTimeout = null;
@@ -3082,13 +3226,10 @@
   // -------------------- SPAWN --------------------
   function scheduleNextGoldenPotato() {
     clearTimeout(spawnTimeout);
-
-    const delay =
-      Math.random() * (GOLDEN_DELAY_MAX - GOLDEN_DELAY_MIN) +
-      GOLDEN_DELAY_MIN;
-
+    const goldenDelayMax = 20 * 60 * 1000 * (window.golden_timing_perk || 1);
+    const delay = Math.random() * (goldenDelayMax - GOLDEN_DELAY_MIN) + GOLDEN_DELAY_MIN;
     spawnTimeout = setTimeout(showGoldenPotato, delay);
-  }
+}
 
   // -------------------- INITIAL SPAWN --------------------
   scheduleNextGoldenPotato();
@@ -3287,7 +3428,11 @@
             if (u.id.includes(key)) {
               const b = buildings.find(b => b.id === effects[key]);
               if (b) b.cpsMultiplier *= 2;
-              if (key === "peeler") potatoesPerClick *= 2;
+              if (key === "peeler") {
+                potatoesPerClick *= 2;
+                window._basePotatoesPerClick = potatoesPerClick;
+                window.potatoesPerClick = potatoesPerClick;
+              }
             }
           }
 
@@ -3446,7 +3591,7 @@
     });
   }
 
-  
+
 
   function renderSkins() {
     const container = document.getElementById("skinsContainer");
@@ -3465,7 +3610,7 @@
       const skinBtn = document.createElement("button");
       skinBtn.className = `skin-div ${s.equipped ? "selected-skin" : ""}`;
       if (!s.unlocked) skinBtn.classList.add("locked-skin");
-
+      const isGolden = s.name?.startsWith("Golden");
       // Inner markup
       skinBtn.innerHTML = `
         <img
@@ -3476,7 +3621,7 @@
           data-skin="${s.id}"
           draggable="false"
         />
-        <p class="skin-label">${s.unlocked ? s.name : "???"}</p>
+        <p class="skin-label ${isGolden ? "gold-text" : ""}">${s.unlocked ? s.name : "???"}">${s.unlocked ? s.name : "???"}</p>
       `;
 
       // -----------------------------
@@ -3486,8 +3631,8 @@
         // Desktop hover
         skinBtn.addEventListener("mouseenter", () => {
           const html = s.unlocked
-            ? `<div class="title">${s.name}</div><div>${s.description}</div>`
-            : `<div class="title">???</div><div>${s.description}</div>`;
+            ? `<div class="title ${isGolden ? "gold-text" : ""}">${s.name}</div><div>${s.description}</div>`
+            : `<div class="title ${isGolden ? "gold-text" : ""}">???</div><div>${s.description}</div>`;
           showTooltip(html, skinBtn);
         });
         skinBtn.addEventListener("mouseleave", hideTooltip);
@@ -3500,8 +3645,8 @@
           ignoreNextClick = true;
 
           const html = s.unlocked
-            ? `<div class="title">${s.name}</div><div>${s.description}</div>`
-            : `<div class="title">???</div><div>${s.description}</div>`;
+            ? `<div class="title ${isGolden ? "gold-text" : ""}">${s.name}</div><div>${s.description}</div>`
+            : `<div class="title ${isGolden ? "gold-text" : ""}">???</div><div>${s.description}</div>`;
           showTooltip(html, skinBtn);
 
           setTimeout(() => (ignoreNextClick = false), 300);
@@ -3675,7 +3820,7 @@
             return
           };
 
-          const cost = b.price * half_price_amount;
+          const cost = b.price * half_price_amount * window.building_discount;
 
           // =====================
           // SELLING MODE
@@ -3687,13 +3832,13 @@
 
             let refund = Math.floor(previousPrice * 0.50);
 
-            refund = Math.floor(refund * half_price_amount);
+            refund = Math.floor(refund * half_price_amount * window.building_discount);
 
             potatoes += refund;
             b.owned--;
             b.price = previousPrice;
             buildingsOwned--;
-
+            achievmentsAdd("seller");
             calculateAutoClick();
 
             updatePotatoDisplay();
@@ -3724,7 +3869,7 @@
           b.owned++;
           b.price = Math.ceil(b.price * 1.15);
           buildingsOwned++;
-
+          window.building_discount -= 0.0001
           calculateAutoClick();
           updatePotatoDisplay();
 
@@ -3740,7 +3885,7 @@
     });
   }
 
-      const displayPrice = b.price * half_price_amount;
+      const displayPrice = b.price * half_price_amount * window.building_discount;
       const img = buildingButton.querySelector(".building-image");
       const nameEl = buildingButton.querySelector(".building-name");
       const priceEl = buildingButton.querySelector(".price-value");
@@ -3832,6 +3977,7 @@
     sfxVolume = parseFloat(sfxSlider.value);
 
     localStorage.setItem("sfxVolume", sfxVolume);
+    window.sfxVolume = sfxVolume;
   });
 
   function maybeStartPeelerOrbit() {
@@ -3928,6 +4074,11 @@
     modalcodes.classList.remove("open");
     modalcodes.style.display = "none";
   });
+
+  closeBtncodesgolden.addEventListener("click", () => {
+    modalcodesgolden.classList.remove("open");
+    modalcodesgolden.style.display = "none";
+  });
   /*
   openModalAnouncements.addEventListener("click", () => {
     modalanouncements.classList.add("open");
@@ -3939,6 +4090,21 @@
     modalanouncements.style.display = "none";
   });
   */
+
+  openBtnr.addEventListener("click", () => {
+      modalr.classList.add("open");
+      modalr.style.display = "flex";
+      
+      // Initialize mindmap when modal is visible
+      if (window.initRebirthMindmap) {
+          window.initRebirthMindmap();
+      }
+  });
+
+  closeBtnr.addEventListener("click", () => {
+    modalr.classList.remove("open");
+    modalr.style.display = "none";
+  });
   const preloadedSkins = new Map();
 
   function preloadSkin(imageSrc) {
@@ -3961,7 +4127,7 @@
     trail.className = "trail";
     trail.style.left = e.clientX - rect.left + (Math.random() * 40 - 20) + "px";
     trail.style.top = e.clientY - rect.top - 20 + "px";
-    trail.textContent = `+${potatoesPerClick}`;
+    trail.textContent = `+${formatNumber(Math.floor(window.potatoesPerClick || potatoesPerClick))}`;
     clickArea.appendChild(trail);
     setTimeout(() => trail.remove(), 1000);
 
@@ -4036,9 +4202,10 @@
     } else {
       frenzy_amount = 1;
     }
-    const increment = (autoClickAmount * frenzy_amount) / 20;
+    const increment = (autoClickAmount * frenzy_amount * window.production_percent) / 20;
     potatoes += increment;
     allTimePotatoes += increment;
+    window.allTimePotatoes = allTimePotatoes;
 
     buildings.forEach((b) => {
       const incomeFromThisBuilding = (b.cps * b.owned) / 20;
@@ -4046,7 +4213,12 @@
     });
     if (storeCount >= 10) {
       console.log("Secret");
-      modalcodes.classList.add("open");
+      if (frenzy || half_price_amount === 0.5) {
+        modalcodesgolden.classList.add("open");
+      } else {
+        modalcodes.classList.add("open");
+      }
+      
       storeCount = 0;
     }
     //checkAchievements();
@@ -4126,16 +4298,17 @@
     return buildings.find((b) => b.id === "cursor");
   }
 
-  let pendingSave = false;
+    let _dbSaveDebounceTimer = null;
+
   function scheduleSave() {
-    if (pendingSave) return;               // already queued
-    pendingSave = true;
-    // give the UI a few ms to paint, then save
-    setTimeout(() => {
-      pendingSave = false;
-      // localStorage is sync – we keep it, DB is async
-      saveGame(true).catch(console.warn);
-    }, 200);                               // 0.2 s is enough for the click animation
+      saveLocal(); // always save locally immediately
+
+      // Reset the debounce timer — DB save fires 60s after the LAST scheduleSave call
+      clearTimeout(_dbSaveDebounceTimer);
+      _dbSaveDebounceTimer = setTimeout(() => {
+          console.log("Debounced save: 60s of inactivity — saving to DB");
+          saveToDb(false).catch(console.warn);
+      }, 60 * 1000);
   }
 
   function light_darkToggle() {
@@ -4199,6 +4372,7 @@
     if (savedVol !== null) {
       sfxVolume = parseFloat(savedVol);
       sfxSlider.value = sfxVolume;
+      window.sfxVolume = sfxVolume;
     }
     setInterval(() => {
       idleTime = Math.floor((Date.now() - lastPlayerAction) / 1000);
@@ -4234,7 +4408,12 @@
 
   document.addEventListener("contextmenu", (e) => e.preventDefault());
 
-  // Expose functions to global scope for onclick handlers in HTML
+  setInterval(() => {
+      if (Math.random() < 0.01) {
+          achievmentsAdd("missing_texture");
+      }
+  }, 1000);
+
   window.achievmentsAdd = achievmentsAdd;
   window.clearLocalData = clearLocalData;
   window.storeCounter = storeCounter;
@@ -4249,4 +4428,6 @@
   window.showTooltip = showTooltip;
   window.hideTooltip = hideTooltip;
   window.hideTooltipImmediate = hideTooltipImmediate;
+  window.renderBuildings = renderBuildings;
+  window.autoClick = autoClick;
 })();
