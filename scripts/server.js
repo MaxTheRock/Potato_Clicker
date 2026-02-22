@@ -24,7 +24,7 @@ const pool = new Pool({
 const JWT_SECRET = process.env.JWT_SECRET || "change-me";
 
 const maintenance = process.env.MAINTENANCE_MODE === "true";
-
+console.log("Maintenance mode:", process.env.MAINTENANCE_MODE);
 if (maintenance) {
   app.use((req, res) => {
     res.status(503).sendFile(path.join(__dirname, "maintenance.html"));
