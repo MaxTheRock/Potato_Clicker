@@ -9,14 +9,16 @@ require("dotenv").config();
 
 const app = express();
 
+app.use('/assets', express.static(path.join(__dirname, '..', 'assets')));
+
 const maintenance = process.env.MAINTENANCE_MODE === "true";
-console.log("Maintenance mode:", process.env.MAINTENANCE_MODE);
 if (maintenance) {
-  app.use((req, res) => {
-    res.status(503).sendFile(path.join(__dirname, "maintenance.html"));
+  app.use((req, res, next) => {
+    // Allow asset requests to pass through
+    if (req.path.startsWith('/assets/')) return next();
+    res.status(503).sendFile(path.join(__dirname, 'maintenance.html'));
   });
 }
-app.use('/assets', express.static(path.join(__dirname, '..', 'assets')));
 
 app.use(cors());
 app.use(express.json());
