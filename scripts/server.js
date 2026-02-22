@@ -27,10 +27,9 @@ const maintenance = process.env.MAINTENANCE_MODE === "true";
 
 if (maintenance) {
   app.use((req, res) => {
-    res.status(503).sendFile(__dirname + "/maintenance.html");
+    res.status(503).sendFile(path.join(process.cwd(), "maintenance.html"));
   });
 }
-
 
 /* -------------------------------------------------------------
    Database schema – users, saves, leaderboard
