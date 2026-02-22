@@ -2725,6 +2725,7 @@
     const save = {
       version: runningVersion,
       stats: {
+        savedAt: Date.now(),
         potatoes,
         allTimePotatoes,
         runStartedAt: Date.now() - (runDurationSeconds || 0) * 1000,
@@ -2902,19 +2903,13 @@ const MANUAL_SAVE_COOLDOWN_MS = 30 * 1000;
           let saveToLoad = remoteSave;
 
           if (localSave && localSave.stats) {
-            const remoteAllTime = remoteSave.stats.allTimePotatoes || 0;
-            const localAllTime = localSave.stats.allTimePotatoes || 0;
+            const remoteTime = remoteSave.stats?.savedAt || 0;
+            const localTime = localSave.stats?.savedAt || 0;
 
-            if (localAllTime > remoteAllTime) {
-              console.log(
-                "Local save is more advanced, using local and saving to backend",
-              );
+            if (localTime > remoteTime) {
               saveToLoad = localSave;
               await window.authApi.save(localSave);
             } else {
-              console.log(
-                "Remote save is more advanced, using remote and updating local",
-              );
               localStorage.setItem(SAVE_KEY_V2, JSON.stringify(remoteSave));
             }
           } else if (!localSave) {
@@ -4416,6 +4411,17 @@ const MANUAL_SAVE_COOLDOWN_MS = 30 * 1000;
           achievmentsAdd("missing_texture");
       }
   }, 1000);
+
+  
+  window.addEventListener("beforeunload", () => {
+    saveLocal();
+    const token = window.authApi?.getToken();
+    if (token) {
+      const save = getSaveObject();
+      const blob = new Blob([JSON.stringify(save)], { type: "application/json" });
+      navigator.sendBeacon("/api/auth/save", blob);
+    }
+  });
 
   window.achievmentsAdd = achievmentsAdd;
   window.clearLocalData = clearLocalData;

@@ -185,10 +185,17 @@ app.get("/api/auth/me", async (req, res) => {
 function requireAuth(req, res, next) {
   try {
     const auth = req.headers.authorization;
-    if (!auth) return res.status(401).json({ error: "No token" });
-    const token = auth.replace("Bearer ", "");
-    const payload = jwt.verify(token, JWT_SECRET);
+    const bodyToken = req.body?._token;
+    const rawToken = auth ? auth.replace("Bearer ", "") : bodyToken;
+    
+    if (!rawToken) return res.status(401).json({ error: "No token" });
+    
+    const payload = jwt.verify(rawToken, JWT_SECRET);
     req.userId = payload.userId;
+    
+    // Clean _token from body so it doesn't get saved to the DB
+    if (req.body?._token) delete req.body._token;
+    
     next();
   } catch (e) {
     return res.status(401).json({ error: "Invalid token" });

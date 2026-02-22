@@ -554,6 +554,9 @@ function initMindmap({ nodes, connections }) {
     window.addEventListener("mousemove", e => moveDrag(e.clientX, e.clientY));
     window.addEventListener("mouseup", endDrag);
     viewport.addEventListener("touchstart", e => {
+        if (e.target.closest('.rebirth-stats') || 
+            e.target.closest('.closeButton-gold') ||
+            e.target.closest('.mindmap-node')) return;
         e.preventDefault();
         if (e.touches.length === 1) startDrag(e.touches[0].clientX, e.touches[0].clientY);
     }, { passive: false });
