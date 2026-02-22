@@ -16,6 +16,7 @@ if (maintenance) {
     res.status(503).sendFile(path.join(__dirname, "maintenance.html"));
   });
 }
+app.use('/assets', express.static(path.join(__dirname, '..', 'assets')));
 
 app.use(cors());
 app.use(express.json());
