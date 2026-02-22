@@ -2903,18 +2903,15 @@ const MANUAL_SAVE_COOLDOWN_MS = 30 * 1000;
           let saveToLoad = remoteSave;
 
           if (localSave && localSave.stats) {
-            const remoteTime = remoteSave.stats?.savedAt || 0;
-            const localTime = localSave.stats?.savedAt || 0;
+            const remoteAllTime = remoteSave.stats?.allTimePotatoes || 0;
+            const localAllTime = localSave.stats?.allTimePotatoes || 0;
 
-            if (localTime > remoteTime) {
+            if (localAllTime > remoteAllTime) {
               saveToLoad = localSave;
               await window.authApi.save(localSave);
             } else {
               localStorage.setItem(SAVE_KEY_V2, JSON.stringify(remoteSave));
             }
-          } else if (!localSave) {
-            console.log("No local save, using remote save");
-            localStorage.setItem(SAVE_KEY_V2, JSON.stringify(remoteSave));
           }
 
           loadV2(saveToLoad);
