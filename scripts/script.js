@@ -3993,14 +3993,15 @@ const MANUAL_SAVE_COOLDOWN_MS = 30 * 1000;
   }
 
   const openRebirthMobile = document.getElementById("openModalRebirth_mobile");
-
-  openRebirthMobile.addEventListener("click", () => {
-      modalr.classList.add("open");
-      modalr.style.display = "flex";
-      if (window.initRebirthMindmap) {
-          window.initRebirthMindmap();
-      }
-  });
+  if (openRebirthMobile) {
+      openRebirthMobile.addEventListener("click", () => {
+          modalr.classList.add("open");
+          modalr.style.display = "flex";
+          if (window.initRebirthMindmap) {
+              window.initRebirthMindmap();
+          }
+      });
+  }
 
   goldenPotatoImage.classList.add("hidden");
   scheduleNextGoldenPotato();
