@@ -1,11 +1,3 @@
-const maintenance = process.env.MAINTENANCE_MODE === "true";
-
-if (maintenance) {
-  app.use((req, res) => {
-    res.status(503).sendFile(__dirname + "/maintenance.html");
-  });
-}
-
 const validator = require("validator");
 const express = require("express");
 const cors = require("cors");
@@ -30,6 +22,15 @@ const pool = new Pool({
 });
 
 const JWT_SECRET = process.env.JWT_SECRET || "change-me";
+
+const maintenance = process.env.MAINTENANCE_MODE === "true";
+
+if (maintenance) {
+  app.use((req, res) => {
+    res.status(503).sendFile(__dirname + "/maintenance.html");
+  });
+}
+
 
 /* -------------------------------------------------------------
    Database schema – users, saves, leaderboard
