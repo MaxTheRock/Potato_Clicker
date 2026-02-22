@@ -8,6 +8,15 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 const app = express();
+
+const maintenance = process.env.MAINTENANCE_MODE === "true";
+console.log("Maintenance mode:", process.env.MAINTENANCE_MODE);
+if (maintenance) {
+  app.use((req, res) => {
+    res.status(503).sendFile(path.join(__dirname, "maintenance.html"));
+  });
+}
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -23,13 +32,6 @@ const pool = new Pool({
 
 const JWT_SECRET = process.env.JWT_SECRET || "change-me";
 
-const maintenance = process.env.MAINTENANCE_MODE === "true";
-console.log("Maintenance mode:", process.env.MAINTENANCE_MODE);
-if (maintenance) {
-  app.use((req, res) => {
-    res.status(503).sendFile(path.join(__dirname, "maintenance.html"));
-  });
-}
 
 /* -------------------------------------------------------------
    Database schema – users, saves, leaderboard
