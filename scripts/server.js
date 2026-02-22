@@ -14,11 +14,12 @@ app.use('/assets', express.static(path.join(__dirname, '..', 'assets')));
 const maintenance = process.env.MAINTENANCE_MODE === "true";
 if (maintenance) {
   app.use((req, res, next) => {
-    // Allow asset requests to pass through
-    if (req.path.startsWith('/assets/')) return next();
+    if (req.path.startsWith('/assets') || req.path.startsWith('/favicon.ico')) return next();
     res.status(503).sendFile(path.join(__dirname, 'maintenance.html'));
   });
 }
+
+app.use(express.static(path.join(__dirname, '..')));
 
 app.use(cors());
 app.use(express.json());
