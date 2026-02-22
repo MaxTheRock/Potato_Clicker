@@ -3856,7 +3856,9 @@ const MANUAL_SAVE_COOLDOWN_MS = 30 * 1000;
           b.owned++;
           b.price = Math.ceil(b.price * 1.15);
           buildingsOwned++;
-          window.building_discount -= 0.0001
+          if (window._rebirthPersistedPurchased?.includes(9)) {
+            window.building_discount -= 0.0001;
+          }
           calculateAutoClick();
           updatePotatoDisplay();
 

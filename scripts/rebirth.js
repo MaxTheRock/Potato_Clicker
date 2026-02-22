@@ -812,7 +812,7 @@ window.performRebirthReset = function () {
     // Things to preserve
     const keptSkins = save.skins;
     const keptAchievements = save.achievments;
-    const keptAllTime = save.stats.allTimePotatoes;
+    const keptAllTime = window.allTimePotatoes || save.stats.allTimePotatoes;
     const keptRp = window.rp || 0;
     const keptPersistedPurchased = window._rebirthPersistedPurchased || [];
     const keptBackgroundAlpha = save.stats.backgroundAlpha || 0.1;
