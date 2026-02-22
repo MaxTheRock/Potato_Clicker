@@ -2892,31 +2892,19 @@ const MANUAL_SAVE_COOLDOWN_MS = 30 * 1000;
   }
 
   async function loadGame() {
-    const localSaveRaw = localStorage.getItem(SAVE_KEY_V2);
-    const localSave = localSaveRaw ? JSON.parse(localSaveRaw) : null;
+      const localSaveRaw = localStorage.getItem(SAVE_KEY_V2);
+      const localSave = localSaveRaw ? JSON.parse(localSaveRaw) : null;
 
-    if (window.authApi && window.authApi.getToken()) {
-      try {
-        const remoteSave = await window.authApi.load();
+      if (window.authApi && window.authApi.getToken()) {
+        try {
+          const remoteSave = await window.authApi.load();
 
-        if (remoteSave && remoteSave.stats) {
-          let saveToLoad = remoteSave;
-
-          if (localSave && localSave.stats) {
-            const remoteAllTime = remoteSave.stats?.allTimePotatoes || 0;
-            const localAllTime = localSave.stats?.allTimePotatoes || 0;
-
-            if (localAllTime > remoteAllTime) {
-              saveToLoad = localSave;
-              await window.authApi.save(localSave);
-            } else {
-              localStorage.setItem(SAVE_KEY_V2, JSON.stringify(remoteSave));
-            }
-          }
-
-          loadV2(saveToLoad);
+          if (remoteSave && remoteSave.stats) {
+          // Always use remote when logged in
+          localStorage.setItem(SAVE_KEY_V2, JSON.stringify(remoteSave));
+          loadV2(remoteSave);
         } else if (localSave) {
-          console.log("No backend save found, loading local save");
+          // No remote save yet, use local and upload it
           loadV2(localSave);
           await window.authApi.save(localSave);
         } else {
