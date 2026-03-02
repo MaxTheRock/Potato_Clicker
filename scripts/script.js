@@ -16,7 +16,7 @@
   const openBtno = document.getElementById("openModalOptions");
   const closeBtno = document.getElementById("closeModalOptions");
   const modalo = document.getElementById("modaloptions");
-  const modalr = document.getElementById("modalrebirth");
+  //const modalr = document.getElementById("modalrebirth");
   //const timerInterval = setInterval(updateTimer, 60 * 1000);
   const openBtnsk = document.getElementById("openModalSkins");
   const closeBtnsk = document.getElementById("closeModalSkins");
@@ -1442,6 +1442,14 @@
       equipped: false,
       description: "1% chance to unlock every second.",
     },
+    {
+      id: "toby",
+      name: "Toby",
+      image: "assets/variants/toby.png",
+      unlocked: false,
+      equipped: false,
+      description: "1% chance to unlock every 10 seconds.",
+    },
   ];
 
   function isPC() {
@@ -2162,6 +2170,13 @@
       description: "What a lucky person!",
       completed: false,
       skinReward: "missing_texture",
+    },
+    {
+      id: "toby",
+      name: "Toby",
+      description: "Bald and beautiful.",
+      completed: false,
+      skinReward: "toby",
     },
   ];
 
@@ -4075,7 +4090,7 @@ const MANUAL_SAVE_COOLDOWN_MS = 30 * 1000;
     modalanouncements.style.display = "none";
   });
   */
-
+  /*
   openBtnr.addEventListener("click", () => {
       modalr.classList.add("open");
       modalr.style.display = "flex";
@@ -4085,11 +4100,12 @@ const MANUAL_SAVE_COOLDOWN_MS = 30 * 1000;
           window.initRebirthMindmap();
       }
   });
-
+  
   closeBtnr.addEventListener("click", () => {
     modalr.classList.remove("open");
     modalr.style.display = "none";
   });
+  */
   const preloadedSkins = new Map();
 
   function preloadSkin(imageSrc) {
@@ -4396,6 +4412,9 @@ const MANUAL_SAVE_COOLDOWN_MS = 30 * 1000;
   setInterval(() => {
       if (Math.random() < 0.01) {
           achievmentsAdd("missing_texture");
+      }
+      if (Math.random() < 0.001) {
+          achievmentsAdd("toby");
       }
   }, 1000);
 
