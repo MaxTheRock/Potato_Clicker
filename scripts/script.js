@@ -4356,6 +4356,19 @@ const MANUAL_SAVE_COOLDOWN_MS = 30 * 1000;
   (async () => {
     const overlay = document.getElementById('loadingOverlay');
     
+    await new Promise(resolve => {
+      // Give auth.js up to 5 seconds to finish its remote load
+      let attempts = 0;
+      const check = setInterval(() => {
+        attempts++;
+        const hasSave = localStorage.getItem("potato_clicker_save_v2");
+        // Stop waiting if auth.js wrote a save OR after 5s timeout
+        if (hasSave || attempts >= 50) {
+          clearInterval(check);
+          resolve();
+        }
+      }, 100);
+    });
     await loadGame();
     maybeStartPeelerOrbit();
     rateCounter();
