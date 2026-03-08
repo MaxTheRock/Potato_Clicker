@@ -150,7 +150,7 @@
     sound.currentTime = 0.5;
     sound.play().catch(() => {});
   }
-
+  let _gameLoaded = false;
   let tooltipHideTimeout = null;
   let mobileAutoHideTimeout = null;
   let comment_count = 0;
@@ -2796,9 +2796,13 @@
   }
 
   async function saveToDb(showStatus = false) {
+    if (!_gameLoaded) {
+        console.warn("Skipping DB save — game not fully loaded yet");
+        return;
+    }
     if (allTimePotatoes === 0 && buildingsOwned === 0 && potatoClicks === 0) {
-      console.warn("Skipping DB save — state looks uninitialised");
-      return;
+        console.warn("Skipping DB save — state looks uninitialised");
+        return;
     }
 
     const save = getSaveObject();
@@ -2894,7 +2898,7 @@ const MANUAL_SAVE_COOLDOWN_MS = 30 * 1000;
       
       try {
         await loadGame();
-        updateDisplay();
+        updatePotatoDisplay();
         updateStatsDisplay();
         renderBuildingsRegular();
         renderUpgradesRegular();
@@ -3971,7 +3975,7 @@ const MANUAL_SAVE_COOLDOWN_MS = 30 * 1000;
     renderBuildings();
     renderUpgrades();
 
-    window.authApi.save();
+    saveToDb(false)
   }
 
   function calculateAutoClick() {
@@ -4392,6 +4396,7 @@ const MANUAL_SAVE_COOLDOWN_MS = 30 * 1000;
     });
 
     await loadGame();
+    _gameLoaded = true;
     maybeStartPeelerOrbit();
     rateCounter();
     updatePotatoComments();
