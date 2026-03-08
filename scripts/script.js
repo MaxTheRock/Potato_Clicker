@@ -4355,20 +4355,21 @@ const MANUAL_SAVE_COOLDOWN_MS = 30 * 1000;
   //updateTimer();
   (async () => {
     const overlay = document.getElementById('loadingOverlay');
-    
+
+    // Wait for auth.js to finish its /me check (sets window._authResolved),
+    // OR time out after 5 seconds so offline / guest users aren't stuck.
     await new Promise(resolve => {
-      // Give auth.js up to 5 seconds to finish its remote load
+      if (window._authResolved) return resolve();
       let attempts = 0;
       const check = setInterval(() => {
         attempts++;
-        const hasSave = localStorage.getItem("potato_clicker_save_v2");
-        // Stop waiting if auth.js wrote a save OR after 5s timeout
-        if (hasSave || attempts >= 50) {
+        if (window._authResolved || attempts >= 50) {
           clearInterval(check);
           resolve();
         }
       }, 100);
     });
+
     await loadGame();
     maybeStartPeelerOrbit();
     rateCounter();
@@ -4381,20 +4382,24 @@ const MANUAL_SAVE_COOLDOWN_MS = 30 * 1000;
     renderSkins();
     renderEventSkins();
     requestAnimationFrame(renderPeelerOrbit);
-    checkBuildingMiddle()
+    checkBuildingMiddle();
+
     const savedVol = localStorage.getItem("sfxVolume");
     if (savedVol !== null) {
       sfxVolume = parseFloat(savedVol);
       sfxSlider.value = sfxVolume;
       window.sfxVolume = sfxVolume;
     }
+
     setInterval(() => {
       idleTime = Math.floor((Date.now() - lastPlayerAction) / 1000);
       console.log("idleTime:", idleTime);
     }, 1000);
+
     setInterval(() => {
       upgradeTime++;
     }, 1000);
+
     console.log(`
       ---------------------------------------------------------------
       Potato Clicker!
@@ -4404,58 +4409,21 @@ const MANUAL_SAVE_COOLDOWN_MS = 30 * 1000;
       Have fun and get clicking!
         - MaxTheRock
     `);
+
     overlay.classList.add('hidden');
 
     if (mode === "dark") {
-      const backgrounds = document.querySelectorAll(".pixelated-background");
-      const storeBanners = document.querySelectorAll(".store-sign");
+      const backgrounds     = document.querySelectorAll(".pixelated-background");
+      const storeBanners    = document.querySelectorAll(".store-sign");
       const storeBannersText = document.querySelectorAll(".store-title");
-      const button_toggle = document.querySelector("#modeToggle");
+      const button_toggle   = document.querySelector("#modeToggle");
 
       backgrounds.forEach(bg => bg.style.backgroundImage = "url('assets/background_dark.png')");
       storeBanners.forEach(sb => sb.style.backgroundImage = "url('assets/store-banner_dark.png')");
       storeBannersText.forEach(st => st.style.color = "white");
       button_toggle.textContent = "Light Mode";
     }
+
     setTimeout(() => overlay.remove(), 500);
   })();
-
-  document.addEventListener("contextmenu", (e) => e.preventDefault());
-
-  setInterval(() => {
-      if (Math.random() < 0.01) {
-          achievmentsAdd("missing_texture");
-      }
-      if (Math.random() < 0.001) {
-          achievmentsAdd("toby");
-      }
-  }, 1000);
-
-  
-  window.addEventListener("beforeunload", () => {
-    saveLocal();
-    const token = window.authApi?.getToken();
-    if (token) {
-      const save = getSaveObject();
-      const blob = new Blob([JSON.stringify(save)], { type: "application/json" });
-      navigator.sendBeacon("/api/auth/save", blob);
-    }
-  });
-
-  window.achievmentsAdd = achievmentsAdd;
-  window.clearLocalData = clearLocalData;
-  window.storeCounter = storeCounter;
-  window.saveGameManual = saveGameManual;
-  window.loadGameManual = loadGameManual;
-  window.loadGame = loadGame;
-  window.getPeelerBuilding = getPeelerBuilding;
-  window.clickerButton = document.getElementById("clickerButton");
-  window.light_darkToggle = light_darkToggle;
-  window.sellPressed = sellPressed;
-  window.buyPressed = buyPressed;
-  window.showTooltip = showTooltip;
-  window.hideTooltip = hideTooltip;
-  window.hideTooltipImmediate = hideTooltipImmediate;
-  window.renderBuildings = renderBuildings;
-  window.autoClick = autoClick;
 })();

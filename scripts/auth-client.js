@@ -1,7 +1,6 @@
 (() => {
   const AUTH_API_BASE = "/api/auth";
   const tokenKey = "auth_token";
-  const LOCAL_SAVE_KEY = "potatoFarmSave";
 
   /* --------------------------------------------------------------
      Token helpers
@@ -39,22 +38,26 @@
       body: JSON.stringify({ username, email, password }),
     });
   }
+
   async function login(identifier, password) {
     return apiFetch("/login", {
       method: "POST",
       body: JSON.stringify({ identifier, password }),
     });
   }
+
   async function me() {
     return apiFetch("/me", { method: "GET" });
   }
 
   /* --------------------------------------------------------------
      Remote save / load
+     These are thin wrappers — script.js owns the actual save logic.
      -------------------------------------------------------------- */
   async function saveRemote(saveObj) {
     return apiFetch("/save", { method: "POST", body: JSON.stringify(saveObj) });
   }
+
   async function loadRemote() {
     return apiFetch("/load", { method: "GET" });
   }
@@ -101,22 +104,19 @@
         { value: 1e18, label: "quintillion" },
         { value: 1e15, label: "quadrillion" },
         { value: 1e12, label: "trillion" },
-        { value: 1e9, label: "billion" },
-        { value: 1e6, label: "million" },
+        { value: 1e9,  label: "billion" },
+        { value: 1e6,  label: "million" },
       ];
       for (const u of units) {
         if (num >= u.value) {
-          return (
-            (num / u.value).toFixed(2).replace(/\.?0+$/, "") + " " + u.label
-          );
+          return (num / u.value).toFixed(2).replace(/\.?0+$/, "") + " " + u.label;
         }
       }
       return num.toLocaleString();
     }
 
     const getRankSuffix = (r) => {
-      const j = r % 10,
-        k = r % 100;
+      const j = r % 10, k = r % 100;
       if (j === 1 && k !== 11) return r + "st";
       if (j === 2 && k !== 12) return r + "nd";
       if (j === 3 && k !== 13) return r + "rd";
@@ -165,172 +165,19 @@
   }
 
   /* --------------------------------------------------------------
-     Core merge helper – single source of truth for combining saves.
-     Takes two save objects (either can be null) and returns a merged
-     object that always keeps the LARGEST numeric values and the UNION
-     of all collection keys.
-     -------------------------------------------------------------- */
-  function mergeSaves(a, b) {
-    const merged = { ...a, ...b };
-
-    // Always keep the largest numeric counters
-    const numericKeys = ["potatoes", "allTimePotatoes"];
-    numericKeys.forEach((key) => {
-      merged[key] = Math.max(Number(a?.[key]) || 0, Number(b?.[key]) || 0);
-    });
-
-    // Union of all collection keys (remote wins on conflicts within a key,
-    // but we keep any key that exists in either save)
-    const collectionKeys = ["buildings", "upgrades", "skins"];
-    collectionKeys.forEach((col) => {
-      merged[col] = { ...(a?.[col] || {}), ...(b?.[col] || {}) };
-    });
-
-    return merged;
-  }
-
-  /* --------------------------------------------------------------
-     Persist a save object to both localStorage and (if logged in)
-     the remote server.  Returns the save object for convenience.
-     -------------------------------------------------------------- */
-  async function persistSave(saveObj) {
-    localStorage.setItem(LOCAL_SAVE_KEY, JSON.stringify(saveObj));
-    // Keep the legacy standalone key in sync
-    localStorage.setItem("allTimePotatoes", saveObj.allTimePotatoes || 0);
-
-    const token = getToken();
-    if (token) {
-      try {
-        await saveRemote(saveObj);
-      } catch (e) {
-        console.warn("Remote save failed – progress is safe locally", e);
-      }
-    }
-
-    return saveObj;
-  }
-
-  /* --------------------------------------------------------------
-     Apply a save object to the global game state.
-     -------------------------------------------------------------- */
-  function applyToGlobals(saveObj) {
-    window.potatoes        = saveObj.potatoes        || 0;
-    window.allTimePotatoes = saveObj.allTimePotatoes || 0;
-    window.buildings       = saveObj.buildings       || {};
-    window.upgrades        = saveObj.upgrades        || {};
-    window.skins           = saveObj.skins           || {};
-    if (saveObj.equippedSkin !== undefined) {
-      window.equippedSkin  = saveObj.equippedSkin;
-    }
-  }
-
-  /* --------------------------------------------------------------
-     Read whatever is in localStorage (returns null if nothing / corrupt).
-     -------------------------------------------------------------- */
-  function readLocalSave() {
-    const raw = localStorage.getItem(LOCAL_SAVE_KEY);
-    if (!raw) return null;
-    try {
-      const parsed = JSON.parse(raw);
-      // Reconcile the legacy standalone allTimePotatoes key
-      const legacyAllTime = Number(localStorage.getItem("allTimePotatoes")) || 0;
-      parsed.allTimePotatoes = Math.max(
-        Number(parsed.allTimePotatoes) || 0,
-        legacyAllTime
-      );
-      return parsed;
-    } catch (_) {
-      console.warn("Corrupt local save – ignoring");
-      return null;
-    }
-  }
-
-  /* --------------------------------------------------------------
-     LOAD GAME
-     ──────────────────────────────────────────────────────────────
-     Strategy:
-       1. Read local save immediately (never lost, even offline).
-       2. If logged in, also fetch the remote save.
-       3. Merge both – largest numeric values win, collections are
-          unioned.  This means progress is NEVER lost from either
-          source.
-       4. Persist the merged result back to both stores so they stay
-          in sync going forward.
-       5. Apply to globals.
-
-     This replaces BOTH the old loadGame and mergeAndPersist so
-     there is only one code path for loading.
-     -------------------------------------------------------------- */
-  async function loadGame() {
-    const localSave = readLocalSave();
-
-    let remoteSave = null;
-    const token = getToken();
-    if (token) {
-      try {
-        remoteSave = await loadRemote();
-      } catch (e) {
-        console.warn("Remote load failed – using local save only", e);
-      }
-    }
-
-    // Merge: local is the base so we never lose offline progress,
-    // remote is overlaid so we never lose cloud progress either.
-    const merged = mergeSaves(localSave, remoteSave);
-
-    // Persist the merged result so both stores agree
-    await persistSave(merged);
-
-    // Wire up globals for the rest of the game
-    applyToGlobals(merged);
-  }
-
-  /* --------------------------------------------------------------
-     SAVE GAME
-     Snapshot current globals → persist locally + remotely.
-     -------------------------------------------------------------- */
-  function saveGame() {
-    const saveObj = {
-      potatoes:        window.potatoes        || 0,
-      allTimePotatoes: window.allTimePotatoes || 0,
-      buildings:       window.buildings       || {},
-      upgrades:        window.upgrades        || {},
-      skins:           window.skins           || {},
-      equippedSkin:    window.equippedSkin    || "default",
-    };
-
-    // Fire-and-forget – errors are logged inside persistSave
-    persistSave(saveObj);
-  }
-
-  /* --------------------------------------------------------------
-     mergeAndPersist – kept for any external callers, now just
-     delegates to the unified helpers above.
-     -------------------------------------------------------------- */
-  async function mergeAndPersist(remoteSave) {
-    const localSave = readLocalSave();
-    const merged = mergeSaves(localSave, remoteSave);
-    await persistSave(merged);
-    applyToGlobals(merged);
-  }
-
-  /* --------------------------------------------------------------
-     Account UI
-     ──────────────────────────────────────────────────────────────
-     Important: loadGame() is called ONCE here on page load.
-     Do NOT call it again from DOMContentLoaded or anywhere else
-     on startup – duplicate calls can race and overwrite progress.
+     Account UI — ONLY handles display + triggering script.js's loadGame.
+     Does NOT load or merge saves itself.
      -------------------------------------------------------------- */
   async function updateAccountUI() {
     const el        = document.getElementById("accountName");
     const farm_name = document.getElementById("nameInput");
-
-    const token = getToken();
+    const token     = getToken();
 
     if (!token) {
       if (el)        el.textContent  = "Not signed in";
       if (farm_name) farm_name.value = "Guest";
-      await loadGame();
+      // Signal to script.js that auth is resolved so it can load
+      window._authResolved = true;
       return;
     }
 
@@ -338,19 +185,20 @@
       const user = await me();
       if (el)        el.textContent  = user.username || user.email || "Account";
       if (farm_name) farm_name.value = `${user.username || "Player"}'s Potato Farm`;
-      await loadGame();
     } catch (e) {
       if (el)        el.textContent  = "Not signed in";
       if (farm_name) farm_name.value = "Guest";
       setToken(null);
-      await loadGame();
     }
+
+    // Signal to script.js that auth is resolved so it can proceed with load
+    window._authResolved = true;
   }
 
   /* --------------------------------------------------------------
-     DOM ready – login / signup wiring
+     DOM ready — login / signup wiring
      -------------------------------------------------------------- */
-  document.addEventListener("DOMContentLoaded", () => {
+  function onDOMReady() {
     const lUser       = document.getElementById("loginUsername");
     const lPass       = document.getElementById("loginPassword");
     const lBtn        = document.getElementById("loginButton");
@@ -378,14 +226,18 @@
         setToken(res.token);
         setStatus(loginStatus, "Logged in successfully!", "success");
 
-        // loadGame is called inside updateAccountUI – no need to call it twice
+        // After login, reload the game from the remote save via script.js
+        if (window.loadGameManual) {
+          await window.loadGameManual();
+        }
+
         await updateAccountUI();
         await updateLeaderboardUI();
       } catch (e) {
         let msg = "Login failed";
         if (e.error) {
           const err = e.error.toLowerCase();
-          if (err.includes("user not found"))       msg = "Username/email not found.";
+          if (err.includes("user not found"))           msg = "Username/email not found.";
           else if (err.includes("invalid credentials")) msg = "Password incorrect. Please check and try again.";
           else msg = e.error;
         }
@@ -393,10 +245,6 @@
         console.error("login error", e);
       }
     });
-
-    // Single startup load – updateAccountUI handles loadGame internally
-    updateAccountUI();
-    updateLeaderboardUI();
 
     const sUser        = document.getElementById("signupUsername");
     const sEmail       = document.getElementById("signupEmail");
@@ -419,18 +267,17 @@
         const res = await signup(username, email, password);
         setToken(res.token);
         setStatus(signupStatus, "Account created successfully!", "success");
-        sUser.value = "";
+        sUser.value  = "";
         sEmail.value = "";
-        sPass.value = "";
+        sPass.value  = "";
 
-        // loadGame is called inside updateAccountUI – no need to call it twice
         await updateAccountUI();
         await updateLeaderboardUI();
       } catch (e) {
         let msg = "Sign up failed";
         if (e.error) {
           const err = e.error.toLowerCase();
-          if (err.includes("already exists")) msg = "Username or email already exists.";
+          if (err.includes("already exists"))  msg = "Username or email already exists.";
           else if (err.includes("invalid email")) msg = "Please enter a valid email address.";
           else msg = e.error;
         }
@@ -438,24 +285,47 @@
         console.error("signup error", e);
       }
     });
-  });
+
+    document.getElementById("logoutButton")?.addEventListener("click", () => {
+      setToken(null);
+      updateAccountUI();
+    });
+
+    // Kick off account check — sets window._authResolved when done,
+    // which unblocks script.js's startup loader.
+    updateAccountUI();
+    updateLeaderboardUI();
+  }
+
+  // Run immediately if DOM is already parsed, otherwise wait for it.
+  // This prevents a 5-second timeout in script.js when auth.js loads
+  // after DOMContentLoaded has already fired (common in production).
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", onDOMReady);
+  } else {
+    onDOMReady();
+  }
 
   /* --------------------------------------------------------------
-     Public API
+     Public API — only expose what script.js actually needs:
+       .save(obj)     → POST to /api/auth/save
+       .load()        → GET  from /api/auth/load
+       .getToken()    → current JWT string or null
+       .me()          → fetch current user info
+       .updateLeaderboardUI() → refresh leaderboard HTML
+       .fetchLeaderboard()    → raw leaderboard data
+       .updateAccountUI()     → refresh account name display
      -------------------------------------------------------------- */
   window.authApi = {
     signup,
     login,
     me,
-    save: saveRemote,
-    load: loadRemote,
+    save:                saveRemote,
+    load:                loadRemote,
     setToken,
     getToken,
     updateAccountUI,
     fetchLeaderboard,
     updateLeaderboardUI,
-    loadGame,
-    saveGame,
-    mergeAndPersist,
   };
 })();
