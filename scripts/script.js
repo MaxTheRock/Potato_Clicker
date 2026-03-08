@@ -78,8 +78,8 @@
         bg.style.setProperty("--overlay-alpha", slider.value);
       });
       backgroundAlpha = Number(slider.value);
+      saveLocal();
     });
-    saveGame(true);
   });
   /**
    * @param {"light"|"dark"} m
@@ -4192,9 +4192,8 @@ const MANUAL_SAVE_COOLDOWN_MS = 30 * 1000;
   }
 
   document.getElementById("logoutButton")?.addEventListener("click", () => {
-    setToken(null);
-    updateAccountUI();
-    if (window.resetGame) window.resetGame(); // clear local game if needed
+    window.authApi?.setToken(null);
+    window.authApi?.updateAccountUI();
   });
 
   function autoClick() {
