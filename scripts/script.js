@@ -2796,6 +2796,11 @@
   }
 
   async function saveToDb(showStatus = false) {
+    if (allTimePotatoes === 0 && buildingsOwned === 0 && potatoClicks === 0) {
+      console.warn("Skipping DB save — state looks uninitialised");
+      return;
+    }
+
     const save = getSaveObject();
 
     if (window.authApi && window.authApi.getToken()) {
@@ -2907,31 +2912,48 @@ const MANUAL_SAVE_COOLDOWN_MS = 30 * 1000;
   }
 
   async function loadGame() {
-      const localSaveRaw = localStorage.getItem(SAVE_KEY_V2);
-      const localSave = localSaveRaw ? JSON.parse(localSaveRaw) : null;
+    const localSaveRaw = localStorage.getItem(SAVE_KEY_V2);
+    const localSave = localSaveRaw ? JSON.parse(localSaveRaw) : null;
 
-      if (window.authApi && window.authApi.getToken()) {
-        try {
-          const remoteSave = await window.authApi.load();
+    if (window.authApi && window.authApi.getToken()) {
+      try {
+        const remoteSave = await window.authApi.load();
 
-          if (remoteSave && remoteSave.stats) {
-          // Always use remote when logged in
-          localStorage.setItem(SAVE_KEY_V2, JSON.stringify(remoteSave));
-          loadV2(remoteSave);
-        } else if (localSave) {
-          // No remote save yet, use local and upload it
+        if (remoteSave && remoteSave.stats) {
+          // Remote exists — always prefer it when logged in.
+          // Only merge local if local has MORE all-time potatoes
+          // (protects against blank local overwriting real remote).
+          const remoteATP = remoteSave.stats.allTimePotatoes || 0;
+          const localATP  = localSave?.stats?.allTimePotatoes || 0;
+
+          if (localATP > remoteATP) {
+            // Local has more progress — upload it then use it
+            console.log("Local save is ahead of remote, uploading local");
+            loadV2(localSave);
+            await window.authApi.save(localSave);
+          } else {
+            // Remote wins — load it and sync locally
+            console.log("Using remote save");
+            localStorage.setItem(SAVE_KEY_V2, JSON.stringify(remoteSave));
+            loadV2(remoteSave);
+          }
+        } else if (localSave && localSave.stats && localSave.stats.allTimePotatoes > 0) {
+          // No remote save yet, but local has real data — upload it
+          console.log("No remote save found, uploading local");
           loadV2(localSave);
           await window.authApi.save(localSave);
         } else {
+          // Nothing anywhere — fresh start
+          console.log("No save found anywhere, starting fresh");
           migrateOldSave();
         }
       } catch (err) {
         console.log("Backend load failed, using local save", err);
-        if (localSave) loadV2(localSave);
+        if (localSave && localSave.stats) loadV2(localSave);
         else migrateOldSave();
       }
     } else {
-      if (localSave) loadV2(localSave);
+      if (localSave && localSave.stats) loadV2(localSave);
       else migrateOldSave();
     }
   }
