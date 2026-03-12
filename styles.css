@@ -2327,3 +2327,15 @@ h3 {
   transform: none;
   box-shadow: none;
 }
+
+.farmer-scene { display: flex; flex-direction: column; gap: 4px; width: 100%; }
+.farmer-field {
+  background: transparent;
+  padding: 8px 10px 4px;
+  min-height: 64px;
+  overflow: hidden;
+}
+.farmer-sprites { display: flex; flex-wrap: nowrap; gap: 4px; align-items: flex-end; overflow-x: auto; overflow-y: hidden; padding-bottom: 30px;}
+.farmer-sprite { display: inline-flex; align-items: flex-end; }
+.farmer-sprite-img { width: 72px; height: 72px; image-rendering: pixelated; object-fit: contain; }
+.farmer-label { display: flex; justify-content: space-between; align-items: center; padding: 0 2px; font-size: 12px; }

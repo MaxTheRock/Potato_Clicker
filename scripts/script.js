@@ -170,7 +170,7 @@
   let potatoClicks = 0;
   let handFarmedPotatoes = 0;
   let goldenPotatoClicks = 0;
-  let runningVersion = "v0.78";
+  let runningVersion = "v0.80";
   let autoClickAmount = 0;
   let runDurationSeconds;
   let totalUpgrades = 0;
@@ -1452,6 +1452,88 @@
     },
   ];
 
+  // ================== FARMER SCENE ==================
+  const FARMER_SKINS = ["default", "dark_skin", "blue", "grey_scale", "nostalgia"];
+  const FARMER_SKIN_THRESHOLDS = [1, 10, 25, 50, 100];
+ 
+  function getFarmerVariants(count) {
+    const available = FARMER_SKIN_THRESHOLDS
+      .map((threshold, i) => count >= threshold ? FARMER_SKINS[i] : null)
+      .filter(Boolean);
+    return available.length ? available : ["default"];
+  }
+ 
+  function renderFarmerMiddle() {
+    const container = document.getElementById("building_middle");
+    if (!container) return;
+ 
+    const farmer = buildings.find(b => b.id === "farmer");
+    const count = farmer ? farmer.owned : 0;
+ 
+    if (count === 0) {
+      container.style.display = "none";
+      return;
+    }
+ 
+    container.style.display = "block";
+ 
+    // Build scene HTML once if it doesn't exist
+    if (!document.getElementById("farmer-scene")) {
+      container.innerHTML = `
+        <div id="farmer-scene" class="farmer-scene">
+          <div class="farmer-field">
+            <div id="farmer-sprites" class="farmer-sprites"></div>
+          </div>
+          <div class="farmer-label">
+            <span id="farmer-count-label"></span>
+            <span class="farmer-cps-label" id="farmer-cps-label"></span>
+          </div>
+        </div>
+      `;
+    }
+ 
+    const spritesContainer = document.getElementById("farmer-sprites");
+    if (!spritesContainer) return;
+ 
+    const variants = getFarmerVariants(count);
+    const maxDisplay = Math.min(count, 50);
+ 
+    // Remove excess sprites
+    while (spritesContainer.children.length > maxDisplay) {
+      spritesContainer.removeChild(spritesContainer.lastChild);
+    }
+ 
+    // Add new sprites
+    while (spritesContainer.children.length < maxDisplay) {
+      const index = spritesContainer.children.length;
+      const skin = variants[index % variants.length];
+ 
+      const sprite = document.createElement("div");
+      sprite.className = "farmer-sprite";
+      sprite.style.marginLeft = index > 0 ? "-20px" : "0";
+      sprite.style.marginTop = `30px`;
+ 
+      const img = document.createElement("img");
+      img.src = `assets/farmers/${skin}.png`;
+      img.alt = "Farmer";
+      img.draggable = false;
+      img.className = "farmer-sprite-img";
+ 
+      sprite.appendChild(img);
+      spritesContainer.appendChild(sprite);
+    }
+ 
+    // Update skin on existing sprites if variant pool changed
+    Array.from(spritesContainer.children).forEach((sprite, i) => {
+      const skin = variants[i % variants.length];
+      const img = sprite.querySelector("img");
+      const expectedSrc = `assets/farmers/${skin}.png`;
+      if (img && !img.src.endsWith(expectedSrc)) {
+        img.src = expectedSrc;
+      }
+    });
+  }
+ 
   function isPC() {
     const isMobileUA = /Mobi|Android|iPhone|iPad|iPod/i.test(
       navigator.userAgent,
@@ -1462,8 +1544,10 @@
 
   function checkBuildingMiddle() {
     const farmer = buildings.find((b) => b.id === "farmer");
-    if (farmer.owned >= 1) {
-      middle_buildings.style.display = "block";
+    if (farmer && farmer.owned >= 1) {
+      renderFarmerMiddle();
+    } else if (middle_buildings) {
+      middle_buildings.style.display = "none";
     }
   }
 
@@ -4446,4 +4530,11 @@ const MANUAL_SAVE_COOLDOWN_MS = 30 * 1000;
 
     setTimeout(() => overlay.remove(), 500);
   })();
+
+  window.storeCounter = storeCounter;
+  window.saveGameManual = saveGameManual;
+  window.loadGameManual = loadGameManual;
+  window.sellPressed = sellPressed;
+  window.buyPressed = buyPressed;
+  window.light_darkToggle = light_darkToggle;
 })();
