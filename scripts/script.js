@@ -1533,6 +1533,9 @@
       }
     });
   }
+
+  // Auto-load farmers on page load
+  document.addEventListener("DOMContentLoaded", checkBuildingMiddle);
  
   function isPC() {
     const isMobileUA = /Mobi|Android|iPhone|iPad|iPod/i.test(
