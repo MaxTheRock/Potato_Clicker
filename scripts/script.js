@@ -1496,7 +1496,7 @@
     if (!spritesContainer) return;
  
     const variants = getFarmerVariants(count);
-    const maxDisplay = Math.min(count, 50);
+    const maxDisplay = Math.min(count, 100);
  
     // Remove excess sprites
     while (spritesContainer.children.length > maxDisplay) {
