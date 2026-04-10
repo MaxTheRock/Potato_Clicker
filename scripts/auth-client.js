@@ -293,7 +293,9 @@
 
     // Kick off account check — sets window._authResolved when done,
     // which unblocks script.js's startup loader.
-    updateAccountUI();
+    updateAccountUI().finally(() => {
+      window._authResolved = true;
+    });
     updateLeaderboardUI();
   }
 
@@ -329,3 +331,5 @@
     updateLeaderboardUI,
   };
 })();
+
+setTimeout(() => { window._authResolved = true; }, 3000);

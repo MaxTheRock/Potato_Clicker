@@ -16,6 +16,7 @@
     if (blocked) {
       e.stopImmediatePropagation();
       e.preventDefault();
+      window.achievmentsAdd("joystick");
       return;
     }
     const now = Date.now();

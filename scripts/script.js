@@ -66,7 +66,6 @@
   const tooltip = document.getElementById("tooltip");
   //const heartContainer = document.querySelector(".heart-container");
   const MODE_STORAGE_KEY = "potato_clicker_mode";
-  const middle_buildings = document.getElementById("building_middle");
   const sell_button = document.getElementById("sell_button");
   const buy_button = document.getElementById("buy_button");
   document.addEventListener("DOMContentLoaded", () => {
@@ -170,7 +169,7 @@
   let potatoClicks = 0;
   let handFarmedPotatoes = 0;
   let goldenPotatoClicks = 0;
-  let runningVersion = "v0.80";
+  let runningVersion = "v0.87";
   let autoClickAmount = 0;
   let runDurationSeconds;
   let totalUpgrades = 0;
@@ -1065,6 +1064,7 @@
       id: "default",
       name: "Default",
       image: "assets/potato.png",
+      rarity: "common",
       unlocked: true,
       equipped: true,
       description: "Unlocked by default.",
@@ -1073,6 +1073,7 @@
       id: "blank",
       name: "Blank",
       image: "assets/variants/blank.png",
+      rarity: "common",
       unlocked: false,
       equipped: false,
       description: "Do nothing for 1 hour.",
@@ -1081,6 +1082,7 @@
       id: "code",
       name: "Code",
       image: "assets/variants/code.png",
+      rarity: "common",
       unlocked: false,
       equipped: false,
       description: "Click on the github link in the navbar.",
@@ -1089,6 +1091,7 @@
       id: "crown",
       name: "Crown",
       image: "assets/variants/crown.png",
+      rarity: "uncommon",
       unlocked: false,
       equipped: false,
       description: "Collect 1 million potatoes.",
@@ -1097,6 +1100,7 @@
       id: "golden",
       name: "Golden",
       image: "assets/variants/golden.png",
+      rarity: "rare",
       unlocked: false,
       equipped: false,
       description: "Use every golden potato variant at least once.",
@@ -1105,6 +1109,7 @@
       id: "monster",
       name: "Potato Punch",
       image: "assets/variants/monster.png",
+      rarity: "common",
       unlocked: false,
       equipped: false,
       description: "A secret is required to unlock this skin.",
@@ -1114,6 +1119,7 @@
       id: "pixel",
       name: "Pixel",
       image: "assets/variants/pixel.png",
+      rarity: "rare",
       unlocked: false,
       equipped: false,
       description: "Collect 10 different skins.",
@@ -1122,6 +1128,7 @@
       id: "rainbow",
       name: "Rainbow",
       image: "assets/variants/rainbow.png",
+      rarity: "legendary",
       unlocked: false,
       equipped: false,
       description: "Unlock every skin in the game.",
@@ -1130,6 +1137,7 @@
       id: "realistic",
       name: "Realistic",
       image: "assets/variants/realistic.png",
+      rarity: "rare",
       unlocked: false,
       equipped: false,
       description: "Start your run 5 days ago.",
@@ -1138,6 +1146,7 @@
       id: "rock",
       name: "Rock",
       image: "assets/variants/rock.png",
+      rarity: "uncommon",
       unlocked: false,
       equipped: false,
       description: "Buy 100 buildings.",
@@ -1146,6 +1155,7 @@
       id: "synth",
       name: "Synth",
       image: "assets/variants/synth.png",
+      rarity: "common",
       unlocked: false,
       equipped: false,
       description: "A secret is required to unlock this skin.",
@@ -1154,6 +1164,7 @@
       id: "inverted",
       name: "Inverted",
       image: "assets/variants/inverted.png",
+      rarity: "common",
       unlocked: false,
       equipped: false,
       description: "Click exactly 666 times in one session.",
@@ -1162,6 +1173,7 @@
       id: "monochrome",
       name: "Monochrome",
       image: "assets/variants/monochrome.png",
+      rarity: "uncommon",
       unlocked: false,
       equipped: false,
       description:
@@ -1171,6 +1183,7 @@
       id: "neon",
       name: "Neon",
       image: "assets/variants/neon.png",
+      rarity: "uncommon",
       unlocked: false,
       equipped: false,
       description: "Click 200 times in 30 seconds.",
@@ -1179,6 +1192,7 @@
       id: "face",
       name: "Face",
       image: "assets/variants/face.png",
+      rarity: "rare",
       unlocked: false,
       equipped: false,
       description: "A secret is required to unlock this skin.",
@@ -1188,6 +1202,7 @@
       id: "menglish",
       name: "Menglish",
       image: "assets/variants/menglish.png",
+      rarity: "legendary",
       unlocked: false,
       equipped: false,
       description: "A secret is required to unlock this skin.",
@@ -1196,6 +1211,7 @@
       id: "glass",
       name: "Glass",
       image: "assets/variants/glass.png",
+      rarity: "uncommon",
       unlocked: false,
       equipped: false,
       description: "Purchase 20 greenhouses.",
@@ -1204,6 +1220,7 @@
       id: "peeled",
       name: "Peeled",
       image: "assets/variants/peeled.png",
+      rarity: "rare",
       unlocked: false,
       equipped: false,
       description: "Purchase 100 peelers.",
@@ -1212,6 +1229,7 @@
       id: "puzzle",
       name: "Puzzle",
       image: "assets/variants/puzzle.png",
+      rarity: "epic",
       unlocked: false,
       equipped: false,
       description: "Find all the secrets in the game.",
@@ -1220,6 +1238,7 @@
       id: "sweet",
       name: "Sweet",
       image: "assets/variants/sweet.png",
+      rarity: "uncommon",
       unlocked: false,
       equipped: false,
       description: "Purchase 50 chip factories.",
@@ -1228,6 +1247,7 @@
       id: "upside-down",
       name: "Upside Down",
       image: "assets/variants/upside-down.png",
+      rarity: "common",
       unlocked: false,
       equipped: false,
       description: "Sell a building.",
@@ -1236,6 +1256,7 @@
       id: "potion",
       name: "Potion",
       image: "assets/variants/potion.png",
+      rarity: "common",
       unlocked: false,
       equipped: false,
       description: "Check out Potion Clicker!",
@@ -1245,6 +1266,7 @@
       id: "geometry",
       name: "Geometry Dash",
       image: "assets/variants/geometry.png",
+      rarity: "common",
       unlocked: false,
       equipped: false,
       description: "A secret is required to unlock this skin.",
@@ -1254,6 +1276,7 @@
       id: "baked",
       name: "Baked",
       image: "assets/variants/baked.png",
+      rarity: "rare",
       unlocked: false,
       equipped: false,
       description: "Play the game for 1 week.",
@@ -1263,6 +1286,7 @@
       id: "finger",
       name: "Finger",
       image: "assets/variants/finger.png",
+      rarity: "rare",
       unlocked: false,
       equipped: false,
       description: "Click 100,000 times.",
@@ -1271,6 +1295,7 @@
       id: "computato",
       name: "Computato",
       image: "assets/variants/computato.png",
+      rarity: "common",
       unlocked: false,
       equipped: false,
       description: "Play on a Computer!",
@@ -1280,6 +1305,7 @@
       id: "astronaut",
       name: "Astronaut",
       image: "assets/variants/astronaut.png",
+      rarity: "rare",
       unlocked: false,
       equipped: false,
       description: "Purchase 1 space related building.",
@@ -1288,6 +1314,7 @@
       id: "sus",
       name: "Sus",
       image: "assets/variants/sus.png",
+      rarity: "epic",
       unlocked: false,
       equipped: false,
       description: "Purchase 10 space related building.",
@@ -1297,6 +1324,7 @@
       id: "crisp",
       name: "Crisp",
       image: "assets/variants/crisp.png",
+      rarity: "epic",
       unlocked: false,
       equipped: false,
       description: "Purchase 200 peelers.",
@@ -1305,6 +1333,7 @@
       id: "ice",
       name: "Ice",
       image: "assets/variants/ice.png",
+      rarity: "uncommon",
       unlocked: false,
       equipped: false,
       description: "Do nothing for 5 hours.",
@@ -1313,6 +1342,7 @@
       id: "yin_yang",
       name: "Yin Yang",
       image: "assets/variants/yin_yang.png",
+      rarity: "legendary",
       unlocked: false,
       equipped: false,
       description: "Purchase 100 of everything!",
@@ -1322,6 +1352,7 @@
       id: "rose",
       name: "Rose",
       image: "assets/variants/rose.png",
+      rarity: "uncommon",
       unlocked: false,
       owned: false,
       description: "Part of the Valentine's Day Event!",
@@ -1332,6 +1363,7 @@
       id: "love_letter",
       name: "Love Letter",
       image: "assets/variants/love_letter.png",
+      rarity: "uncommon",
       unlocked: false,
       equipped: false,
       description: "Part of the Valentine's Day Event!",
@@ -1341,6 +1373,7 @@
       id: "cupid",
       name: "Cupid",
       image: "assets/variants/cupid.png",
+      rarity: "uncommon",
       unlocked: false,
       equipped: false,
       description: "Part of the Valentine's Day Event!",
@@ -1351,6 +1384,7 @@
       id: "chocolate",
       name: "Chocolate",
       image: "assets/variants/chocolate.png",
+      rarity: "uncommon",
       unlocked: false,
       equipped: false,
       description: "Part of the Valentine's Day Event!",
@@ -1360,6 +1394,7 @@
       id: "gift_box",
       name: "Gift Box",
       image: "assets/variants/gift_box.png",
+      rarity: "uncommon",
       unlocked: false,
       equipped: false,
       description: "Part of the Valentine's Day Event!",
@@ -1369,6 +1404,7 @@
       id: "heart",
       name: "Heart",
       image: "assets/variants/heart.png",
+      rarity: "rare",
       unlocked: false,
       equipped: false,
       description: "Part of the Valentine's Day Event!",
@@ -1378,6 +1414,7 @@
       id: "grass",
       name: "Grass",
       image: "assets/variants/grass.png",
+      rarity: "uncommon",
       unlocked: false,
       equipped: false,
       description: "Purchase 100 farmers!",
@@ -1387,6 +1424,7 @@
       id: "noll_sport",
       name: "Noll Sport",
       image: "assets/variants/noll_sport.png",
+      rarity: "common",
       unlocked: false,
       equipped: false,
       description: "A secret is required to unlock this skin.",
@@ -1396,6 +1434,7 @@
       id: "bruh",
       name: "Bruh",
       image: "assets/variants/bruh.png",
+      rarity: "uncommon",
       unlocked: false,
       equipped: false,
       description: "Cycle through 50 comments without refreshing.",
@@ -1404,24 +1443,17 @@
       id: "grape_mlg",
       name: "Grape MLG",
       image: "assets/variants/grape_mlg.png",
+      rarity: "legendary",
       unlocked: false,
       equipped: false,
       description: "Top 10 on the leaderboard exclusive.",
       credits: "Designed by Thomas Warne.",
     },
     {
-      id: "navy",
-      name: "The Navy",
-      image: "assets/variants/navy.png",
-      unlocked: false,
-      equipped: false,
-      description: "As always, Navy sings second.",
-      credits: "Designed by William Gravenor.",
-    },
-    {
       id: "golden_bruh",
       name: "Golden Bruh",
       image: "assets/variants/golden_bruh.png",
+      rarity: "epic",
       unlocked: false,
       equipped: false,
       description: "A golden secret is required to unlock this skin.",
@@ -1430,6 +1462,7 @@
       id: "golden_astronaut",
       name: "Golden Astronaut",
       image: "assets/variants/golden_astronaut.png",
+      rarity: "epic",
       unlocked: false,
       equipped: false,
       description: "A golden secret is required to unlock this skin.",
@@ -1438,6 +1471,7 @@
       id: "missing_texture",
       name: "Missing Texture",
       image: "assets/variants/missing_texture.png",
+      rarity: "uncommon",
       unlocked: false,
       equipped: false,
       description: "1% chance to unlock every second.",
@@ -1446,9 +1480,28 @@
       id: "toby",
       name: "Toby",
       image: "assets/variants/toby.png",
+      rarity: "epic",
       unlocked: false,
       equipped: false,
       description: "1% chance to unlock every 10 seconds.",
+    },
+    {
+      id: "maintenance",
+      name: "Maintenance",
+      image: "assets/variants/maintenance.png",
+      rarity: "rare",
+      unlocked: false,
+      equipped: false,
+      description: "Sorry for the inconvenience!",
+    },
+    {
+      id: "joystick",
+      name: "Joystick",
+      image: "assets/variants/joystick.png",
+      rarity: "rare",
+      unlocked: false,
+      equipped: false,
+      description: "Get caught cheating...",
     },
   ];
 
@@ -1456,86 +1509,221 @@
   const FARMER_SKINS = ["default", "dark_skin", "blue", "grey_scale", "nostalgia"];
   const FARMER_SKIN_THRESHOLDS = [1, 10, 25, 50, 100];
  
+  // Seeded random function for deterministic randomness based on index
+  function seededRandom(seed) {
+    const x = Math.sin(seed) * 10000;
+    return x - Math.floor(x);
+  }
+
   function getFarmerVariants(count) {
     const available = FARMER_SKIN_THRESHOLDS
       .map((threshold, i) => count >= threshold ? FARMER_SKINS[i] : null)
       .filter(Boolean);
     return available.length ? available : ["default"];
   }
+
+  // Get random farmer skin based on index (deterministic)
+  function getRandomFarmerSkin(index, variants) {
+    if (variants.length === 0) return "default";
+    const randVal = seededRandom(index + 12345);
+    return variants[Math.floor(randVal * variants.length)];
+  }
  
-  function renderFarmerMiddle() {
-    const container = document.getElementById("building_middle");
-    if (!container) return;
- 
-    const farmer = buildings.find(b => b.id === "farmer");
-    const count = farmer ? farmer.owned : 0;
- 
-    if (count === 0) {
-      container.style.display = "none";
-      return;
+  // Store random Y offsets for consistency
+  let farmerYOffsets = {};
+  
+  function getRandomYOffset(index, minY = -15, maxY = 15) {
+    if (!farmerYOffsets[index]) {
+      farmerYOffsets[index] = Math.random() * (maxY - minY) + minY;
     }
- 
-    container.style.display = "block";
- 
-    // Build scene HTML once if it doesn't exist
-    if (!document.getElementById("farmer-scene")) {
-      container.innerHTML = `
-        <div id="farmer-scene" class="farmer-scene">
-          <div class="farmer-field">
-            <div id="farmer-sprites" class="farmer-sprites"></div>
-          </div>
-          <div class="farmer-label">
-            <span id="farmer-count-label"></span>
-            <span class="farmer-cps-label" id="farmer-cps-label"></span>
-          </div>
+    return farmerYOffsets[index];
+  }
+
+  function renderFarmerMiddle() {
+    const container = document.getElementById("building_middle_farmer");  // ← changed
+    if (!container) return;
+
+    let scene = document.getElementById("farmer-scene");
+    if (!scene) {
+      scene = document.createElement("div");
+      scene.id = "farmer-scene";
+      scene.className = "farmer-scene";
+      scene.innerHTML = `
+        <div class="farmer-field">
+          <div id="farmer-sprites" class="farmer-sprites"></div>
+        </div>
+        <div class="farmer-label">
+          <span id="farmer-count-label"></span>
+          <span class="farmer-cps-label" id="farmer-cps-label"></span>
         </div>
       `;
+      container.appendChild(scene);
     }
- 
+
+    const farmer = buildings.find(b => b.id === "farmer");
+    const count = farmer ? farmer.owned : 0;
     const spritesContainer = document.getElementById("farmer-sprites");
     if (!spritesContainer) return;
- 
+
     const variants = getFarmerVariants(count);
     const maxDisplay = Math.min(count, 100);
- 
-    // Remove excess sprites
+
     while (spritesContainer.children.length > maxDisplay) {
       spritesContainer.removeChild(spritesContainer.lastChild);
     }
- 
-    // Add new sprites
     while (spritesContainer.children.length < maxDisplay) {
       const index = spritesContainer.children.length;
-      const skin = variants[index % variants.length];
- 
+      const skin = getRandomFarmerSkin(index, variants);
+      const yOffset = getRandomYOffset(index);
       const sprite = document.createElement("div");
       sprite.className = "farmer-sprite";
-      sprite.style.marginLeft = index > 0 ? "-20px" : "0";
-      sprite.style.marginTop = `30px`;
- 
+      sprite.style.marginLeft = index > 0 ? "-30px" : "0";
+      sprite.style.marginTop = "30px";
+      sprite.style.transform = `translateY(${yOffset}px)`;
       const img = document.createElement("img");
       img.src = `assets/farmers/${skin}.png`;
       img.alt = "Farmer";
       img.draggable = false;
       img.className = "farmer-sprite-img";
- 
       sprite.appendChild(img);
       spritesContainer.appendChild(sprite);
     }
- 
-    // Update skin on existing sprites if variant pool changed
+
     Array.from(spritesContainer.children).forEach((sprite, i) => {
-      const skin = variants[i % variants.length];
+      const skin = getRandomFarmerSkin(i, variants);
+      const yOffset = getRandomYOffset(i);
+      sprite.style.transform = `translateY(${yOffset}px)`;
       const img = sprite.querySelector("img");
       const expectedSrc = `assets/farmers/${skin}.png`;
-      if (img && !img.src.endsWith(expectedSrc)) {
-        img.src = expectedSrc;
-      }
+      if (img && !img.src.endsWith(expectedSrc)) img.src = expectedSrc;
     });
   }
 
+  // ================== TRACTOR SCENE ==================
+  const TRACTOR_SKINS = ["default", "magazine", "neon", "overworked", "high_contrast", "golden"];
+  const TRACTOR_SKIN_THRESHOLDS = [1, 10, 25, 50, 100, 200];
+ 
+  function getTractorVariants(count) {
+    const available = TRACTOR_SKIN_THRESHOLDS
+      .map((threshold, i) => count >= threshold ? TRACTOR_SKINS[i] : null)
+      .filter(Boolean);
+    return available.length ? available : ["default"];
+  }
+
+  // Get random tractor skin based on index (deterministic)
+  function getRandomTractorSkin(index, variants) {
+    if (variants.length === 0) return "default";
+    const randVal = seededRandom(index + 54321);
+    return variants[Math.floor(randVal * variants.length)];
+  }
+ 
+  // Store random Y offsets for tractors
+  let tractorYOffsets = {};
+  
+  function getTractorRandomYOffset(index, minY = -20, maxY = 20) {
+    if (!tractorYOffsets[index]) {
+      tractorYOffsets[index] = Math.random() * (maxY - minY) + minY;
+    }
+    return tractorYOffsets[index];
+  }
+
+  function renderTractorMiddle() {
+    const container = document.getElementById("building_middle_tractor");  // ← changed
+    if (!container) return;
+
+    let scene = document.getElementById("tractor-scene");
+    if (!scene) {
+      scene = document.createElement("div");
+      scene.id = "tractor-scene";
+      scene.className = "tractor-scene";
+      scene.innerHTML = `
+        <div class="tractor-field">
+          <div id="tractor-sprites" class="tractor-sprites"></div>
+        </div>
+        <div class="tractor-label">
+          <span id="tractor-count-label"></span>
+          <span class="tractor-cps-label" id="tractor-cps-label"></span>
+        </div>
+      `;
+      container.appendChild(scene);
+    }
+
+    const tractor = buildings.find(b => b.id === "tractor");
+    const count = tractor ? tractor.owned : 0;
+    const spritesContainer = document.getElementById("tractor-sprites");
+    if (!spritesContainer) return;
+
+    const variants = getTractorVariants(count);
+    const maxDisplay = Math.min(count, 100);
+
+    while (spritesContainer.children.length > maxDisplay) {
+      spritesContainer.removeChild(spritesContainer.lastChild);
+    }
+    while (spritesContainer.children.length < maxDisplay) {
+      const index = spritesContainer.children.length;
+      const skin = getRandomTractorSkin(index, variants);
+      const yOffset = getTractorRandomYOffset(index);
+      const sprite = document.createElement("div");
+      sprite.className = "tractor-sprite";
+      sprite.style.marginLeft = index > 0 ? "-20px" : "0";
+      sprite.style.marginTop = "40px";
+      sprite.style.transform = `translateY(${yOffset}px)`;
+      const img = document.createElement("img");
+      img.src = `assets/tractors/${skin}.png`;
+      img.alt = "Tractor";
+      img.draggable = false;
+      img.className = "tractor-sprite-img";
+      sprite.appendChild(img);
+      spritesContainer.appendChild(sprite);
+    }
+
+    Array.from(spritesContainer.children).forEach((sprite, i) => {
+      const skin = getRandomTractorSkin(i, variants);
+      const yOffset = getTractorRandomYOffset(i);
+      sprite.style.transform = `translateY(${yOffset}px)`;
+      const img = sprite.querySelector("img");
+      const expectedSrc = `assets/tractors/${skin}.png`;
+      if (img && !img.src.endsWith(expectedSrc)) img.src = expectedSrc;
+    });
+  }
+
+
   // Auto-load farmers on page load
   document.addEventListener("DOMContentLoaded", checkBuildingMiddle);
+
+  document.addEventListener("DOMContentLoaded", () => {
+
+    function setupParallax() {
+      const farmerSprites = document.getElementById("farmer-sprites");
+      const tractorSprites = document.getElementById("tractor-sprites");
+
+      const farmerContainer = document.getElementById("building_middle_farmer");
+      const tractorContainer = document.getElementById("building_middle_tractor");
+
+      // FARMER SCROLL
+      if (farmerSprites && farmerContainer) {
+        farmerSprites.addEventListener("scroll", () => {
+          const x = farmerSprites.scrollLeft;
+
+          // move background slower than scroll
+          farmerContainer.style.backgroundPosition = `${-x * 0.8}px 0`;
+        });
+      }
+
+      // TRACTOR SCROLL
+      if (tractorSprites && tractorContainer) {
+        tractorSprites.addEventListener("scroll", () => {
+          const x = tractorSprites.scrollLeft;
+
+          tractorContainer.style.backgroundPosition = `${-x * 0.8}px 0`;
+        });
+      }
+    }
+
+    // run once AND after rendering (important because elements are created dynamically)
+    setTimeout(setupParallax, 100);
+  });
+ 
  
   function isPC() {
     const isMobileUA = /Mobi|Android|iPhone|iPad|iPod/i.test(
@@ -1547,12 +1735,19 @@
 
   function checkBuildingMiddle() {
     const farmer = buildings.find((b) => b.id === "farmer");
-    if (farmer && farmer.owned >= 1) {
-      renderFarmerMiddle();
-    } else if (middle_buildings) {
-      middle_buildings.style.display = "none";
-    }
+    const tractor = buildings.find((b) => b.id === "tractor");
+
+    const farmerContainer = document.getElementById("building_middle_farmer");
+    const tractorContainer = document.getElementById("building_middle_tractor");
+
+    if (farmerContainer) farmerContainer.style.display = farmer?.owned >= 1 ? "block" : "none";
+    if (tractorContainer) tractorContainer.style.display = tractor?.owned >= 1 ? "block" : "none";
+
+    if (farmer?.owned >= 1) renderFarmerMiddle();
+    if (tractor?.owned >= 1) renderTractorMiddle();
+    
   }
+
 
   function checkAchievements() {
     cheatDetection();
@@ -2265,6 +2460,20 @@
       completed: false,
       skinReward: "toby",
     },
+    {
+      id: "maintenance",
+      name: "Maintenance",
+      description: "Sorry for the inconvenience!",
+      completed: false,
+      skinReward: "maintenance",
+    },
+    {
+      id: "joystick",
+      name: "Joystick",
+      description: "Get caught cheating...",
+      completed: false,
+      skinReward: "joystick",
+    },
   ];
 
   let _isTop10 = false;
@@ -2830,7 +3039,7 @@
         savedAt: Date.now(),
         potatoes,
         allTimePotatoes,
-        runStartedAt: Date.now() - (runDurationSeconds || 0) * 1000,
+        runStartedAt: runStartTime,
         potatoesPerClick,
         autoClickAmount,
         potatoClicks,
@@ -2939,7 +3148,7 @@
   }
 
   let _lastManualSave = 0;
-const MANUAL_SAVE_COOLDOWN_MS = 30 * 1000;
+  const MANUAL_SAVE_COOLDOWN_MS = 30 * 1000;
 
   function saveGameManual() {
       const btn = document.getElementById("saveButton");
@@ -3634,7 +3843,7 @@ const MANUAL_SAVE_COOLDOWN_MS = 30 * 1000;
   function ringSpacing(ring) {
     return ring < 3 ? 31 : 32 + (ring - 2) * 2;
   }
-
+  /*
   function renderEventSkins() {
     const container = document.getElementById("v_skinsContainer");
     if (!container) return;
@@ -3683,12 +3892,15 @@ const MANUAL_SAVE_COOLDOWN_MS = 30 * 1000;
       container.appendChild(skinDiv);
     });
   }
-
+  */
 
 
   function renderSkins() {
     const container = document.getElementById("skinsContainer");
-    if (!container) return;
+    if (!container) {
+      console.error("skinsContainer not found");
+      return;
+    }
 
     container.innerHTML = "";
 
@@ -3697,6 +3909,8 @@ const MANUAL_SAVE_COOLDOWN_MS = 30 * 1000;
 
     // Currently equipped skin
     const equippedSkin = getEquippedSkin();
+    
+    let unlockedCount = 0;
 
     skins.forEach((s) => {
       // Create button
@@ -3705,6 +3919,20 @@ const MANUAL_SAVE_COOLDOWN_MS = 30 * 1000;
       if (!s.unlocked) skinBtn.classList.add("locked-skin");
       const isGolden = s.name?.startsWith("Golden");
       // Inner markup
+      const rarityColors = {
+        common: "#888888",
+        uncommon: "#4CAF50",
+        rare: "#2196F3",
+        epic: "#9C27B0",
+        legendary: "#FF9800"
+      };
+      const rarityColor = rarityColors[s.rarity] || "#888888";
+      const rarityDisplay = s.unlocked ? s.rarity?.charAt(0).toUpperCase() + s.rarity?.slice(1) : "";
+      
+      if (s.unlocked) {
+        unlockedCount++;
+      }
+      
       skinBtn.innerHTML = `
         <img
           src="${s.unlocked ? s.image : "assets/mystery_potato.png"}"
@@ -3714,7 +3942,8 @@ const MANUAL_SAVE_COOLDOWN_MS = 30 * 1000;
           data-skin="${s.id}"
           draggable="false"
         />
-        <p class="skin-label ${isGolden ? "gold-text" : ""}">${s.unlocked ? s.name : "???"}">${s.unlocked ? s.name : "???"}</p>
+        <p class="skin-label ${isGolden ? "gold-text" : ""}">${s.unlocked ? s.name : "???"}</p>
+        ${s.unlocked ? `<div class="skin-rarity" style="color: ${rarityColor}; font-size: 12px; font-weight: bold; margin-top: 4px;">${rarityDisplay}</div>` : ""}
       `;
 
       // -----------------------------
@@ -3724,7 +3953,7 @@ const MANUAL_SAVE_COOLDOWN_MS = 30 * 1000;
         // Desktop hover
         skinBtn.addEventListener("mouseenter", () => {
           const html = s.unlocked
-            ? `<div class="title ${isGolden ? "gold-text" : ""}">${s.name}</div><div>${s.description}</div>`
+            ? `<div class="title ${isGolden ? "gold-text" : ""}">${s.name}</div><div style="color: ${rarityColor};">Rarity: ${rarityDisplay}</div><div>${s.description}</div>`
             : `<div class="title ${isGolden ? "gold-text" : ""}">???</div><div>${s.description}</div>`;
           showTooltip(html, skinBtn);
         });
@@ -3738,7 +3967,7 @@ const MANUAL_SAVE_COOLDOWN_MS = 30 * 1000;
           ignoreNextClick = true;
 
           const html = s.unlocked
-            ? `<div class="title ${isGolden ? "gold-text" : ""}">${s.name}</div><div>${s.description}</div>`
+            ? `<div class="title ${isGolden ? "gold-text" : ""}">${s.name}</div><div style="color: ${rarityColor};">Rarity: ${rarityDisplay}</div><div>${s.description}</div>`
             : `<div class="title ${isGolden ? "gold-text" : ""}">???</div><div>${s.description}</div>`;
           showTooltip(html, skinBtn);
 
@@ -4468,7 +4697,7 @@ const MANUAL_SAVE_COOLDOWN_MS = 30 * 1000;
       let attempts = 0;
       const check = setInterval(() => {
         attempts++;
-        if (window._authResolved || attempts >= 50) {
+        if (window._authResolved || attempts >= 100) {
           clearInterval(check);
           resolve();
         }
@@ -4477,7 +4706,12 @@ const MANUAL_SAVE_COOLDOWN_MS = 30 * 1000;
 
     await loadGame();
     _gameLoaded = true;
-    await saveToDb(false);
+
+    achievmentsAdd("maintenance");
+
+    if (window.authApi?.getToken()) {
+      await saveToDb(false);
+    }
     maybeStartPeelerOrbit();
     rateCounter();
     updatePotatoComments();
@@ -4487,7 +4721,7 @@ const MANUAL_SAVE_COOLDOWN_MS = 30 * 1000;
     renderUpgradesRegular();
     autoSave();
     renderSkins();
-    renderEventSkins();
+    //renderEventSkins();
     requestAnimationFrame(renderPeelerOrbit);
     checkBuildingMiddle();
 
@@ -4514,6 +4748,9 @@ const MANUAL_SAVE_COOLDOWN_MS = 30 * 1000;
       This is the potato clicker console. Don't mess around here unless you know what you are doing as you may accidentally wipe your game save
 
       Have fun and get clicking!
+
+      P.S You get caught cheating by using an autoclicker ;) -- If you get caught using any other methods to cheat, you will be banned from the leaderboard and your progress may be reset. So play fair and have fun!
+
         - MaxTheRock
     `);
 
@@ -4540,4 +4777,6 @@ const MANUAL_SAVE_COOLDOWN_MS = 30 * 1000;
   window.sellPressed = sellPressed;
   window.buyPressed = buyPressed;
   window.light_darkToggle = light_darkToggle;
+  window.achievmentsAdd = achievmentsAdd;
+  window.clearLocalData = clearLocalData;
 })();

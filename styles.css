@@ -11,12 +11,21 @@ html,
 body {
   height: 100%;
   margin: 0;
-  overflow: visible;
+  overflow: auto;
 }
 
 body {
   display: flex;
   flex-direction: column;
+}
+
+@media (max-width: 700px) {
+  html,
+  body {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
 }
 
 nav {
@@ -97,10 +106,12 @@ main {
   background-color: rgb(0, 6, 19);
   height: calc(100vh - 18px - 20px);
   margin-top: 10px;
+  overflow: hidden;
 }
 
 .main-inner {
   overflow-x: hidden;
+  width: 100%;
 }
 
 section {
@@ -127,60 +138,24 @@ section {
   }
 }
 
-@media (max-width: 700px) {
-  main {
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-    min-height: 0;
-    margin: 0;
-  }
-
-  section {
-    flex-grow: 0;
-    overflow: hidden;
-  }
-
-  main > section {
-    width: 100% !important;
-    margin: 5px 0;
-    overflow: hidden;
-  }
-
-  .clicking-section,
-  .upgrade-section,
-  .game-section {
-    max-width: 100%;
-    min-width: 100%;
-    align-self: stretch;
-    overflow: hidden;
-  }
-}
 .pixelated-background {
-  transform: translateZ(0);
-  position: relative; /* required for ::before */
+  position: relative;
+  background-image: 
+    linear-gradient(rgba(0, 0, 0, var(--overlay-alpha)), rgba(0, 0, 0, var(--overlay-alpha))),
+    url("assets/background.png");
+  background-size: auto, 960px 960px;
+  background-repeat: repeat, repeat;
+  background-attachment: scroll, local;
+  image-rendering: pixelated;
+  background-position: center center;
+  background-origin: padding-box;
   
   /* Define CSS variable on parent */
   --overlay-alpha: 0; /* start fully bright */
 }
 
 .pixelated-background::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-
-  background-image: url("assets/background.png");
-  background-size: 960px 960px; /* make image larger */
-  background-position: center;
-  background-repeat: repeat;
-  image-rendering: pixelated;
-
-  /* Use parent's variable */
-  background-color: rgba(0, 0, 0, var(--overlay-alpha));
-  background-blend-mode: multiply;
-
-  will-change: transform;
-  z-index: -1;
+  display: none;
 }
 
 .clicking-section {
@@ -188,7 +163,7 @@ section {
   margin: 5px;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .game-section {
@@ -198,14 +173,47 @@ section {
 }
 
 .upgrade-section {
-  width: 10px;
+  width: 569px;
   margin: 5px;
   overflow-x: hidden;
 }
 
 @media (min-width: 1040px) and (max-width: 1450px) {
   .upgrade-section {
-    width: 200px;
+    width: 500px;
+  }
+}
+
+@media (max-width: 700px) {
+  main {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: auto;
+    margin: 0;
+  }
+
+  .main-inner {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  section {
+    width: 100%;
+    margin: 5px 0;
+    height: auto;
+    min-height: auto;
+  }
+
+  .clicking-section,
+  .game-section,
+  .upgrade-section {
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+    height: auto;
+    min-height: auto;
   }
 }
 
@@ -755,8 +763,8 @@ h3 {
   display: flex;
   flex-direction: row;
   gap: 1px;
-  overflow-x: scroll;
-  z-index: -1;
+  overflow-x:visible;
+  z-index: auto;
 }
 
 .upgrades-container:hover {
@@ -2091,20 +2099,28 @@ h3 {
 }
 
 .building-container-middle {
-  background-image: url("assets/farmer_background.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: repeat;
-  image-rendering: pixelated;
-  will-change: transform;
-  transform: translateZ(0);
   background-size: 600px 150px;
+  background-repeat: repeat-x;
+  background-position: center 0;
+
+  image-rendering: pixelated;
+  will-change: background-position;
+  transform: translateZ(0);
+
   width: auto;
   height: 150px;
   margin: 10px;
   border: rgba(0, 0, 0, 0.315) 4px solid;
   border-radius: 20px;
-  display:none;
+  display: none;
+}
+
+.building-container-farmer {
+  background-image: url("assets/farmer_background.png");
+}
+
+.building-container-tractor {
+  background-image: url("assets/tractor_background.png");
 }
 
 .sell {
@@ -2339,3 +2355,15 @@ h3 {
 .farmer-sprite { display: inline-flex; align-items: flex-end; }
 .farmer-sprite-img { width: 72px; height: 72px; image-rendering: pixelated; object-fit: contain; }
 .farmer-label { display: flex; justify-content: space-between; align-items: center; padding: 0 2px; font-size: 12px; }
+
+.tractor-scene { display: flex; flex-direction: column; gap: 4px; width: 100%; }
+.tractor-field {
+  background: transparent;
+  padding: 8px 10px 4px;
+  min-height: 64px;
+  overflow: hidden;
+}
+.tractor-sprites { display: flex; flex-wrap: nowrap; gap: 4px; align-items: flex-end; overflow-x: auto; overflow-y: hidden; padding-bottom: 30px;}
+.tractor-sprite { display: inline-flex; align-items: flex-end; }
+.tractor-sprite-img { width: 94px; height: 70px; image-rendering: pixelated; object-fit: contain; }
+.tractor-label { display: flex; justify-content: space-between; align-items: center; padding: 0 2px; font-size: 12px; }
