@@ -169,7 +169,7 @@
   let potatoClicks = 0;
   let handFarmedPotatoes = 0;
   let goldenPotatoClicks = 0;
-  let runningVersion = "v0.87";
+  let runningVersion = "v0.93";
   let autoClickAmount = 0;
   let runDurationSeconds;
   let totalUpgrades = 0;
@@ -1620,7 +1620,7 @@
   // Store random Y offsets for tractors
   let tractorYOffsets = {};
   
-  function getTractorRandomYOffset(index, minY = -20, maxY = 20) {
+  function getTractorRandomYOffset(index, minY = 0, maxY = 20) {
     if (!tractorYOffsets[index]) {
       tractorYOffsets[index] = Math.random() * (maxY - minY) + minY;
     }
@@ -1687,6 +1687,180 @@
     });
   }
 
+  // ================== GREENHOUSE SCENE ==================
+  const GREENHOUSE_SKINS = ["default", "pop_art", "dark", "golden", "neon"];
+  const GREENHOUSE_SKIN_THRESHOLDS = [1, 10, 25, 50, 100];
+ 
+  function getGreenhouseVariants(count) {
+    const available = GREENHOUSE_SKIN_THRESHOLDS
+      .map((threshold, i) => count >= threshold ? GREENHOUSE_SKINS[i] : null)
+      .filter(Boolean);
+    return available.length ? available : ["default"];
+  }
+
+  // Get random greenhouse skin based on index (deterministic)
+  function getRandomGreenhouseSkin(index, variants) {
+    if (variants.length === 0) return "default";
+    const randVal = seededRandom(index + 54321);
+    return variants[Math.floor(randVal * variants.length)];
+  }
+ 
+  let greenhousesYOffsets = {};
+  
+  function getGreenhouseRandomYOffset(index, minY = 20, maxY = 30) {
+    if (!greenhousesYOffsets[index]) {
+      greenhousesYOffsets[index] = Math.random() * (maxY - minY) + minY;
+    }
+    return greenhousesYOffsets[index];
+  }
+
+  function renderGreenhouseMiddle() {
+    const container = document.getElementById("building_middle_greenhouse");  // ← changed
+    if (!container) return;
+
+    let scene = document.getElementById("greenhouse-scene");
+    if (!scene) {
+      scene = document.createElement("div");
+      scene.id = "greenhouse-scene";
+      scene.className = "greenhouse-scene";
+      scene.innerHTML = `
+        <div class="greenhouse-field">
+          <div id="greenhouse-sprites" class="greenhouse-sprites"></div>
+        </div>
+        <div class="greenhouse-label">
+          <span id="greenhouse-count-label"></span>
+          <span class="greenhouse-cps-label" id="greenhouse-cps-label"></span>
+        </div>
+      `;
+      container.appendChild(scene);
+    }
+
+    const greenhouse = buildings.find(b => b.id === "greenhouse");
+    const count = greenhouse ? greenhouse.owned : 0;
+    const spritesContainer = document.getElementById("greenhouse-sprites");
+    if (!spritesContainer) return;
+
+    const variants = getGreenhouseVariants(count);
+    const maxDisplay = Math.min(count, 100);
+
+    while (spritesContainer.children.length > maxDisplay) {
+      spritesContainer.removeChild(spritesContainer.lastChild);
+    }
+    while (spritesContainer.children.length < maxDisplay) {
+      const index = spritesContainer.children.length;
+      const skin = getRandomGreenhouseSkin(index, variants);
+      const yOffset = getGreenhouseRandomYOffset(index);
+      const sprite = document.createElement("div");
+      sprite.className = "greenhouse-sprite";
+      sprite.style.marginLeft = index > 0 ? "-20px" : "0";
+      sprite.style.marginTop = "40px";
+      sprite.style.transform = `translateY(${yOffset}px)`;
+      const img = document.createElement("img");
+      img.src = `assets/greenhouses/${skin}.png`;
+      img.alt = "Greenhouse";
+      img.draggable = false;
+      img.className = "greenhouse-sprite-img";
+      sprite.appendChild(img);
+      spritesContainer.appendChild(sprite);
+    }
+
+    Array.from(spritesContainer.children).forEach((sprite, i) => {
+      const skin = getRandomGreenhouseSkin(i, variants);
+      const yOffset = getGreenhouseRandomYOffset(i);
+      sprite.style.transform = `translateY(${yOffset}px)`;
+      const img = sprite.querySelector("img");
+      const expectedSrc = `assets/greenhouses/${skin}.png`;
+      if (img && !img.src.endsWith(expectedSrc)) img.src = expectedSrc;
+    });
+  }
+
+  // ================== CHIP SCENE ==================
+  const CHIP_SKINS = ["default", "burnt", "shelf"];
+  const CHIP_SKIN_THRESHOLDS = [1, 10, 25];
+ 
+  function getChipVariants(count) {
+    const available = CHIP_SKIN_THRESHOLDS
+      .map((threshold, i) => count >= threshold ? CHIP_SKINS[i] : null)
+      .filter(Boolean);
+    return available.length ? available : ["default"];
+  }
+
+  // Get random chip skin based on index (deterministic)
+  function getRandomChipSkin(index, variants) {
+    if (variants.length === 0) return "default";
+    const randVal = seededRandom(index + 54321);
+    return variants[Math.floor(randVal * variants.length)];
+  }
+ 
+  let chipsYOffsets = {};
+  
+  function getChipRandomYOffset(index, minY = 0, maxY = 0) {
+    if (!chipsYOffsets[index]) {
+      chipsYOffsets[index] = Math.random() * (maxY - minY) + minY;
+    }
+    return chipsYOffsets[index];
+  }
+
+  function renderChipMiddle() {
+    const container = document.getElementById("building_middle_chip");  // ← changed
+    if (!container) return;
+
+    let scene = document.getElementById("chip-scene");
+    if (!scene) {
+      scene = document.createElement("div");
+      scene.id = "chip-scene";
+      scene.className = "chip-scene";
+      scene.innerHTML = `
+        <div class="chip-field">
+          <div id="chip-sprites" class="chip-sprites"></div>
+        </div>
+        <div class="chip-label">
+          <span id="chip-count-label"></span>
+          <span class="chip-cps-label" id="chip-cps-label"></span>
+        </div>
+      `;
+      container.appendChild(scene);
+    }
+
+    const greenhouse = buildings.find(b => b.id === "chip_factory");
+    const count = greenhouse ? greenhouse.owned : 0;
+    const spritesContainer = document.getElementById("chip-sprites");
+    if (!spritesContainer) return;
+
+    const variants = getChipVariants(count);
+    const maxDisplay = Math.min(count, 100);
+
+    while (spritesContainer.children.length > maxDisplay) {
+      spritesContainer.removeChild(spritesContainer.lastChild);
+    }
+    while (spritesContainer.children.length < maxDisplay) {
+      const index = spritesContainer.children.length;
+      const skin = getRandomChipSkin(index, variants);
+      const yOffset = getChipRandomYOffset(index);
+      const sprite = document.createElement("div");
+      sprite.className = "chip-sprite";
+      sprite.style.marginLeft = index > 0 ? "0" : "0";
+      sprite.style.marginTop = "80px";
+      sprite.style.transform = `translateY(${yOffset}px)`;
+      const img = document.createElement("img");
+      img.src = `assets/chips/${skin}.png`;
+      img.alt = "Chip Factory";
+      img.draggable = false;
+      img.className = "chip-sprite-img";
+      sprite.appendChild(img);
+      spritesContainer.appendChild(sprite);
+    }
+
+    Array.from(spritesContainer.children).forEach((sprite, i) => {
+      const skin = getRandomChipSkin(i, variants);
+      const yOffset = getChipRandomYOffset(i);
+      sprite.style.transform = `translateY(${yOffset}px)`;
+      const img = sprite.querySelector("img");
+      const expectedSrc = `assets/chips/${skin}.png`;
+      if (img && !img.src.endsWith(expectedSrc)) img.src = expectedSrc;
+    });
+  }
+
 
   // Auto-load farmers on page load
   document.addEventListener("DOMContentLoaded", checkBuildingMiddle);
@@ -1696,28 +1870,33 @@
     function setupParallax() {
       const farmerSprites = document.getElementById("farmer-sprites");
       const tractorSprites = document.getElementById("tractor-sprites");
+      const greenhouseSprites = document.getElementById("greenhouse-sprites");
+      const chipSprites = document.getElementById("chip-sprites");
 
       const farmerContainer = document.getElementById("building_middle_farmer");
       const tractorContainer = document.getElementById("building_middle_tractor");
+      const greenhouseContainer = document.getElementById("building_middle_greenhouse");
+      const chipContainer = document.getElementById("building_middle_chip");
 
-      // FARMER SCROLL
-      if (farmerSprites && farmerContainer) {
-        farmerSprites.addEventListener("scroll", () => {
-          const x = farmerSprites.scrollLeft;
+      function makeParallaxScroller(sprites, container, factor) {
+        if (!sprites || !container) return;
+        let lastScroll = sprites.scrollLeft;
+        let bgOffsetX = -(sprites.scrollLeft * factor);
 
-          // move background slower than scroll
-          farmerContainer.style.backgroundPosition = `${-x * 0.8}px 0`;
+        container.style.backgroundPosition = `${bgOffsetX}px 0`;
+
+        sprites.addEventListener("scroll", () => {
+          const delta = sprites.scrollLeft - lastScroll;
+          lastScroll = sprites.scrollLeft;
+          bgOffsetX -= delta * factor;
+          container.style.backgroundPosition = `${bgOffsetX}px 0`;
         });
       }
 
-      // TRACTOR SCROLL
-      if (tractorSprites && tractorContainer) {
-        tractorSprites.addEventListener("scroll", () => {
-          const x = tractorSprites.scrollLeft;
-
-          tractorContainer.style.backgroundPosition = `${-x * 0.8}px 0`;
-        });
-      }
+      makeParallaxScroller(farmerSprites, farmerContainer, 0.8);
+      makeParallaxScroller(tractorSprites, tractorContainer, 0.8);
+      makeParallaxScroller(greenhouseSprites, greenhouseContainer, 0.8);
+      makeParallaxScroller(chipSprites, chipContainer, 1.0);
     }
 
     // run once AND after rendering (important because elements are created dynamically)
@@ -1736,16 +1915,23 @@
   function checkBuildingMiddle() {
     const farmer = buildings.find((b) => b.id === "farmer");
     const tractor = buildings.find((b) => b.id === "tractor");
+    const greenhouse = buildings.find((b) => b.id === "greenhouse");
+    const chip = buildings.find((b) => b.id === "chip_factory");
 
     const farmerContainer = document.getElementById("building_middle_farmer");
     const tractorContainer = document.getElementById("building_middle_tractor");
+    const greenhouseContainer = document.getElementById("building_middle_greenhouse");
+    const chipContainer = document.getElementById("building_middle_chip");
 
     if (farmerContainer) farmerContainer.style.display = farmer?.owned >= 1 ? "block" : "none";
     if (tractorContainer) tractorContainer.style.display = tractor?.owned >= 1 ? "block" : "none";
+    if (greenhouseContainer) greenhouseContainer.style.display = greenhouse?.owned >= 1 ? "block" : "none";
+    if (chipContainer) chipContainer.style.display = chip?.owned >= 1 ? "block" : "none";
 
     if (farmer?.owned >= 1) renderFarmerMiddle();
     if (tractor?.owned >= 1) renderTractorMiddle();
-    
+    if (greenhouse?.owned >= 1) renderGreenhouseMiddle();
+    if (chip?.owned >= 1) renderChipMiddle();
   }
 
 
@@ -3959,32 +4145,37 @@
         });
         skinBtn.addEventListener("mouseleave", hideTooltip);
       } else {
-        // Mobile tap shows tooltip
-        let ignoreNextClick = false;
+        let tooltipShown = false;
 
-        skinBtn.addEventListener("touchstart", (e) => {
-          e.stopPropagation(); // prevent immediate close
-          ignoreNextClick = true;
-
-          const html = s.unlocked
-            ? `<div class="title ${isGolden ? "gold-text" : ""}">${s.name}</div><div style="color: ${rarityColor};">Rarity: ${rarityDisplay}</div><div>${s.description}</div>`
-            : `<div class="title ${isGolden ? "gold-text" : ""}">???</div><div>${s.description}</div>`;
-          showTooltip(html, skinBtn);
-
-          setTimeout(() => (ignoreNextClick = false), 300);
-        });
-
-        // Mobile click also uses same ignoreNextClick
         skinBtn.addEventListener("click", () => {
-          if (ignoreNextClick) return;
+          if (!tooltipShown) {
+            // First tap: show tooltip
+            const html = s.unlocked
+              ? `<div class="title ${isGolden ? "gold-text" : ""}">${s.name}</div><div style="color: ${rarityColor};">Rarity: ${rarityDisplay}</div><div>${s.description}</div>`
+              : `<div class="title ${isGolden ? "gold-text" : ""}">???</div><div>${s.description}</div>`;
+            showTooltip(html, skinBtn);
+            tooltipShown = true;
 
-          if (!s.unlocked) {
-            // Flash red to indicate locked
-            skinBtn.style.filter = "brightness(0.5) hue-rotate(0deg)";
-            setTimeout(() => (skinBtn.style.filter = ""), 200);
+            // Reset if they tap anywhere else
+            const reset = (e) => {
+              if (!skinBtn.contains(e.target)) {
+                tooltipShown = false;
+                document.removeEventListener("touchstart", reset);
+              }
+            };
+            document.addEventListener("touchstart", reset);
             return;
           }
 
+          // Second tap: select or flash
+          tooltipShown = false;
+          hideTooltipImmediate();
+
+          if (!s.unlocked) {
+            skinBtn.style.filter = "brightness(0.5)";
+            setTimeout(() => (skinBtn.style.filter = ""), 200);
+            return;
+          }
           selectSkin(s.id);
           updatePotatoDisplay();
           renderSkins();
@@ -4653,13 +4844,17 @@
     const button_toggle = document.querySelector("#modeToggle");
 
     if (mode === "light") {
-      backgrounds.forEach(bg => bg.style.backgroundImage = "url('assets/background_dark.png')");
+      backgrounds.forEach(bg => {
+        bg.style.setProperty("--bg-image", "url('assets/background_dark.png')");
+      });
       storeBanners.forEach(sb => sb.style.backgroundImage = "url('assets/store-banner_dark.png')");
       storeBannersText.forEach(st => st.style.color = "white");
       mode = "dark";
       button_toggle.textContent = "Light Mode";
     } else {
-      backgrounds.forEach(bg => bg.style.backgroundImage = "url('assets/background.png')");
+      backgrounds.forEach(bg => {
+        bg.style.setProperty("--bg-image", "url('assets/background.png')");
+      });
       storeBanners.forEach(sb => sb.style.backgroundImage = "url('assets/store-banner.png')");
       storeBannersText.forEach(st => st.style.color = "black");
       mode = "light";
